@@ -42,12 +42,6 @@ public class Api {
         return false;
     }
 
-    public static void login() {
-        if (Allmusic.CONFIG.cookie == null || Allmusic.CONFIG.cookie.isEmpty()) {
-            loginAnonimous();
-        }
-    }
-
     public static boolean refreshCookie() {
         if (Allmusic.CONFIG.cookie == null || Allmusic.CONFIG.cookie.isEmpty()) {
             return loginAnonimous();
@@ -77,7 +71,6 @@ public class Api {
 
     private static MusicObj getMusic(int id) {
         if (id == 0) return null;
-        login();
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
                         .url(HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/song/url").newBuilder()
                                 .addQueryParameter("id", String.valueOf(id))
@@ -101,7 +94,16 @@ public class Api {
 
     public static String getMusicUrl(int id) {
         MusicObj music = getMusic(id);
-        if (music != null && music.freeTrialInfo == null) {  // Don't play trial music
+        if (music != null && (music.freeTrialInfo == null || (music.fee != 0 && music.payed != 1))) {  // Don't play trial music
+            return music.url;
+        }
+        return null;
+    }
+
+    public static String getMusicUrl(MusicObj musicObj) {
+        MusicObj music = getMusic(musicObj.id);
+        if (music != null && (music.freeTrialInfo == null || (music.fee != 0 && music.payed != 1))
+                && ((musicObj.dt == 0) || music.time == musicObj.dt)) {  // Check if time matches
             return music.url;
         }
         return null;
@@ -109,7 +111,6 @@ public class Api {
 
     public static MusicObj getMusicInfo(int id) {
         if (id == 0) return null;
-        login();
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
                         .url(HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/song/detail").newBuilder()
                                 .addQueryParameter("ids", String.valueOf(id))
@@ -131,9 +132,8 @@ public class Api {
         return null;
     }
 
-    public static SongList getSongList(int id) {
+    public static SongList getSongList(long id) {
         if (id == 0) return null;
-        login();
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
                         .url(HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/playlist/track/all").newBuilder()
                                 .addQueryParameter("id", String.valueOf(id))

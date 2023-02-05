@@ -18,6 +18,9 @@ public class MusicObj {
     public int id;
     public String url;
     public int dt;
+    protected int time; // should be equal to dt, to determine if the song is trial (fuck netease)
     protected FreeTrialInfoObj freeTrialInfo;
+    protected byte fee;
+    protected byte payed;
     public String player;  // who ordered this song
 }

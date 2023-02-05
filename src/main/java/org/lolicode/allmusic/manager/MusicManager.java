@@ -14,6 +14,7 @@ import org.lolicode.allmusic.music.Api;
 import org.lolicode.allmusic.music.MusicObj;
 
 import java.util.List;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,43 +22,51 @@ public class MusicManager {
     private static final Pattern intPattern = Pattern.compile("\\d+");
     private static final Pattern urlPattern1 = Pattern.compile("song/(\\d+)");
     private static final Pattern urlPattern2 = Pattern.compile("[?&]id=(\\d+)");
-
     public static void playNext(MinecraftServer server) {
-        if (Allmusic.FUTURES.size() > 0) {
-            for (java.util.concurrent.ScheduledFuture<?> future : Allmusic.FUTURES) {
-                if (!(future.isDone() || future.isCancelled())) {
-                    future.cancel(false);
-                }
-//                Allmusic.FUTURES.remove(future);  // FIXME: ConcurrentModificationException
-            }
+        if (Allmusic.task != null) {
+            Allmusic.task.cancel();  // If user issues next command, cancel the current task in case it's not finished
+            Allmusic.task = null;
         }
         if (OnlineRealPlayerHelper.getOnlineRealPlayerList(server).size() == 0)
             return;
-        boolean success = false;
+
         Allmusic.currentVote.clear();
-        MusicObj next = Allmusic.orderList.next();
-        if (next == null) {
-            next = Allmusic.idleList.next();
-        }
-        if (next == null) {
-            Allmusic.LOGGER.error("Get next music failed");
-            return;  // In case runs forever if idleList is empty
-        } else {
-            try {
-                play(next, server);
-                Allmusic.currentMusic = next;
-                Allmusic.FUTURES.add(0,
-                        Allmusic.EXECUTOR.schedule(() ->
-                                playNext(server), next.dt, java.util.concurrent.TimeUnit.MILLISECONDS));  // FIXME: Server can't shutdown
-                success = true;
-            } catch (Exception e) {
-                Allmusic.LOGGER.error("Play music failed", e);
+        Allmusic.EXECUTOR.execute(() -> {
+            boolean success = false;
+
+            MusicObj next = Allmusic.orderList.next();
+            if (next == null) {
+                next = Allmusic.idleList.next();
             }
-        }
-        if (!success) {
-            Allmusic.FUTURES.add(0, Allmusic.EXECUTOR
-                    .schedule(() -> playNext(server), 5, java.util.concurrent.TimeUnit.SECONDS));
-        }
+            if (next == null) {
+                Allmusic.LOGGER.error("Get next music failed");
+                return;  // In case runs forever if idleList is empty
+            } else {
+                try {
+                    play(next, server);
+                    Allmusic.currentMusic = next;
+                    Allmusic.task = new TimerTask() {
+                        @Override
+                        public void run() {
+                            playNext(server);
+                        }
+                    };
+                    Allmusic.TIMER.schedule(Allmusic.task, next.dt);
+                    success = true;
+                } catch (Exception e) {
+                    Allmusic.LOGGER.error("Play music failed", e);
+                }
+            }
+            if (!success) {
+                Allmusic.task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        playNext(server);
+                    }
+                };
+                Allmusic.TIMER.schedule(Allmusic.task, 5000);
+            }
+        });
     }
 
     public static void play(@NotNull MusicObj musicObj, MinecraftServer server) {
@@ -99,7 +108,7 @@ public class MusicManager {
     }
 
     public static void order(MinecraftServer server, ServerCommandSource source, String url) {
-        int id = 0;
+        int id;
         if (intPattern.matcher(url).matches()) {
             id = Integer.parseInt(url);
         } else {
@@ -111,6 +120,8 @@ public class MusicManager {
             }
             if (matcher.find()) {
                 id = Integer.parseInt(matcher.group(1));
+            } else {
+                id = 0;
             }
         }
         if (Allmusic.currentMusic.id == id || Allmusic.orderList.hasSong(id)) {
@@ -118,22 +129,24 @@ public class MusicManager {
             return;
         }
 
-        MusicObj musicObj = Api.getMusicInfo(id);
-        if (musicObj != null) {
-            if (source.isExecutedByPlayer()) {
-                musicObj.player = source.getName();
+        Allmusic.EXECUTOR.execute(() -> {
+            MusicObj musicObj = Api.getMusicInfo(id);
+            if (musicObj != null) {
+                if (source.isExecutedByPlayer()) {
+                    musicObj.player = source.getName();
+                } else {
+                    musicObj.player = "console";
+                }
+                Allmusic.orderList.add(musicObj);
+                server.getPlayerManager().broadcast(PacketHelper.getOrderMessage(musicObj), false);
+                if (!Allmusic.orderList.isPlaying
+                        && OnlineRealPlayerHelper.getOnlineRealPlayerList(server).size() > 0) {
+                    playNext(server);
+                }
             } else {
-                musicObj.player = "console";
+                source.sendFeedback(PacketHelper.getOrderMessage(), false);
             }
-            Allmusic.orderList.add(musicObj);
-            server.getPlayerManager().broadcast(PacketHelper.getOrderMessage(musicObj), false);
-            if (!Allmusic.orderList.isPlaying
-                    && OnlineRealPlayerHelper.getOnlineRealPlayerList(server).size() > 0) {
-                playNext(server);
-            }
-        } else {
-            source.sendFeedback(PacketHelper.getOrderMessage(), false);
-        }
+        });
     }
 
     public static void del(MinecraftServer server, ServerCommandSource source, int index) {

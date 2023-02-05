@@ -6,13 +6,13 @@ import java.util.LinkedList;
 import java.util.Random;
 
 public class SongList {
-    public LinkedList<MusicObj> songs = new LinkedList<>();
+    public volatile LinkedList<MusicObj> songs = new LinkedList<>();
 
-    protected int id = 0;
+    protected volatile long id = 0;
 
-    protected boolean isPersistent = false;
+    protected volatile boolean isPersistent = false;
 
-    public boolean isPlaying = false;
+    public volatile boolean isPlaying = false;
 
     public void add(MusicObj musicObj) {
         songs.add(musicObj);
@@ -29,7 +29,7 @@ public class SongList {
             music = songs.get(0);
             songs.remove(0);
         }
-        String url = Api.getMusicUrl(music.id);  // Don't use cached url, as the url may be expired
+        String url = Api.getMusicUrl(music);  // Don't use cached url, as the url may be expired
         if (url != null) {
             music.url = url;
 
@@ -64,20 +64,20 @@ public class SongList {
         id = newSongList.id;
     }
 
-    public static boolean loadIdleList() {
-        if (Allmusic.CONFIG.idleList == 0) return false;
-        try {
-            SongList songList = Api.getSongList(Allmusic.CONFIG.idleList);
-            if (songList != null) {
-                Allmusic.idleList.load(songList);
-                Allmusic.idleList.isPersistent = true;
-                Allmusic.idleList.id = Allmusic.CONFIG.idleList;
-                return true;
+    public static void loadIdleList() {
+        if (Allmusic.CONFIG.idleList == 0) return;
+        Allmusic.EXECUTOR.execute(() -> {
+            try {
+                SongList songList = Api.getSongList(Allmusic.CONFIG.idleList);
+                if (songList != null) {
+                    Allmusic.idleList.load(songList);
+                    Allmusic.idleList.isPersistent = true;
+                    Allmusic.idleList.id = Allmusic.CONFIG.idleList;
+                }
+            } catch (Exception e) {
+                Allmusic.LOGGER.error("Failed to load idle list", e);
             }
-        } catch (Exception e) {
-            Allmusic.LOGGER.error("Failed to load idle list", e);
-        }
-        return false;
+        });
     }
 
     public boolean hasSong(MusicObj musicObj) {

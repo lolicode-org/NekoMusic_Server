@@ -12,7 +12,7 @@ import java.io.*;
 
 public class ModConfig {
     public String cookie = "";
-    public int idleList = 0;
+    public long idleList = 0;
     public String apiAddress = "";
     public float voteThreshold = 0.5f;
 
@@ -78,10 +78,12 @@ public class ModConfig {
     }
 
     public static void relogin(MinecraftServer server, ServerCommandSource source) {
-        if (Api.refreshCookie()) {
-            source.sendFeedback(Text.of("§aAllMusic: Re-login successful"), true);
-        } else {
-            source.sendFeedback(Text.of("§cAllMusic: Re-login failed"), true);
-        }
+        Allmusic.EXECUTOR.execute(() -> {
+            if (Api.refreshCookie()) {
+                source.sendFeedback(Text.of("§aAllMusic: Re-login successful"), true);
+            } else {
+                source.sendFeedback(Text.of("§cAllMusic: Re-login failed"), true);
+            }
+        });
     }
 }

@@ -1,16 +1,12 @@
 package org.lolicode.allmusic.music;
 
-import com.google.gson.reflect.TypeToken;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.lolicode.allmusic.Allmusic;
-import org.lolicode.allmusic.command.MusicCommand;
 import org.lolicode.allmusic.config.ModConfig;
 
 import java.io.IOException;
-import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.List;
 
 public class Api {
@@ -21,6 +17,11 @@ public class Api {
 
     private static class MusicObjWrapper {
         protected List<MusicObj> data;
+        protected int code;
+    }
+
+    private static class MusicInfoWrapper {
+        protected MusicObj[] songs;
         protected int code;
     }
 
@@ -74,7 +75,7 @@ public class Api {
         return false;
     }
 
-    public static MusicObj getMusic(int id) {
+    private static MusicObj getMusic(int id) {
         if (id == 0) return null;
         login();
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
@@ -100,8 +101,32 @@ public class Api {
 
     public static String getMusicUrl(int id) {
         MusicObj music = getMusic(id);
-        if (music != null && music.payed - music.fee >= 0) {  // Don't play trial music
+        if (music != null && music.freeTrialInfo == null) {  // Don't play trial music
             return music.url;
+        }
+        return null;
+    }
+
+    public static MusicObj getMusicInfo(int id) {
+        if (id == 0) return null;
+        login();
+        try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
+                        .url(HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/song/detail").newBuilder()
+                                .addQueryParameter("ids", String.valueOf(id))
+                                .addQueryParameter("cookie", Allmusic.CONFIG.cookie)
+                                .build())
+                        .build())
+                .execute()) {
+            if (response.code() == 200 && response.body() != null) {
+                MusicInfoWrapper music = Allmusic.GSON.fromJson(response.body().string(), MusicInfoWrapper.class);
+                if (music.songs != null && music.songs.length > 0) {
+                    return music.songs[0];
+                }
+            } else {
+                Allmusic.LOGGER.error("Failed to get music info: Invalid response " + response.code());
+            }
+        } catch (IOException e) {
+            Allmusic.LOGGER.error("Failed to get music info: Network error", e);
         }
         return null;
     }

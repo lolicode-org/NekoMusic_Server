@@ -1,21 +1,23 @@
 package org.lolicode.allmusic.music;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 public class MusicObj {
-    public class ArtistObj {
+    public static class ArtistObj {
         public String name;
         protected String id;
+    }
+
+    protected static class FreeTrialInfoObj {
+        public int start;
+        public int end;
     }
 
     public List<ArtistObj> ar = List.of();
     public String name;
     public int id;
     public String url;
-    public int time;
-    protected byte fee;
-    protected byte payed;
+    public int dt;
+    protected FreeTrialInfoObj freeTrialInfo;
     public String player;  // who ordered this song
 }

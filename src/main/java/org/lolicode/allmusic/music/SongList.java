@@ -3,7 +3,6 @@ package org.lolicode.allmusic.music;
 import org.lolicode.allmusic.Allmusic;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 public class SongList {
@@ -13,19 +12,38 @@ public class SongList {
 
     protected boolean isPersistent = false;
 
+    public boolean isPlaying = false;
+
     public void add(MusicObj musicObj) {
         songs.add(musicObj);
     }
 
     public MusicObj next() {
         if (songs.size() == 0) return null;
+
+        MusicObj music;
         if (isPersistent) {
             Random random = new Random();
-            return Api.getMusic(songs.get(random.nextInt(songs.size())).id);  // Don't use cached url, as the url may be expired
+            music = songs.get(random.nextInt(songs.size()));
+        } else {
+            music = songs.get(0);
+            songs.remove(0);
         }
-        MusicObj musicObj = songs.get(0);
-        songs.remove(0);
-        return Api.getMusic(musicObj.id);
+        String url = Api.getMusicUrl(music.id);  // Don't use cached url, as the url may be expired
+        if (url != null) {
+            music.url = url;
+
+            isPlaying = true;
+            if (isPersistent)
+                Allmusic.orderList.isPlaying = false;
+            else
+                Allmusic.idleList.isPlaying = false;
+            return music;
+        } else {
+            if (isPersistent)
+                songs.remove(music);  // Remove the song from the list if it's not available
+            return next();
+        }
     }
 
     public boolean remove(MusicObj musicObj) {
@@ -58,6 +76,17 @@ public class SongList {
             }
         } catch (Exception e) {
             Allmusic.LOGGER.error("Failed to load idle list", e);
+        }
+        return false;
+    }
+
+    public boolean hasSong(MusicObj musicObj) {
+        return songs.contains(musicObj);
+    }
+
+    public boolean hasSong(int id) {
+        for (MusicObj musicObj : songs) {
+            if (musicObj.id == id) return true;
         }
         return false;
     }

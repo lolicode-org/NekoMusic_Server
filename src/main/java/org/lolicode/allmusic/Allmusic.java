@@ -11,6 +11,7 @@ import org.lolicode.allmusic.config.ModConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import okhttp3.OkHttpClient;
+import org.lolicode.allmusic.music.MusicObj;
 import org.lolicode.allmusic.music.SongList;
 import org.lolicode.allmusic.event.PlayerJoinCallback;
 import org.lolicode.allmusic.task.PlayerJoin;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -33,18 +33,18 @@ public class Allmusic implements DedicatedServerModInitializer {
     public static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).setPrettyPrinting().create();
     public static final ModConfig CONFIG = new ModConfig();
     public static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
-    public static final List<ScheduledFuture> EXECUTORS = new ArrayList<>();
+    public static final ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor();
+    public static final List<ScheduledFuture> FUTURES = new ArrayList<>();
 
     public static final SongList idleList = new SongList();
-    public static final SongList playingList = new SongList();
+    public static final SongList orderList = new SongList();
     public static Set<String> currentVote = new HashSet<>();
+    public static MusicObj currentMusic = null;
 
     @Override
     public void onInitializeServer() {
         if (ModConfig.load()) {
-            CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-                MusicCommand.register(dispatcher);
-            });
+            CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> MusicCommand.register(dispatcher));
             PlayerJoinCallback.EVENT.register(PlayerJoin::OnPlayerJoin);
             LOGGER.info("AllMusic mod loaded");
         } else {

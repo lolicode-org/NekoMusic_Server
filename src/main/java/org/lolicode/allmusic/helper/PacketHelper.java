@@ -1,9 +1,7 @@
 package org.lolicode.allmusic.helper;
 
-import com.mojang.datafixers.TypeRewriteRule;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.minecraft.network.Packet;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
@@ -30,10 +28,13 @@ public class PacketHelper {
     }
 
     public static Text getPlayMessage(@NotNull MusicObj musicObj) {
+        String player = musicObj.player;
+        if (player == null || player.equals(""))
+            player = "Default";
         return Text.of("§eNow playing: §a" + musicObj.name + " §e-§9 "
                 + String.join(" & ",
                 musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
-                + " §eby §9" + musicObj.player);
+                + " §eby §d" + player);
     }
 
     public static Text getVoteMessage(int count, int total) {
@@ -45,11 +46,15 @@ public class PacketHelper {
         return Text.of("§eOrdered: §a" + musicObj.name + " §e-§9 "
                 + String.join(" & ",
                 musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
-                + " §eby §9" + musicObj.player);
+                + " §eby §d" + musicObj.player);
     }
 
     public static Text getOrderMessage() {
         return Text.of("§cGet music info failed.");
+    }
+
+    public static Text getOrderedMessage() {
+        return Text.of("§cThis song has been ordered.");
     }
 
     public static Text getDelMessage(MusicObj musicObj) {
@@ -61,17 +66,17 @@ public class PacketHelper {
     }
 
     public static Text getListMessage() {
-        if (Allmusic.playingList.songs.size() == 0) {
+        if (Allmusic.orderList.songs.size() == 0) {
             return Text.of("§cNo music in playing list.");
         } else {
-            StringBuilder sb = new StringBuilder("§ePlaying list: ");
-            for (MusicObj musicObj : Allmusic.playingList.songs) {
+            StringBuilder sb = new StringBuilder("§ePlaying list: \n");
+            for (MusicObj musicObj : Allmusic.orderList.songs) {
                 sb.append("§a").append(musicObj.name).append(" §e-§9 ")
                         .append(String.join(" & ",
                                 musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new)))
-                        .append(" §eby §9").append(musicObj.player).append("§e, ");
+                        .append(" §eby §d").append(musicObj.player).append("\n");
             }
-            return Text.of(sb.substring(0, sb.length() - 2));
+            return Text.of(sb.substring(0, sb.length() - 1));
         }
     }
 

@@ -26,9 +26,14 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation 'me.lucko:fabric-permissions-api:0.2-SNAPSHOT'
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    include(modImplementation('me.lucko:fabric-permissions-api:0.2-SNAPSHOT'))
     modImplementation "carpet:fabric-carpet:${project.carpet_branch}-${project.carpet_core_version}"
+
+    include implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    include implementation("com.squareup.okio:okio-jvm:3.3.0") //okio-jvm, not okio. This cost me like 1hr of debugging
+    modLocalRuntime("net.fabricmc:fabric-language-kotlin:1.9.1+kotlin.1.8.10") { // includes kotlin for squareup libs
+        exclude module: "fabric-loader"
+    }
 }
 
 processResources {

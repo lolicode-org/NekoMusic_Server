@@ -7,20 +7,23 @@ import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.util.Identifier;
-import org.lolicode.allmusic.command.MusicCommand;
-import org.lolicode.allmusic.config.ModConfig;
+import okhttp3.OkHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import okhttp3.OkHttpClient;
+import org.lolicode.allmusic.command.MusicCommand;
+import org.lolicode.allmusic.config.ModConfig;
+import org.lolicode.allmusic.event.PlayerJoinCallback;
 import org.lolicode.allmusic.music.MusicObj;
 import org.lolicode.allmusic.music.SongList;
-import org.lolicode.allmusic.event.PlayerJoinCallback;
 import org.lolicode.allmusic.task.PlayerJoin;
+import org.lolicode.allmusic.task.ServerStop;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class Allmusic implements DedicatedServerModInitializer {
     public static final String MOD_ID = "allmusic";
@@ -49,18 +52,6 @@ public class Allmusic implements DedicatedServerModInitializer {
         } else {
             LOGGER.error("Failed to load mod config, mod will not work");
         }
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> onServerStop());
-    }
-
-    private void onServerStop() {
-        TIMER.cancel();
-        EXECUTOR.shutdown();
-        try {
-            if (!EXECUTOR.awaitTermination(5, TimeUnit.SECONDS)) {
-                EXECUTOR.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            EXECUTOR.shutdownNow();
-        }
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> ServerStop.onServerStop());
     }
 }

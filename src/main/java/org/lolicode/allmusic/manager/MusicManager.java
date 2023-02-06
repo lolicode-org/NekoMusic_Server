@@ -51,7 +51,7 @@ public class MusicManager {
                             playNext(server);
                         }
                     };
-                    Allmusic.TIMER.schedule(Allmusic.task, next.dt);
+                    Allmusic.TIMER.schedule(Allmusic.task, next.dt + 3000);  // Add 3 seconds to avoid the music starts before the previous one ends
                     success = true;
                 } catch (Exception e) {
                     Allmusic.LOGGER.error("Play music failed", e);

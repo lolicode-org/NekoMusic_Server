@@ -23,8 +23,7 @@ public class SongList {
 
         MusicObj music;
         if (isPersistent) {
-            Random random = new Random();
-            music = songs.get(random.nextInt(songs.size()));
+            music = songs.get(new Random().nextInt(songs.size()));
         } else {
             music = songs.get(0);
             songs.remove(0);

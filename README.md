@@ -101,3 +101,18 @@ Cookie是可选的，如果不填写，会导致无法获取更高音质或者�
 [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)：网易云音乐API
 
 [AllMusic_M](https://github.com/Coloryr/AllMusic_M)：客户端以及部分参考
+
+## 许可证
+```text
+Copyright (c) 2023 KoishiMoe
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+```

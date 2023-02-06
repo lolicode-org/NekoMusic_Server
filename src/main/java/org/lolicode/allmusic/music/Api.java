@@ -72,7 +72,8 @@ public class Api {
     private static MusicObj getMusic(int id) {
         if (id == 0) return null;
         HttpUrl.Builder url = HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/song/info").newBuilder()
-                .addQueryParameter("id", String.valueOf(id));
+                .addQueryParameter("id", String.valueOf(id))
+                .addQueryParameter("br", String.valueOf(Allmusic.CONFIG.maxQuality));
         if (Allmusic.CONFIG.cookie != null && !Allmusic.CONFIG.cookie.isEmpty()) {
             url.addQueryParameter("cookie", Allmusic.CONFIG.cookie);
         }

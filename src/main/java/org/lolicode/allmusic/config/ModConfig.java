@@ -15,6 +15,7 @@ public class ModConfig {
     public long idleList = 0;
     public String apiAddress = "";
     public float voteThreshold = 0.5f;
+    public int maxQuality = 320000;
 
     private static File configFile;
 

@@ -71,11 +71,14 @@ public class Api {
 
     private static MusicObj getMusic(int id) {
         if (id == 0) return null;
+        HttpUrl.Builder url = HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/song/info").newBuilder()
+                .addQueryParameter("id", String.valueOf(id));
+        if (Allmusic.CONFIG.cookie != null && !Allmusic.CONFIG.cookie.isEmpty()) {
+            url.addQueryParameter("cookie", Allmusic.CONFIG.cookie);
+        }
+
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
-                        .url(HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/song/url").newBuilder()
-                                .addQueryParameter("id", String.valueOf(id))
-                                .addQueryParameter("cookie", Allmusic.CONFIG.cookie)
-                                .build())
+                        .url(url.build())
                         .build())
                 .execute()) {
             if (response.code() == 200 && response.body() != null) {
@@ -111,11 +114,13 @@ public class Api {
 
     public static MusicObj getMusicInfo(int id) {
         if (id == 0) return null;
+        HttpUrl.Builder url = HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/song/detail").newBuilder()
+                .addQueryParameter("ids", String.valueOf(id));
+        if (Allmusic.CONFIG.cookie != null && !Allmusic.CONFIG.cookie.isEmpty()) {
+            url.addQueryParameter("cookie", Allmusic.CONFIG.cookie);
+        }
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
-                        .url(HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/song/detail").newBuilder()
-                                .addQueryParameter("ids", String.valueOf(id))
-                                .addQueryParameter("cookie", Allmusic.CONFIG.cookie)
-                                .build())
+                        .url(url.build())
                         .build())
                 .execute()) {
             if (response.code() == 200 && response.body() != null) {
@@ -134,11 +139,13 @@ public class Api {
 
     public static SongList getSongList(long id) {
         if (id == 0) return null;
+        HttpUrl.Builder url = HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/playlist/track/all").newBuilder()
+                .addQueryParameter("id", String.valueOf(id));
+        if (Allmusic.CONFIG.cookie != null && !Allmusic.CONFIG.cookie.isEmpty()) {
+            url.addQueryParameter("cookie", Allmusic.CONFIG.cookie);
+        }
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
-                        .url(HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/playlist/track/all").newBuilder()
-                                .addQueryParameter("id", String.valueOf(id))
-                                .addQueryParameter("cookie", Allmusic.CONFIG.cookie)
-                                .build())
+                        .url(url.build())
                         .build())
                 .execute()) {
             if (response.code() == 200 && response.body() != null) {

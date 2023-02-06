@@ -28,6 +28,20 @@
 
 **注意：** 高版本（大概是1.19+）的客户端Mod似乎存在严重的Bug [1](https://github.com/Coloryr/AllMusic_M/issues/16) [2](https://github.com/Coloryr/AllMusic_M/issues/17)，如果你使用原版客户端发现了卡死的情况，可以尝试使用我的[修复版](https://github.com/lolicode-org/AllMusic_M/releases)。
 
+### 命令
+
+| 命令               | 权限                    | 用途                                 |
+|:-----------------|:----------------------|:-----------------------------------|
+| `/music`         | `allmusic`            | 命令根节点。后面可以直接加歌曲ID或者链接来快速点歌（需要点歌权限） |
+| `/music add`     | `allmusic.add`        | 点歌，后面可以加歌曲ID或者链接                   |
+| `/music list`    | `allmusic.list`       | 查看当前播放列表                           |
+| `/music vote`    | `allmusic.vote`       | 投票切歌                               |
+| `/music next`    | `allmusic.next`       | 强制切歌                               |
+| `/music del`     | `allmusic.del`        | 删除当前播放列表中的歌曲                       |
+| `/music del`     | `allmusic.del.others` | 删除别人点的歌曲                           |
+| `/music reload`  | `allmusic.reload`     | 重新加载配置文件                           |
+| `/music relogin` | `allmusic.relogin`    | 刷新登录凭证（未填写cookie时无效）               |
+
 ### API
 
 本项目并不直接与网易的API交互，而是通过 [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi) 来获取音乐信息。此举是为了降低网易后续可能的限制带来的影响。
@@ -76,6 +90,8 @@ Cookie是可选的，如果不填写，会导致无法获取更高音质或者�
 
 后续可能会增加在控制台中获取Cookie的功能。
 
+**注意：** 请不要将您的Cookie泄露给他人，否则可能会导致您的帐号被盗。
+
 ## 问题反馈
 
 请使用本项目的Issue页面进行反馈，如果您有更好的建议或者想法，也欢迎在Issue中提出。由于时间以及水平所限，我可能并不会实现很多功能，如有需要，可以自行Fork后修改。
@@ -83,4 +99,5 @@ Cookie是可选的，如果不填写，会导致无法获取更高音质或者�
 ## 致谢
 
 [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)：网易云音乐API
+
 [AllMusic_M](https://github.com/Coloryr/AllMusic_M)：客户端以及部分参考

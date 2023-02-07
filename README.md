@@ -8,7 +8,7 @@
 
 ### 服务端
 
-1. 请确保已安装 [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api) 。
+1. 请确保已安装 [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api) 和 [Fabric Language Kotlin](https://www.curseforge.com/minecraft/mc-mods/fabric-language-kotlin)。
 2. 从 [Releases](https://github.com/lolicode-org/AllMusic_Server/releases) 下载最新版本的服务端Mod，放入服务端的 `mods` 目录中。
 3. 启动服务端，服务端会在 `config` 目录下生成 `allmusic.json` 配置文件，根据需要修改配置文件。
 ```json5
@@ -62,9 +62,11 @@ Requires=network.target
 
 [Service]
 Type=simple
-User=minecraft  # 改成你的服务端运行的用户
-WorkingDirectory=/home/minecraft/NeteaseCloudMusicApi  # 改成你的API所在的目录
-ExecStart=/usr/bin/node /home/minecraft/NeteaseCloudMusicApi/app.js
+# 改成你的服务端运行的用户
+User=minecraft
+# 改成你的API所在的目录
+WorkingDirectory=/home/minecraft/NeteaseCloudMusicApi
+ExecStart=/usr/bin/node app.js
 Restart=always
 RestartSec=5s
 PrivateTmp=true

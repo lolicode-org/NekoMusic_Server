@@ -8,6 +8,7 @@ import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import org.lolicode.allmusic.config.ModConfig;
+import org.lolicode.allmusic.helper.LoginHelper;
 import org.lolicode.allmusic.manager.MusicManager;
 
 public class MusicCommand {
@@ -68,12 +69,33 @@ public class MusicCommand {
                     ModConfig.reload(context.getSource().getServer(), context.getSource());
                     return 0;
                 }).build();
-        LiteralCommandNode<ServerCommandSource> reloginNode = CommandManager.literal("relogin")
-                .requires(Permissions.require("allmusic.relogin", 2))
-                .executes(context -> {
-                    ModConfig.relogin(context.getSource().getServer(), context.getSource());
-                    return 0;
-                }).build();
+        LiteralCommandNode<ServerCommandSource> loginNode = CommandManager.literal("login")
+                .requires(Permissions.require("allmusic.login", 4))
+                .then(CommandManager.literal("start")
+                        .requires(Permissions.require("allmusic.login.start", 4))
+                        .executes(context -> {
+                            LoginHelper.genQr(context.getSource());
+                            return 0;
+                        }))
+                .then(CommandManager.literal("check")
+                        .requires(Permissions.require("allmusic.login.check", 4))
+                        .executes(context -> {
+                            LoginHelper.check(context.getSource());
+                            return 0;
+                        }))
+                .then(CommandManager.literal("status")
+                        .requires(Permissions.require("allmusic.login.status", 4))
+                        .executes(context -> {
+                            LoginHelper.status(context.getSource());
+                            return 0;
+                        }))
+                .build();
+//        LiteralCommandNode<ServerCommandSource> reloginNode = CommandManager.literal("relogin")
+//                .requires(Permissions.require("allmusic.relogin", 2))
+//                .executes(context -> {
+//                    ModConfig.relogin(context.getSource().getServer(), context.getSource());
+//                    return 0;
+//                }).build();
 
         rootNode.addChild(addNode);
         rootNode.addChild(delNode);
@@ -82,7 +104,8 @@ public class MusicCommand {
         rootNode.addChild(voteNode);
 //        rootNode.addChild(helpNode);
         rootNode.addChild(reloadNode);
-        rootNode.addChild(reloginNode);
+        rootNode.addChild(loginNode);
+//        rootNode.addChild(reloginNode);
         dispatcher.getRoot().addChild(rootNode);
     }
 }

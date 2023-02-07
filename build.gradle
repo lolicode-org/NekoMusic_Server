@@ -15,6 +15,7 @@ repositories {
 
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { name "Carpet"; url "https://masa.dy.fi/maven" }
+    mavenCentral()
 }
 
 dependencies {
@@ -34,6 +35,9 @@ dependencies {
     modLocalRuntime("net.fabricmc:fabric-language-kotlin:1.9.1+kotlin.1.8.10") { // includes kotlin for squareup libs
         exclude module: "fabric-loader"
     }
+    include implementation('xyz.dunjiao.cloud:qr-to-console:1.0')
+    include implementation('com.google.zxing:javase:3.5.1')
+    include implementation('com.google.zxing:core:3.5.1')
 }
 
 processResources {

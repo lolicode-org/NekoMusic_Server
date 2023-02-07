@@ -30,17 +30,20 @@
 
 ### 命令
 
-| 命令               | 权限                    | 用途                                 |
-|:-----------------|:----------------------|:-----------------------------------|
-| `/music`         | `allmusic`            | 命令根节点。后面可以直接加歌曲ID或者链接来快速点歌（需要点歌权限） |
-| `/music add`     | `allmusic.add`        | 点歌，后面可以加歌曲ID或者链接                   |
-| `/music list`    | `allmusic.list`       | 查看当前播放列表                           |
-| `/music vote`    | `allmusic.vote`       | 投票切歌                               |
-| `/music next`    | `allmusic.next`       | 强制切歌                               |
-| `/music del`     | `allmusic.del`        | 删除当前播放列表中的歌曲                       |
-| `/music del`     | `allmusic.del.others` | 删除别人点的歌曲                           |
-| `/music reload`  | `allmusic.reload`     | 重新加载配置文件                           |
-| `/music relogin` | `allmusic.relogin`    | 刷新登录凭证（未填写cookie时无效）               |
+| 命令                    | 权限                      | 用途                                 |
+|:----------------------|:------------------------|:-----------------------------------|
+| `/music`              | `allmusic`              | 命令根节点。后面可以直接加歌曲ID或者链接来快速点歌（需要点歌权限） |
+| `/music add`          | `allmusic.add`          | 点歌，后面可以加歌曲ID或者链接                   |
+| `/music list`         | `allmusic.list`         | 查看当前播放列表                           |
+| `/music vote`         | `allmusic.vote`         | 投票切歌                               |
+| `/music next`         | `allmusic.next`         | 强制切歌                               |
+| `/music del`          | `allmusic.del`          | 删除当前播放列表中的歌曲                       |
+| `/music del`          | `allmusic.del.others`   | 删除别人点的歌曲                           |
+| `/music reload`       | `allmusic.reload`       | 重新加载配置文件                           |
+| `/music login`        | `allmusic.login`        | 登陆命令根节点                            |
+| `/music login start`  | `allmusic.login.start`  | 开始登陆，会在**控制台**打印登陆二维码，**在聊天栏无法执行** |
+| `/music login check`  | `allmusic.login.check`  | 检查登陆状态，如果登陆成功，会将cookie写入配置文件       |
+| `/music login status` | `allmusic.login.status` | 显示当前登陆的用户信息                        |
 
 ### API
 
@@ -84,13 +87,19 @@ WantedBy=multi-user.target
 
 ### Cookie
 
-本Mod并不要求填写您的帐号密码，这一方面是为了保护您的隐私，另一方面是因为网易的登录接口已经添加了验证码，大部分情况下使用帐号密码会登陆失败。因此，您需要手动获取您的Cookie。
+本Mod并不要求填写您的帐号密码，这一方面是为了保护您的隐私，另一方面是因为网易的登录接口已经添加了验证码，大部分情况下使用帐号密码会登陆失败。
 
-Cookie是可选的，如果不填写，会导致无法获取更高音质或者会员歌曲，同时对歌单的访问也会受到限制。
+Cookie是可选的，如果不填写，会导致无法获取更高音质或者会员歌曲，同时对歌单的访问可能会受到限制。
 
-后续可能会增加在控制台中获取Cookie的功能。
+**注意：** 
+1. 请不要将您的Cookie泄露给他人，否则会导致您的帐号被盗。**不建议**在没有实际控制权的服务器（如面板服）上登陆账号。
+2. 后续网易**可能**采取针对共享VIP帐号的限制措施，开发者不对您因使用本Mod而导致的任何损失负责，使用时请确保符合当地法律法规。
 
-**注意：** 请不要将您的Cookie泄露给他人，否则可能会导致您的帐号被盗。
+获取Cookie:
+1. 登陆服务器控制台
+2. 输入`/music login start`，扫描生成的二维码
+> 注意：如果生成的二维码长宽比不一致导致无法被网易云客户端扫描，可以换个终端模拟器再试。您也可以拍照/截图后使用图片编辑工具拉伸后再扫描。
+3. 扫描并授权后，输入`/music login check`，控制台会输出结果。如果成功，Cookie会被自动保存在配置文件中
 
 ## 问题反馈
 

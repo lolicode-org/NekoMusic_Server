@@ -1,73 +1,211 @@
 package org.lolicode.allmusic.music;
 
+import com.google.gson.annotations.SerializedName;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.lolicode.allmusic.Allmusic;
 import org.lolicode.allmusic.config.ModConfig;
+import xyz.dunjiao.cloud.commons.lang.QRCodeUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class Api {
+    private static String key = "";
+
+    public static class LOGIN_STATUS {
+        public static final int FAILED = -1;
+        public static final int NO_KEY = -2;
+        public static final int EXPIRED = 800;
+        public static final int WAITING = 801;
+        public static final int SCANNED = 802;
+        public static final int SUCCESS = 803;
+    }
+
+    private static class KeyObj {
+        class Data {
+            String unikey;
+            int code;
+        }
+        Data data;
+        int code;
+    }
+
+    private static class QrCodeObj {
+        class Data {
+            String qrurl;
+//          String qrimg;
+        }
+
+        Data data;
+        int code;
+    }
+
     private static class CookieObj {
-        protected int code;
-        protected String cookie;
+        int code;
+        String cookie;
+    }
+
+    public static class UserInfo {
+        public static class Data {
+            public static class Profile {
+                @SerializedName("userId")
+                public long userId;
+                public String nickname;
+                @SerializedName("vipType")
+                public int vipType;
+            }
+
+            public Profile profile;
+            public int code;
+        }
+
+        public Data data;
     }
 
     private static class MusicObjWrapper {
-        protected List<MusicObj> data;
-        protected int code;
+        List<MusicObj> data;
+        int code;
     }
 
     private static class MusicInfoWrapper {
-        protected MusicObj[] songs;
-        protected int code;
+        MusicObj[] songs;
+        int code;
     }
 
-    public static boolean loginAnonimous() {
+    public static boolean genLoginKey() {
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
-                .url(Allmusic.CONFIG.apiAddress + "/register/anonimous")
+                .url(Allmusic.CONFIG.apiAddress + "/login/qr/key")
                 .build()).execute()) {
             if (response.code() == 200 && response.body() != null) {
-                Allmusic.CONFIG.cookie = Allmusic.GSON.fromJson(response.body().string(), CookieObj.class).cookie;
-                ModConfig.save();
+                key = Allmusic.GSON.fromJson(response.body().string(), KeyObj.class).data.unikey;
                 return true;
             } else {
-                Allmusic.LOGGER.error("Failed to register anonimous user: " + response.code());
+                Allmusic.LOGGER.error("Failed to generate login key, response code: " + response.code());
             }
         } catch (IOException e) {
-            Allmusic.LOGGER.error("Failed to register anonimous user", e);
+            Allmusic.LOGGER.error("Failed to generate login key", e);
         }
         return false;
     }
 
-    public static boolean refreshCookie() {
-        if (Allmusic.CONFIG.cookie == null || Allmusic.CONFIG.cookie.isEmpty()) {
-            return loginAnonimous();
-        }
+    public static String genLoginQrcode() {
+        if (key == null || key.isEmpty()) return null;
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
-                .url(HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/login/refresh").newBuilder()
-                        .addQueryParameter("cookie", Allmusic.CONFIG.cookie)
-                        .build())
+                .url(Allmusic.CONFIG.apiAddress + "/login/qr/create?key=" + key)
                 .build()).execute()) {
             if (response.code() == 200 && response.body() != null) {
-                String newCookie = Allmusic.GSON.fromJson(response.body().string(), CookieObj.class).cookie;
-                if (newCookie == null || newCookie.isEmpty()) {
-                    Allmusic.LOGGER.error("Failed to refresh cookie: Invalid response");
-                } else {
-                    Allmusic.CONFIG.cookie = newCookie;
+                String qrurl = Allmusic.GSON.fromJson(response.body().string(), QrCodeObj.class).data.qrurl;
+                if (qrurl != null && !qrurl.isEmpty()) {
+                    QRCodeWriter qrCodeWriter = new QRCodeWriter();
+                    Map<EncodeHintType, ?> hints = Map.of(EncodeHintType.CHARACTER_SET, "UTF-8",
+                            EncodeHintType.MARGIN, 1);
+                    BitMatrix bitMatrix = qrCodeWriter.encode(qrurl, BarcodeFormat.QR_CODE, 32, 32, hints);
+                    return QRCodeUtils.toString(bitMatrix, false);
+                }
+            }
+            Allmusic.LOGGER.error("Failed to generate login qrcode: " + response.code());
+        } catch (IOException | WriterException e) {
+            Allmusic.LOGGER.error("Failed to generate login qrcode", e);
+        }
+        return null;
+    }
+
+    public static int checkLoginStatus() {
+        if (key == null || key.isEmpty()) return LOGIN_STATUS.NO_KEY;
+        try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
+                .url(Allmusic.CONFIG.apiAddress + "/login/qr/check?key=" + key)
+                .build()).execute()) {
+            if (response.code() == 200 && response.body() != null) {
+                CookieObj cookieObj = Allmusic.GSON.fromJson(response.body().string(), CookieObj.class);
+                if (cookieObj.code == LOGIN_STATUS.SUCCESS) {
+                    Allmusic.CONFIG.cookie = cookieObj.cookie;
                     ModConfig.save();
-                    return true;
+                    return LOGIN_STATUS.SUCCESS;
+                } else {
+                    Allmusic.LOGGER.error("Failed to check login status: " + cookieObj.code);
+                    return cookieObj.code;
                 }
             } else {
-                Allmusic.LOGGER.error("Failed to refresh cookie: " + response.code());
+                Allmusic.LOGGER.error("Failed to check login status: " + response.code());
             }
         } catch (IOException e) {
-            Allmusic.LOGGER.error("Failed to refresh cookie", e);
+            Allmusic.LOGGER.error("Failed to check login status", e);
         }
-        return false;
+        return LOGIN_STATUS.FAILED;
     }
+
+    public static UserInfo.Data.Profile getUserInfo() {
+        if (Allmusic.CONFIG.cookie == null || Allmusic.CONFIG.cookie.isEmpty()) throw new RuntimeException("Not logged in");
+        try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
+                .url(Allmusic.CONFIG.apiAddress + "/login/status?cookie=" + Allmusic.CONFIG.cookie)
+                .build()).execute()) {
+            if (response.code() == 200 && response.body() != null) {
+                UserInfo userInfo = Allmusic.GSON.fromJson(response.body().string(), UserInfo.class);
+                if (userInfo.data.code == 200) {
+                    return userInfo.data.profile;
+                } else {
+                    Allmusic.LOGGER.error("Failed to get user info: " + userInfo.data.code);
+                }
+            } else {
+                Allmusic.LOGGER.error("Failed to get user info: Invaild response: " + response.code());
+            }
+        } catch (IOException e) {
+            Allmusic.LOGGER.error("Failed to get user info", e);
+        }
+        return null;
+    }
+
+//    public static boolean loginAnonimous() {
+//        try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
+//                .url(Allmusic.CONFIG.apiAddress + "/register/anonimous")
+//                .build()).execute()) {
+//            if (response.code() == 200 && response.body() != null) {
+//                Allmusic.CONFIG.cookie = Allmusic.GSON.fromJson(response.body().string(), CookieObj.class).cookie;
+//                ModConfig.save();
+//                return true;
+//            } else {
+//                Allmusic.LOGGER.error("Failed to register anonimous user: " + response.code());
+//            }
+//        } catch (IOException e) {
+//            Allmusic.LOGGER.error("Failed to register anonimous user", e);
+//        }
+//        return false;
+//    }
+
+//    public static boolean refreshCookie() {
+//        if (Allmusic.CONFIG.cookie == null || Allmusic.CONFIG.cookie.isEmpty()) {
+//            return loginAnonimous();
+//        }
+//        try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
+//                .url(HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/login/refresh").newBuilder()
+//                        .addQueryParameter("cookie", Allmusic.CONFIG.cookie)
+//                        .build())
+//                .build()).execute()) {
+//            if (response.code() == 200 && response.body() != null) {
+//                String newCookie = Allmusic.GSON.fromJson(response.body().string(), CookieObj.class).cookie;
+//                if (newCookie == null || newCookie.isEmpty()) {
+//                    Allmusic.LOGGER.error("Failed to refresh cookie: Invalid response");
+//                } else {
+//                    Allmusic.CONFIG.cookie = newCookie;
+//                    ModConfig.save();
+//                    return true;
+//                }
+//            } else {
+//                Allmusic.LOGGER.error("Failed to refresh cookie: " + response.code());
+//            }
+//        } catch (IOException e) {
+//            Allmusic.LOGGER.error("Failed to refresh cookie", e);
+//        }
+//        return false;
+//    }
 
     private static MusicObj getMusic(int id) {
         if (id == 0) return null;

@@ -5,7 +5,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import org.lolicode.allmusic.Allmusic;
-import org.lolicode.allmusic.music.Api;
 import org.lolicode.allmusic.music.SongList;
 
 import java.io.*;
@@ -78,13 +77,13 @@ public class ModConfig {
         }
     }
 
-    public static void relogin(MinecraftServer server, ServerCommandSource source) {
-        Allmusic.EXECUTOR.execute(() -> {
-            if (Api.refreshCookie()) {
-                source.sendFeedback(Text.of("§aAllMusic: Re-login successful"), true);
-            } else {
-                source.sendFeedback(Text.of("§cAllMusic: Re-login failed"), true);
-            }
-        });
-    }
+//    public static void relogin(MinecraftServer server, ServerCommandSource source) {
+//        Allmusic.EXECUTOR.execute(() -> {
+//            if (Api.refreshCookie()) {
+//                source.sendFeedback(Text.of("§aAllMusic: Re-login successful"), true);
+//            } else {
+//                source.sendFeedback(Text.of("§cAllMusic: Re-login failed"), true);
+//            }
+//        });
+//    }
 }

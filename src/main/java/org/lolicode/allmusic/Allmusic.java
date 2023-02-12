@@ -1,5 +1,6 @@
 package org.lolicode.allmusic;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,7 +37,8 @@ public class Allmusic implements DedicatedServerModInitializer {
     public static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
     public static final Timer TIMER = new Timer();
     public static volatile TimerTask task = null;
-    public static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    public static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(
+            new ThreadFactoryBuilder().setNameFormat("AllMusic-Thread-%d").build());
 
     public static final SongList idleList = new SongList();
     public static final SongList orderList = new SongList();

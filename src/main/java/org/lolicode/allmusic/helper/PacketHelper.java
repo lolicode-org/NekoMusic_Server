@@ -3,9 +3,11 @@ package org.lolicode.allmusic.helper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
+import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.lolicode.allmusic.Allmusic;
+import org.lolicode.allmusic.music.Api;
 import org.lolicode.allmusic.music.MusicObj;
 
 import java.nio.charset.StandardCharsets;
@@ -80,4 +82,57 @@ public class PacketHelper {
         }
     }
 
+    public static Text getSearchMessage(Api.SearchResult result) {
+        if (result.result.songs.length == 0) {
+            return Text.of("§cNo music found.");
+        } else {
+            MutableText text = Text.literal("§aName §e-§9 Artist §e- §dAlbum" + "\n")
+                    .setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.YELLOW)));
+            for (Api.SearchResult.Result.OneSong song : result.result.songs) {
+                text.append(Text.literal("§a" + song.name + " §e-§9 "
+                        + String.join(" & ",
+                        song.artists.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
+                        + "§e - §d" + song.album.name + "\n").setStyle(
+                        Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.GREEN))
+                                .withClickEvent(new ClickEvent(
+                                        ClickEvent.Action.RUN_COMMAND,
+                                        "/music add " + song.id))
+                                .withHoverEvent(new HoverEvent(
+                                        HoverEvent.Action.SHOW_TEXT,
+                                        Text.of("Click to add it to playing list.")))));
+            }
+            MutableText pagePrev = Text.literal("<<");
+            if (result.result.page == 1) {
+                pagePrev.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.GRAY)));
+            } else {
+                pagePrev.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.BLUE))
+                        .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/music search " + (result.result.page - 1) + " " + result.result.keyword))
+                        .withHoverEvent(new HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                Text.of("Click to go to previous page."))));
+            }
+            MutableText pageNext = Text.literal(">>");
+            if (result.result.page == (result.result.songCount + 9) / 10) {
+                pageNext.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.GRAY)));
+            } else {
+                pageNext.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.BLUE))
+                        .withClickEvent(new ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/music search " + (result.result.page + 1) + " " + result.result.keyword))
+                        .withHoverEvent(new HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                Text.of("Click to go to next page."))));
+            }
+            text.append(pagePrev).append(Text.of(
+                            "§r ---- §ePage §a" + result.result.page + " §r/ §a" + (result.result.songCount + 9) / 10 + "§r ---- "))
+                    .append(pageNext);
+            return text;
+        }
+    }
+
+    public static Text getSearchMessage() {
+        return Text.of("§cSearch music failed.");
+    }
 }

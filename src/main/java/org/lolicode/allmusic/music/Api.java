@@ -80,6 +80,30 @@ public class Api {
         int code;
     }
 
+    public static class SearchResult {
+        public static class Result {
+            public static class OneSong {
+                public static class AlbumObj {
+                    public long id;
+                    public String name;
+                }
+                public long id;
+                public String name;
+                public List<MusicObj.ArtistObj> artists;
+                public AlbumObj album;
+            }
+            public OneSong[] songs;
+            @SerializedName("hasMore")
+            public boolean hasMore;
+            @SerializedName("songCount")
+            public int songCount;
+            public int page;
+            public String keyword;
+        }
+        public Result result;
+        public int code;
+    }
+
     public static boolean genLoginKey() {
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
                 .url(Allmusic.CONFIG.apiAddress + "/login/qr/key")
@@ -163,7 +187,7 @@ public class Api {
         return null;
     }
 
-    private static MusicObj getMusic(int id) {
+    private static MusicObj getMusic(long id) {
         if (id == 0) return null;
         HttpUrl.Builder url = HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/song/url").newBuilder()
                 .addQueryParameter("id", String.valueOf(id))
@@ -190,7 +214,7 @@ public class Api {
         return null;
     }
 
-    public static String getMusicUrl(int id) {
+    public static String getMusicUrl(long id) {
         MusicObj music = getMusic(id);
         if (music != null && (music.freeTrialInfo == null || (music.fee != 0 && music.payed != 1))) {  // Don't play trial music
             return music.url;
@@ -207,7 +231,7 @@ public class Api {
         return null;
     }
 
-    public static MusicObj getMusicInfo(int id) {
+    public static MusicObj getMusicInfo(long id) {
         if (id == 0) return null;
         HttpUrl.Builder url = HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/song/detail").newBuilder()
                 .addQueryParameter("ids", String.valueOf(id));
@@ -252,6 +276,34 @@ public class Api {
             }
         } catch (IOException e) {
             Allmusic.LOGGER.error("Failed to get songs: Network error", e);
+        }
+        return null;
+    }
+
+    public static SearchResult search(String keyword, int page, int limit) {
+        if (keyword == null || keyword.isEmpty()) return null;
+        HttpUrl.Builder url = HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/search").newBuilder()
+                .addQueryParameter("keywords", keyword)
+                .addQueryParameter("type", "1")
+                .addQueryParameter("limit", String.valueOf(limit))
+                .addQueryParameter("offset", String.valueOf((page - 1) * limit));
+        if (Allmusic.CONFIG.cookie != null && !Allmusic.CONFIG.cookie.isEmpty()) {
+            url.addQueryParameter("cookie", Allmusic.CONFIG.cookie);
+        }
+        try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
+                        .url(url.build())
+                        .build())
+                .execute()) {
+            if (response.code() == 200 && response.body() != null) {
+                SearchResult result = Allmusic.GSON.fromJson(response.body().string(), SearchResult.class);
+                result.result.page = page;
+                result.result.keyword = keyword;
+                return result;
+            } else {
+                Allmusic.LOGGER.error("Failed to search songs: Invalid response " + response.code());
+            }
+        } catch (IOException e) {
+            Allmusic.LOGGER.error("Failed to search songs: Network error", e);
         }
         return null;
     }

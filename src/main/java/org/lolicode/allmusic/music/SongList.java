@@ -83,7 +83,7 @@ public class SongList {
         return songs.contains(musicObj);
     }
 
-    public boolean hasSong(int id) {
+    public boolean hasSong(long id) {
         for (MusicObj musicObj : songs) {
             if (musicObj.id == id) return true;
         }

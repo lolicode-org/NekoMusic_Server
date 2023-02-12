@@ -108,9 +108,9 @@ public class MusicManager {
     }
 
     public static void order(MinecraftServer server, ServerCommandSource source, String url) {
-        int id;
+        long id;
         if (intPattern.matcher(url).matches()) {
-            id = Integer.parseInt(url);
+            id = Long.parseLong(url);
         } else {
             Matcher matcher;
             if (url.contains("m/song/") || url.contains("#/song/")) {
@@ -119,7 +119,7 @@ public class MusicManager {
                 matcher = urlPattern2.matcher(url);
             }
             if (matcher.find()) {
-                id = Integer.parseInt(matcher.group(1));
+                id = Long.parseLong(matcher.group(1));
             } else {
                 id = 0;
             }
@@ -166,5 +166,16 @@ public class MusicManager {
 
     public static void list(MinecraftServer server, ServerCommandSource source) {
         source.sendFeedback(PacketHelper.getListMessage(), false);
+    }
+
+    public static void search(MinecraftServer server, ServerCommandSource source, String keyword, int page) {
+        Allmusic.EXECUTOR.execute(() -> {
+            Api.SearchResult result = Api.search(keyword, page, 10);
+            if (result != null) {
+                source.sendFeedback(PacketHelper.getSearchMessage(result), false);
+            } else {
+                source.sendFeedback(PacketHelper.getSearchMessage(), false);
+            }
+        });
     }
 }

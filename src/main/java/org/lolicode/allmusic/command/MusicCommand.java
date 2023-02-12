@@ -51,6 +51,21 @@ public class MusicCommand {
                     MusicManager.next(context.getSource().getServer());
                     return 0;
                 }).build();
+        LiteralCommandNode<ServerCommandSource> searchNode = CommandManager.literal("search")
+                .requires(Permissions.require("allmusic.search", 0))
+                .then(CommandManager.argument("keyword", StringArgumentType.greedyString())
+                        .executes(context -> {
+                            String keyword = StringArgumentType.getString(context, "keyword");
+                            MusicManager.search(context.getSource().getServer(), context.getSource(), keyword, 1);
+                            return 0;
+                        })
+                        .then(CommandManager.argument("page", IntegerArgumentType.integer())
+                                .executes(context -> {
+                                    String keyword = StringArgumentType.getString(context, "keyword");
+                                    int page = IntegerArgumentType.getInteger(context, "page");
+                                    MusicManager.search(context.getSource().getServer(), context.getSource(), keyword, page);
+                                    return 0;
+                                }))).build();
         LiteralCommandNode<ServerCommandSource> voteNode = CommandManager.literal("vote")
                 .requires(Permissions.require("allmusic.vote", 0))
                 .executes(context -> {
@@ -89,11 +104,10 @@ public class MusicCommand {
         rootNode.addChild(delNode);
         rootNode.addChild(listNode);
         rootNode.addChild(nextNode);
+        rootNode.addChild(searchNode);
         rootNode.addChild(voteNode);
-//        rootNode.addChild(helpNode);
         rootNode.addChild(reloadNode);
         rootNode.addChild(loginNode);
-//        rootNode.addChild(reloginNode);
         dispatcher.getRoot().addChild(rootNode);
     }
 }

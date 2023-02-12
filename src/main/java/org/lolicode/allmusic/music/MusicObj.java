@@ -15,10 +15,10 @@ public class MusicObj {
 
     public List<ArtistObj> ar = List.of();
     public String name;
-    public int id;
+    public long id;
     public String url;
-    public int dt;
-    protected int time; // should be equal to dt, to determine if the song is trial (fuck netease)
+    public long dt;
+    protected long time; // should be equal to dt, to determine if the song is trial (fuck netease)
     protected FreeTrialInfoObj freeTrialInfo;
     protected byte fee;
     protected byte payed;

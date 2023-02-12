@@ -30,7 +30,7 @@ public class Api {
     }
 
     private static class KeyObj {
-        class Data {
+        static class Data {
             String unikey;
             int code;
         }
@@ -39,7 +39,7 @@ public class Api {
     }
 
     private static class QrCodeObj {
-        class Data {
+        static class Data {
             String qrurl;
 //          String qrimg;
         }
@@ -162,50 +162,6 @@ public class Api {
         }
         return null;
     }
-
-//    public static boolean loginAnonimous() {
-//        try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
-//                .url(Allmusic.CONFIG.apiAddress + "/register/anonimous")
-//                .build()).execute()) {
-//            if (response.code() == 200 && response.body() != null) {
-//                Allmusic.CONFIG.cookie = Allmusic.GSON.fromJson(response.body().string(), CookieObj.class).cookie;
-//                ModConfig.save();
-//                return true;
-//            } else {
-//                Allmusic.LOGGER.error("Failed to register anonimous user: " + response.code());
-//            }
-//        } catch (IOException e) {
-//            Allmusic.LOGGER.error("Failed to register anonimous user", e);
-//        }
-//        return false;
-//    }
-
-//    public static boolean refreshCookie() {
-//        if (Allmusic.CONFIG.cookie == null || Allmusic.CONFIG.cookie.isEmpty()) {
-//            return loginAnonimous();
-//        }
-//        try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()
-//                .url(HttpUrl.parse(Allmusic.CONFIG.apiAddress + "/login/refresh").newBuilder()
-//                        .addQueryParameter("cookie", Allmusic.CONFIG.cookie)
-//                        .build())
-//                .build()).execute()) {
-//            if (response.code() == 200 && response.body() != null) {
-//                String newCookie = Allmusic.GSON.fromJson(response.body().string(), CookieObj.class).cookie;
-//                if (newCookie == null || newCookie.isEmpty()) {
-//                    Allmusic.LOGGER.error("Failed to refresh cookie: Invalid response");
-//                } else {
-//                    Allmusic.CONFIG.cookie = newCookie;
-//                    ModConfig.save();
-//                    return true;
-//                }
-//            } else {
-//                Allmusic.LOGGER.error("Failed to refresh cookie: " + response.code());
-//            }
-//        } catch (IOException e) {
-//            Allmusic.LOGGER.error("Failed to refresh cookie", e);
-//        }
-//        return false;
-//    }
 
     private static MusicObj getMusic(int id) {
         if (id == 0) return null;

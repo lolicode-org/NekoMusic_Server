@@ -113,6 +113,10 @@ Cookie是可选的，如果不填写，会导致无法获取更高音质或者�
 
 [AllMusic_M](https://github.com/Coloryr/AllMusic_M)：客户端以及部分参考
 
+[Qr Code to Console](https://github.com/yuanyouxi/qr-code-to-console): 二维码生成
+
+[Fabric Permissions API](https://github.com/lucko/fabric-permissions-api): 权限API
+
 ## 许可证
 ```text
 Copyright (c) 2023 KoishiMoe

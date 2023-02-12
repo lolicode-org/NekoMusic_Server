@@ -80,7 +80,4 @@ public class PacketHelper {
         }
     }
 
-//    public static Text getHelpMessage() {
-//        return Text.of("§eAllmusic help: §a/om play §e- play music, §a/om vote §e- vote music, §a/om order §e- order music, §a/om list §e- list music, §a/om del §e- delete music");
-//    }
 }

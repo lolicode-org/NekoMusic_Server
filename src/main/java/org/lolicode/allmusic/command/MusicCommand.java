@@ -57,12 +57,6 @@ public class MusicCommand {
                     MusicManager.vote(context.getSource().getServer(), context.getSource());
                     return 0;
                 }).build();
-//        LiteralCommandNode<ServerCommandSource> helpNode = CommandManager.literal("help")
-//                .requires(Permissions.require("allmusic.help", 0))
-//                .executes(context -> {
-//                    // TODO
-//                    return 0;
-//                }).build();
         LiteralCommandNode<ServerCommandSource> reloadNode = CommandManager.literal("reload")
                 .requires(Permissions.require("allmusic.reload", 2))
                 .executes(context -> {
@@ -90,12 +84,6 @@ public class MusicCommand {
                             return 0;
                         }))
                 .build();
-//        LiteralCommandNode<ServerCommandSource> reloginNode = CommandManager.literal("relogin")
-//                .requires(Permissions.require("allmusic.relogin", 2))
-//                .executes(context -> {
-//                    ModConfig.relogin(context.getSource().getServer(), context.getSource());
-//                    return 0;
-//                }).build();
 
         rootNode.addChild(addNode);
         rootNode.addChild(delNode);

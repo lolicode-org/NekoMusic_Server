@@ -83,8 +83,8 @@ public class PacketHelper {
     }
 
     public static Text getSearchMessage(Api.SearchResult result) {
-        if (result.result.songs.length == 0) {
-            return Text.of("§cNo music found.");
+        if (result.result.songs == null || result.result.songs.length == 0) {
+            return Text.of("§cNo result found.");
         } else {
             MutableText text = Text.literal("§aName §e-§9 Artist §e- §dAlbum" + "\n")
                     .setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.YELLOW)));
@@ -108,7 +108,7 @@ public class PacketHelper {
                 pagePrev.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.BLUE))
                         .withClickEvent(new ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
-                                "/music search " + (result.result.page - 1) + " " + result.result.keyword))
+                                "/music search page " + (result.result.page - 1) + " " + result.result.keyword))
                         .withHoverEvent(new HoverEvent(
                                 HoverEvent.Action.SHOW_TEXT,
                                 Text.of("Click to go to previous page."))));
@@ -120,7 +120,7 @@ public class PacketHelper {
                 pageNext.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.BLUE))
                         .withClickEvent(new ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
-                                "/music search " + (result.result.page + 1) + " " + result.result.keyword))
+                                "/music search page " + (result.result.page + 1) + " " + result.result.keyword))
                         .withHoverEvent(new HoverEvent(
                                 HoverEvent.Action.SHOW_TEXT,
                                 Text.of("Click to go to next page."))));
@@ -133,6 +133,6 @@ public class PacketHelper {
     }
 
     public static Text getSearchMessage() {
-        return Text.of("§cSearch music failed.");
+        return Text.of("§cSearch failed.");
     }
 }

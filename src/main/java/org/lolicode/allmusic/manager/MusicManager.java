@@ -171,7 +171,7 @@ public class MusicManager {
     public static void search(MinecraftServer server, ServerCommandSource source, String keyword, int page) {
         Allmusic.EXECUTOR.execute(() -> {
             Api.SearchResult result = Api.search(keyword, page, 10);
-            if (result != null) {
+            if (result != null && result.result != null) {
                 source.sendFeedback(PacketHelper.getSearchMessage(result), false);
             } else {
                 source.sendFeedback(PacketHelper.getSearchMessage(), false);

@@ -3,7 +3,7 @@
   "id": "allmusic",
   "version": "${version}",
   "name": "Allmusic",
-  "description": "A porting of AllMusic_P to fabric server",
+  "description": "A server-side music player for Minecraft",
   "authors": [
     "KoishiMoe"
   ],

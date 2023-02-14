@@ -71,14 +71,26 @@ public class MusicManager {
 
     public static void play(@NotNull MusicObj musicObj, MinecraftServer server) {
         List<ServerPlayerEntity> playerList = OnlineRealPlayerHelper.getOnlineRealPlayerList(server);
-        PacketByteBuf buf = PacketHelper.getPlayPacket(musicObj);
-        if (buf == null)
+        if (playerList.size() == 0)
+            return;
+
+        PacketByteBuf stopBuf = PacketHelper.getStopPacket();
+        for (ServerPlayerEntity player : playerList) {
+            try {
+                ServerPlayNetworking.send(player, Allmusic.ID, stopBuf);
+            } catch (Exception e) {
+                Allmusic.LOGGER.error("Send stop packet failed", e);
+            }
+        }
+
+        PacketByteBuf playBuf = PacketHelper.getPlayPacket(musicObj);
+        if (playBuf == null)
             throw new RuntimeException("Generate play packet failed");
         for (ServerPlayerEntity player : playerList) {
             try {
-                ServerPlayNetworking.send(player, Allmusic.ID, buf);
+                ServerPlayNetworking.send(player, Allmusic.ID, playBuf);
             } catch (Exception e) {
-                e.printStackTrace();
+                Allmusic.LOGGER.error("Send play packet failed", e);
             }
         }
         server.getPlayerManager().broadcast(PacketHelper.getPlayMessage(musicObj), false);

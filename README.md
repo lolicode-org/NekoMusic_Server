@@ -26,7 +26,7 @@
 
 下载对应版本的[AllMusic_M](https://github.com/Colyyr/AllMusic_M/releases)，按照正常的Mod安装方法安装即可。
 
-**注意：** 高版本（大概是1.19+）的客户端Mod似乎存在严重的Bug [1](https://github.com/Coloryr/AllMusic_M/issues/16) [2](https://github.com/Coloryr/AllMusic_M/issues/17)，如果你使用原版客户端发现了卡死的情况，可以尝试使用我的[修复版](https://github.com/lolicode-org/AllMusic_M/releases)。
+**注意：** 高版本（大概是1.19+）的客户端Mod可能会导致客户端卡死等问题，由本服务端造成的该问题理论上已经被修复，但如果您仍然发现了类似问题，可以尝试使用我的[修复版](https://github.com/lolicode-org/AllMusic_M/releases)。如果仍然无法解决，请在 [Issues](https://github.com/lolicode-org/AllMusic_Server/issues) 中提出。
 
 ### 命令
 

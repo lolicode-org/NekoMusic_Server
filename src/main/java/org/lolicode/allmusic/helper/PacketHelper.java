@@ -29,6 +29,15 @@ public class PacketHelper {
         return new PacketByteBuf(buf);
     }
 
+    public static PacketByteBuf getStopPacket() {
+        byte[] bytes = "[Stop]".getBytes(StandardCharsets.UTF_8);
+        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
+        buf.writeByte(666);
+        buf.writeBytes(bytes);
+
+        return new PacketByteBuf(buf);
+    }
+
     public static Text getPlayMessage(@NotNull MusicObj musicObj) {
         String player = musicObj.player;
         if (player == null || player.equals(""))

@@ -150,15 +150,15 @@ public class MusicManager {
     }
 
     public static void del(MinecraftServer server, ServerCommandSource source, int index) {
-        if (index < 0 || index >= Allmusic.orderList.songs.size()) {
+        if (index <= 0 || index > Allmusic.orderList.songs.size()) {
             source.sendFeedback(PacketHelper.getDelMessage(), true);
             return;
         }
-        MusicObj musicObj = Allmusic.orderList.songs.get(index);
+        MusicObj musicObj = Allmusic.orderList.songs.get(index - 1);
         if (musicObj.player.equals(source.getName())
                 || Permissions.check(source, "allmusic.del.other", 1)) {
-            Allmusic.orderList.songs.remove(index);
-            server.getPlayerManager().broadcast(PacketHelper.getDelMessage(musicObj),false);
+            Allmusic.orderList.songs.remove(index - 1);
+            source.sendFeedback(PacketHelper.getDelMessage(musicObj), true);
         } else {
             source.sendFeedback(PacketHelper.getDelMessage(), true);
         }

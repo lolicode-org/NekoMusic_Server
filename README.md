@@ -38,7 +38,7 @@
 | `/music vote`         | `allmusic.vote`         | 投票切歌                               |
 | `/music next`         | `allmusic.next`         | 强制切歌                               |
 | `/music del`          | `allmusic.del`          | 删除当前播放列表中的歌曲                       |
-| `/music del`          | `allmusic.del.others`   | 删除别人点的歌曲                           |
+| `/music del`          | `allmusic.del.other`    | 删除别人点的歌曲                           |
 | `/music search`       | `allmusic.search`       | 搜索歌曲                               |
 | `/music reload`       | `allmusic.reload`       | 重新加载配置文件                           |
 | `/music login`        | `allmusic.login`        | 登陆命令根节点                            |

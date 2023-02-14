@@ -72,8 +72,9 @@ public class PacketHelper {
             return Text.of("§cNo music in playing list.");
         } else {
             StringBuilder sb = new StringBuilder("§ePlaying list: \n");
+            int num = 0;
             for (MusicObj musicObj : Allmusic.orderList.songs) {
-                sb.append("§a").append(musicObj.name).append(" §e-§9 ")
+                sb.append("§e").append(++num).append(". ").append("§a").append(musicObj.name).append(" §e-§9 ")
                         .append(String.join(" & ",
                                 musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new)))
                         .append(" §eby §d").append(musicObj.player).append("\n");
@@ -88,8 +89,9 @@ public class PacketHelper {
         } else {
             MutableText text = Text.literal("§aName §e-§9 Artist §e- §dAlbum" + "\n")
                     .setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.YELLOW)));
+            int num = 0;
             for (Api.SearchResult.Result.OneSong song : result.result.songs) {
-                text.append(Text.literal("§a" + song.name + " §e-§9 "
+                text.append(Text.literal( "§e" + (++num) + ". " + "§a" + song.name + " §e-§9 "
                         + String.join(" & ",
                         song.artists.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                         + "§e - §d" + song.album.name + "\n").setStyle(

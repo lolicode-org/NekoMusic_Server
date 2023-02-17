@@ -163,7 +163,7 @@ public class MusicManager {
 
     public static void del(MinecraftServer server, ServerCommandSource source, int index) {
         if (index <= 0 || index > Allmusic.orderList.songs.size()) {
-            source.sendFeedback(PacketHelper.getDelMessage(), true);
+            source.sendFeedback(PacketHelper.getDelMessage(1), true);
             return;
         }
         MusicObj musicObj = Allmusic.orderList.songs.get(index - 1);
@@ -172,7 +172,7 @@ public class MusicManager {
             Allmusic.orderList.songs.remove(index - 1);
             source.sendFeedback(PacketHelper.getDelMessage(musicObj), true);
         } else {
-            source.sendFeedback(PacketHelper.getDelMessage(), true);
+            source.sendFeedback(PacketHelper.getDelMessage(2), true);
         }
     }
 

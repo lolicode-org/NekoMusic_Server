@@ -50,7 +50,7 @@ public class PacketHelper {
 
     public static Text getVoteMessage(int count, int total) {
         return Text.of("§eVote count: §a" + count + " §e/ §9" + total +
-                " §e(§a" + (int) (count * 100.0 / total) + "%§e of §a" + Allmusic.CONFIG.voteThreshold + "%§e)");
+                " §e(§a" + (int) (count * 100.0 / total) + "%§e of §a" + Allmusic.CONFIG.voteThreshold * 100 + "%§e)");
     }
 
     public static Text getOrderMessage(@NotNull MusicObj musicObj) {
@@ -72,23 +72,34 @@ public class PacketHelper {
         return Text.of("§eDeleted: §a" + musicObj.name);
     }
 
-    public static Text getDelMessage() {
-        return Text.of("§cDelete music failed.");
+    public static Text getDelMessage(int error) {
+        if (error == 1) {
+            return Text.of("§cInvalid index.");
+        } else if (error == 2) {
+            return Text.of("§cYou don't have sufficient permissions.");
+        } else {
+            return Text.of("§cDelete music failed.");
+        }
     }
 
     public static Text getListMessage() {
         if (Allmusic.orderList.songs.size() == 0) {
             return Text.of("§cNo music in playing list.");
         } else {
-            StringBuilder sb = new StringBuilder("§ePlaying list: \n");
+            MutableText text = Text.literal("§ePlaying list: \n");
             int num = 0;
             for (MusicObj musicObj : Allmusic.orderList.songs) {
-                sb.append("§e").append(++num).append(". ").append("§a").append(musicObj.name).append(" §e-§9 ")
-                        .append(String.join(" & ",
-                                musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new)))
-                        .append(" §eby §d").append(musicObj.player).append("\n");
+                text.append(Text.literal("§e" + (++num) + ". " + "§a" + musicObj.name + " §e-§9 "
+                        + String.join(" & ",
+                        musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
+                        + " §eby §d" + musicObj.player))
+                        .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music del " + num))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to delete it.")))));
+                if (num != Allmusic.orderList.songs.size())
+                    text.append(Text.literal("\n"));
             }
-            return Text.of(sb.substring(0, sb.length() - 1));
+            return text;
         }
     }
 

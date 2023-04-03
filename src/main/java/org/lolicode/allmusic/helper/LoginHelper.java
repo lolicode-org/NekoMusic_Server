@@ -1,6 +1,8 @@
 package org.lolicode.allmusic.helper;
 
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import org.lolicode.allmusic.Allmusic;
 import org.lolicode.allmusic.music.Api;
@@ -8,13 +10,16 @@ import org.lolicode.allmusic.music.Api;
 
 public class LoginHelper {
     public static void genQr(ServerCommandSource source) {
-        if (source.isExecutedByPlayer()) {
-            source.sendFeedback(Text.of("§cPlease run this command in the console"), false);
-            return;
-        }
         Allmusic.EXECUTOR.execute(() -> {
             try {
                 if (Api.genLoginKey()) {
+                    if (source.isExecutedByPlayer()) {
+                        source.sendFeedback(Text.of("§ePlease open the link below and scan the QR code displayed in your browser:"), false);
+                        MutableText link = Text.literal("§bhttps://qrcode.lolicode.org/?text=" + Api.getLoginKey());
+                        link.setStyle(link.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://qrcode.lolicode.org/?text=" + Api.getLoginKey())));
+                        source.sendFeedback(link, false);
+                        return;
+                    }
                     String qrCode = Api.genLoginQrcode();
                     if (qrCode != null) {
                         source.sendFeedback(Text.of("§ePlease scan the QR code below to login"), false);

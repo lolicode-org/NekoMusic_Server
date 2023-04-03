@@ -120,6 +120,11 @@ public class Api {
         return false;
     }
 
+    public static String getLoginKey() {
+        if (key == null || key.isEmpty()) genLoginKey();
+        return key;
+    }
+
     public static String genLoginQrcode() {
         if (key == null || key.isEmpty()) return null;
         try (Response response = Allmusic.HTTP_CLIENT.newCall(new Request.Builder()

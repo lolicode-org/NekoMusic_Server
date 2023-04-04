@@ -1,4 +1,4 @@
-package org.lolicode.allmusic.event;
+package org.lolicode.nekomusic.event;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

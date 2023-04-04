@@ -1,16 +1,16 @@
-package org.lolicode.allmusic.helper;
+package org.lolicode.nekomusic.helper;
 
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import org.lolicode.allmusic.Allmusic;
-import org.lolicode.allmusic.music.Api;
+import org.lolicode.nekomusic.NekoMusic;
+import org.lolicode.nekomusic.music.Api;
 
 
 public class LoginHelper {
     public static void genQr(ServerCommandSource source) {
-        Allmusic.EXECUTOR.execute(() -> {
+        NekoMusic.EXECUTOR.execute(() -> {
             try {
                 if (Api.genLoginKey()) {
                     if (source.isExecutedByPlayer()) {
@@ -33,13 +33,13 @@ public class LoginHelper {
                 }
             } catch (Exception e) {
                 source.sendFeedback(Text.of("§cFailed to generate QR code"), false);
-                Allmusic.LOGGER.error("Failed to generate QR code", e);
+                NekoMusic.LOGGER.error("Failed to generate QR code", e);
             }
         });
     }
 
     public static void check(ServerCommandSource source) {
-        Allmusic.EXECUTOR.execute(() -> {
+        NekoMusic.EXECUTOR.execute(() -> {
             try {
                 switch (Api.checkLoginStatus()) {
                     case Api.LOGIN_STATUS.NO_KEY ->
@@ -55,13 +55,13 @@ public class LoginHelper {
                 }
             } catch (Exception e) {
                 source.sendFeedback(Text.of("§cFailed to check login status: Internal error"), false);
-                Allmusic.LOGGER.error("Failed to check login status", e);
+                NekoMusic.LOGGER.error("Failed to check login status", e);
             }
         });
     }
 
     public static void status(ServerCommandSource source) {
-        Allmusic.EXECUTOR.execute(() -> {
+        NekoMusic.EXECUTOR.execute(() -> {
             try {
                 Api.UserInfo.Data.Profile profile = Api.getUserInfo();
                 if (profile != null) {
@@ -77,7 +77,7 @@ public class LoginHelper {
                     source.sendFeedback(Text.of("§eLogin status: §cNot logged in"), false);
                 } else {
                     source.sendFeedback(Text.of("§cFailed to get user info: Internal error"), false);
-                    Allmusic.LOGGER.error("Failed to get user info", e);
+                    NekoMusic.LOGGER.error("Failed to get user info", e);
                 }
             }
         });

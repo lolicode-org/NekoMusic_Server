@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
-  "id": "allmusic",
+  "id": "nekomusic",
   "version": "${version}",
-  "name": "Allmusic",
+  "name": "NekoMusic",
   "description": "A server-side music player for Minecraft",
   "authors": [
     "KoishiMoe"
   ],
   "contact": {
-    "repo": "https://github.com/lolicode-org/AllMusic"
+    "repo": "https://github.com/lolicode-org/NekoMusic_Server"
   },
   "license": "MIT",
-  "icon": "assets/allmusic/icon.png",
+  "icon": "assets/nekomusic/icon.png",
   "environment": "server",
   "entrypoints": {
     "server": [
-      "org.lolicode.allmusic.Allmusic"
+      "org.lolicode.nekomusic.NekoMusic"
     ]
   },
   "mixins": [
-    "allmusic.mixins.json"
+    "nekomusic.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.13",

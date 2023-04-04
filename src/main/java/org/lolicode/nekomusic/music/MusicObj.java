@@ -1,4 +1,4 @@
-package org.lolicode.allmusic.music;
+package org.lolicode.nekomusic.music;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.lolicode.allmusic.helper;
+package org.lolicode.nekomusic.helper;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -6,9 +6,9 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
-import org.lolicode.allmusic.Allmusic;
-import org.lolicode.allmusic.music.Api;
-import org.lolicode.allmusic.music.MusicObj;
+import org.lolicode.nekomusic.NekoMusic;
+import org.lolicode.nekomusic.music.Api;
+import org.lolicode.nekomusic.music.MusicObj;
 
 import java.nio.charset.StandardCharsets;
 
@@ -50,7 +50,7 @@ public class PacketHelper {
 
     public static Text getVoteMessage(int count, int total) {
         return Text.of("§eVote count: §a" + count + " §e/ §9" + total +
-                " §e(§a" + (int) (count * 100.0 / total) + "%§e of §a" + Allmusic.CONFIG.voteThreshold * 100 + "%§e)");
+                " §e(§a" + (int) (count * 100.0 / total) + "%§e of §a" + NekoMusic.CONFIG.voteThreshold * 100 + "%§e)");
     }
 
     public static Text getOrderMessage(@NotNull MusicObj musicObj) {
@@ -83,12 +83,12 @@ public class PacketHelper {
     }
 
     public static Text getListMessage() {
-        if (Allmusic.orderList.songs.size() == 0) {
+        if (NekoMusic.orderList.songs.size() == 0) {
             return Text.of("§cNo music in playing list.");
         } else {
             MutableText text = Text.literal("§ePlaying list: \n");
             int num = 0;
-            for (MusicObj musicObj : Allmusic.orderList.songs) {
+            for (MusicObj musicObj : NekoMusic.orderList.songs) {
                 text.append(Text.literal("§e" + (++num) + ". " + "§a" + musicObj.name + " §e-§9 "
                         + String.join(" & ",
                         musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
@@ -96,7 +96,7 @@ public class PacketHelper {
                         .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music del id " + musicObj.id))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to delete it.")))));
-                if (num != Allmusic.orderList.songs.size())
+                if (num != NekoMusic.orderList.songs.size())
                     text.append(Text.literal("\n"));
             }
             return text;

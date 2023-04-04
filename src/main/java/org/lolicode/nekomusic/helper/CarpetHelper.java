@@ -1,5 +1,5 @@
 // Taken from https://github.com/NikitaCartes/EasyAuth
-package org.lolicode.allmusic.helper;
+package org.lolicode.nekomusic.helper;
 
 import carpet.patches.EntityPlayerMPFake;
 import net.fabricmc.loader.api.FabricLoader;

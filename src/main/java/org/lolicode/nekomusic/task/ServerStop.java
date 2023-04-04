@@ -1,9 +1,9 @@
-package org.lolicode.allmusic.task;
+package org.lolicode.nekomusic.task;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.lolicode.allmusic.Allmusic.EXECUTOR;
-import static org.lolicode.allmusic.Allmusic.TIMER;
+import static org.lolicode.nekomusic.NekoMusic.EXECUTOR;
+import static org.lolicode.nekomusic.NekoMusic.TIMER;
 
 public class ServerStop {
     public static void onServerStop() {

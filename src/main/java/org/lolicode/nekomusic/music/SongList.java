@@ -1,6 +1,6 @@
-package org.lolicode.allmusic.music;
+package org.lolicode.nekomusic.music;
 
-import org.lolicode.allmusic.Allmusic;
+import org.lolicode.nekomusic.NekoMusic;
 
 import java.util.LinkedList;
 import java.util.Random;
@@ -38,9 +38,9 @@ public class SongList {
 
             isPlaying = true;
             if (isPersistent)
-                Allmusic.orderList.isPlaying = false;
+                NekoMusic.orderList.isPlaying = false;
             else
-                Allmusic.idleList.isPlaying = false;
+                NekoMusic.idleList.isPlaying = false;
             return music;
         } else {
             if (isPersistent)
@@ -68,17 +68,17 @@ public class SongList {
     }
 
     public static void loadIdleList() {
-        if (Allmusic.CONFIG.idleList == 0) return;
-        Allmusic.EXECUTOR.execute(() -> {
+        if (NekoMusic.CONFIG.idleList == 0) return;
+        NekoMusic.EXECUTOR.execute(() -> {
             try {
-                SongList songList = Api.getSongList(Allmusic.CONFIG.idleList);
+                SongList songList = Api.getSongList(NekoMusic.CONFIG.idleList);
                 if (songList != null) {
-                    Allmusic.idleList.load(songList);
-                    Allmusic.idleList.isPersistent = true;
-                    Allmusic.idleList.id = Allmusic.CONFIG.idleList;
+                    NekoMusic.idleList.load(songList);
+                    NekoMusic.idleList.isPersistent = true;
+                    NekoMusic.idleList.id = NekoMusic.CONFIG.idleList;
                 }
             } catch (Exception e) {
-                Allmusic.LOGGER.error("Failed to load idle list", e);
+                NekoMusic.LOGGER.error("Failed to load idle list", e);
             }
         });
     }

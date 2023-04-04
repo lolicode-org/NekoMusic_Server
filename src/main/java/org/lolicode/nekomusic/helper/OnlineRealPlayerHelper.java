@@ -1,4 +1,4 @@
-package org.lolicode.allmusic.helper;
+package org.lolicode.nekomusic.helper;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;

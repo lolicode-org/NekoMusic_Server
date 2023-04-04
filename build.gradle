@@ -32,7 +32,7 @@ dependencies {
 
     include implementation("com.squareup.okhttp3:okhttp:4.10.0")
     include implementation("com.squareup.okio:okio-jvm:3.3.0") //okio-jvm, not okio. This cost me like 1hr of debugging
-    modLocalRuntime("net.fabricmc:fabric-language-kotlin:1.9.1+kotlin.1.8.10") { // includes kotlin for squareup libs
+    modLocalRuntime("net.fabricmc:fabric-language-kotlin:${project.fabric_language_kotlin_version}") { // includes kotlin for squareup libs
         exclude module: "fabric-loader"
     }
     include implementation('xyz.dunjiao.cloud:qr-to-console:1.0')

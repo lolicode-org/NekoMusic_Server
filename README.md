@@ -1,16 +1,27 @@
-# AllMusic Server
+# NekoMusic Server
 
-适用于Fabric服务端的AllMusic Mod，为Fabric服务器提供全服点歌功能。
+适用于Fabric服务端的点歌Mod
 
-本项目使用了 [Coloryr](https://github.com/Coloryr) 的 [AllMusic_M](https://github.com/Coloryr/AllMusic_M) 作为配套客户端，但**并不是**其服务端的Fabric移植。
+> 2023.04.04更新：
+> 
+> [上游项目](https://github.com/Coloryr/AllMusic_Server)已适配了forge和fabric服务端，如果需要所有原版功能或者保持与上游客户端的兼容性，建议使用上游项目。
+> 
+> 本项目将继续维护，但原则上仅留作自用。同时，本项目将**不再**保证与上游客户端的兼容性。为了与上游项目区分，已更改仓库名、modid、包名等。
+> 
+> 本项目**目前**和上游项目的区别有：
+> * 使用了外置的API
+> * 只允许扫码登陆
+> * 仅支持fabric 1.19及以上版本的服务端
+> * 使用Fabric-Permission-API作为权限管理
+> * 目前不支持歌词、封面等功能
 
 ## 使用
 
 ### 服务端
 
 1. 请确保已安装 [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api) 和 [Fabric Language Kotlin](https://www.curseforge.com/minecraft/mc-mods/fabric-language-kotlin)。
-2. 从 [Releases](https://github.com/lolicode-org/AllMusic_Server/releases) 下载最新版本的服务端Mod，放入服务端的 `mods` 目录中。
-3. 启动服务端，服务端会在 `config` 目录下生成 `allmusic.json` 配置文件，根据需要修改配置文件。
+2. 从 [Releases](https://github.com/lolicode-org/NekoMusic_Server/releases) 下载最新版本的服务端Mod，放入服务端的 `mods` 目录中。
+3. 启动服务端，服务端会在 `config` 目录下生成 `nekomusic.json` 配置文件，根据需要修改配置文件。（如果您是旧版本升级而来，请手动将`allmusic.json`重命名为`nekomusic.json`）
 ```json5
 {
   "cookie": "",  // 某云的cookie，用于获取音乐信息
@@ -24,27 +35,25 @@
 
 ### 客户端
 
-下载对应版本的[AllMusic_M](https://github.com/Colyyr/AllMusic_M/releases)，按照正常的Mod安装方法安装即可。
-
-**注意：** 高版本（大概是1.19+）的客户端Mod可能会导致客户端卡死等问题，由本服务端造成的该问题理论上已经被修复，但如果您仍然发现了类似问题，可以尝试使用我的[修复版](https://github.com/lolicode-org/AllMusic_M/releases)。如果仍然无法解决，请在 [Issues](https://github.com/lolicode-org/AllMusic_Server/issues) 中提出。
+下载对应版本的[客户端](https://github.com/lolicode-org/NekoMusic_Cli)，按照正常的Mod安装方法安装即可。
 
 ### 命令
 
-| 命令                    | 权限                      | 用途                                     |
-|:----------------------|:------------------------|:---------------------------------------|
-| `/music`              | `allmusic`              | 命令根节点。后面可以直接加歌曲ID或者链接来快速点歌（需要点歌权限）     |
-| `/music add`          | `allmusic.add`          | 点歌，后面可以加歌曲ID或者链接                       |
-| `/music list`         | `allmusic.list`         | 查看当前播放列表                               |
-| `/music vote`         | `allmusic.vote`         | 投票切歌                                   |
-| `/music next`         | `allmusic.next`         | 强制切歌                                   |
-| `/music del`          | `allmusic.del`          | 删除当前播放列表中的歌曲                           |
-| `/music del`          | `allmusic.del.other`    | 删除别人点的歌曲                               |
-| `/music search`       | `allmusic.search`       | 搜索歌曲                                   |
-| `/music reload`       | `allmusic.reload`       | 重新加载配置文件                               |
-| `/music login`        | `allmusic.login`        | 登陆命令根节点                                |
-| `/music login start`  | `allmusic.login.start`  | 开始登陆，会在**控制台**打印登陆二维码，或者在**聊天栏**显示登陆链接 |
-| `/music login check`  | `allmusic.login.check`  | 检查登陆状态，如果登陆成功，会将cookie写入配置文件           |
-| `/music login status` | `allmusic.login.status` | 显示当前登陆的用户信息                            |
+| 命令                    | 权限                       | 用途                                     |
+|:----------------------|:-------------------------|:---------------------------------------|
+| `/music`              | `nekomusic`              | 命令根节点。后面可以直接加歌曲ID或者链接来快速点歌（需要点歌权限）     |
+| `/music add`          | `nekomusic.add`          | 点歌，后面可以加歌曲ID或者链接                       |
+| `/music list`         | `nekomusic.list`         | 查看当前播放列表                               |
+| `/music vote`         | `nekomusic.vote`         | 投票切歌                                   |
+| `/music next`         | `nekomusic.next`         | 强制切歌                                   |
+| `/music del`          | `nekomusic.del`          | 删除当前播放列表中的歌曲                           |
+| `/music del`          | `nekomusic.del.other`    | 删除别人点的歌曲                               |
+| `/music search`       | `nekomusic.search`       | 搜索歌曲                                   |
+| `/music reload`       | `nekomusic.reload`       | 重新加载配置文件                               |
+| `/music login`        | `nekomusic.login`        | 登陆命令根节点                                |
+| `/music login start`  | `nekomusic.login.start`  | 开始登陆，会在**控制台**打印登陆二维码，或者在**聊天栏**显示登陆链接 |
+| `/music login check`  | `nekomusic.login.check`  | 检查登陆状态，如果登陆成功，会将cookie写入配置文件           |
+| `/music login status` | `nekomusic.login.status` | 显示当前登陆的用户信息                            |
 
 ### API
 

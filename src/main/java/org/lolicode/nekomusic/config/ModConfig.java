@@ -1,11 +1,11 @@
-package org.lolicode.allmusic.config;
+package org.lolicode.nekomusic.config;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-import org.lolicode.allmusic.Allmusic;
-import org.lolicode.allmusic.music.SongList;
+import org.lolicode.nekomusic.NekoMusic;
+import org.lolicode.nekomusic.music.SongList;
 
 import java.io.*;
 
@@ -20,7 +20,7 @@ public class ModConfig {
 
     public static void prepare() {
         if (configFile != null) return;
-        configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "allmusic.json");
+        configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "nekomusic.json");
     }
 
     public static void create() {
@@ -30,11 +30,11 @@ public class ModConfig {
     public static void save() {
         prepare();
 
-        String config = Allmusic.GSON.toJson(Allmusic.CONFIG);
+        String config = NekoMusic.GSON.toJson(NekoMusic.CONFIG);
         try (FileWriter writer = new FileWriter(configFile)) {
             writer.write(config);
         } catch (IOException e) {
-            Allmusic.LOGGER.error("Failed to save mod config", e);
+            NekoMusic.LOGGER.error("Failed to save mod config", e);
         }
     }
 
@@ -46,23 +46,23 @@ public class ModConfig {
         }
         if (configFile.exists()) {
             try (BufferedReader reader = new BufferedReader(new FileReader(configFile))) {
-                ModConfig config = Allmusic.GSON.fromJson(reader, ModConfig.class);
+                ModConfig config = NekoMusic.GSON.fromJson(reader, ModConfig.class);
                 if (config != null) {
-                    Allmusic.CONFIG.cookie = config.cookie;
-                    Allmusic.CONFIG.idleList = config.idleList;
+                    NekoMusic.CONFIG.cookie = config.cookie;
+                    NekoMusic.CONFIG.idleList = config.idleList;
                     if (config.apiAddress == null || config.apiAddress.isEmpty()) {
                         throw new RuntimeException("apiAddress is null in config.json");
                     }
-                    Allmusic.CONFIG.apiAddress = config.apiAddress;
+                    NekoMusic.CONFIG.apiAddress = config.apiAddress;
                     if (config.idleList > 0) {
                         SongList.loadIdleList();
                     }
                     return true;
                 }
             } catch (IOException e) {
-                Allmusic.LOGGER.error("Failed to load mod config", e);
+                NekoMusic.LOGGER.error("Failed to load mod config", e);
             } catch (RuntimeException e) {
-                Allmusic.LOGGER.error("Failed to parse mod config", e);
+                NekoMusic.LOGGER.error("Failed to parse mod config", e);
             }
         }
 
@@ -71,9 +71,9 @@ public class ModConfig {
 
     public static void reload(MinecraftServer server, ServerCommandSource source) {
         if (load()) {
-            source.sendFeedback(Text.of("§aAllMusic: Config reloaded"), true);
+            source.sendFeedback(Text.of("§aNekoMusic: Config reloaded"), true);
         } else {
-            source.sendFeedback(Text.of("§cAllMusic: Config reload failed"), true);
+            source.sendFeedback(Text.of("§cNekoMusic: Config reload failed"), true);
         }
     }
 

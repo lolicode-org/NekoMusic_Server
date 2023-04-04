@@ -74,7 +74,7 @@ public class PacketHelper {
 
     public static Text getDelMessage(int error) {
         if (error == 1) {
-            return Text.of("§cInvalid index.");
+            return Text.of("§cInvalid index or id.");
         } else if (error == 2) {
             return Text.of("§cYou don't have sufficient permissions.");
         } else {
@@ -94,7 +94,7 @@ public class PacketHelper {
                         musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                         + " §eby §d" + musicObj.player))
                         .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music del " + num))
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music del id " + musicObj.id))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to delete it.")))));
                 if (num != Allmusic.orderList.songs.size())
                     text.append(Text.literal("\n"));

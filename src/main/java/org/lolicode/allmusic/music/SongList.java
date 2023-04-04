@@ -18,6 +18,10 @@ public class SongList {
         songs.add(musicObj);
     }
 
+    public MusicObj get(long id) {
+        return songs.stream().filter(musicObj -> musicObj.id == id).findFirst().orElse(null);
+    }
+
     public MusicObj next() {
         if (songs.size() == 0) return null;
 

@@ -176,6 +176,21 @@ public class MusicManager {
         }
     }
 
+    public static void del(MinecraftServer server, ServerCommandSource source, long id) {
+        MusicObj musicObj = Allmusic.orderList.get(id);
+        if (musicObj == null) {
+            source.sendFeedback(PacketHelper.getDelMessage(1), true);
+            return;
+        }
+        if (musicObj.player.equals(source.getName())
+                || Permissions.check(source, "allmusic.del.other", 1)) {
+            Allmusic.orderList.songs.remove(musicObj);
+            source.sendFeedback(PacketHelper.getDelMessage(musicObj), true);
+        } else {
+            source.sendFeedback(PacketHelper.getDelMessage(2), true);
+        }
+    }
+
     public static void list(MinecraftServer server, ServerCommandSource source) {
         source.sendFeedback(PacketHelper.getListMessage(), false);
     }

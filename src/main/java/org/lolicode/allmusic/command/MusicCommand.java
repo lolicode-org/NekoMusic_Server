@@ -2,6 +2,7 @@ package org.lolicode.allmusic.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import me.lucko.fabric.api.permissions.v0.Permissions;
@@ -33,12 +34,20 @@ public class MusicCommand {
                         })).build();
         LiteralCommandNode<ServerCommandSource> delNode = CommandManager.literal("del")
                 .requires(Permissions.require("allmusic.del", 0))
-                .then(CommandManager.argument("id", IntegerArgumentType.integer())
+                .then(CommandManager.argument("index", IntegerArgumentType.integer())
                         .executes(context -> {
-                            int id = IntegerArgumentType.getInteger(context, "id");
-                            MusicManager.del(context.getSource().getServer(), context.getSource(), id);
+                            int index = IntegerArgumentType.getInteger(context, "index");
+                            MusicManager.del(context.getSource().getServer(), context.getSource(), index);
                             return 0;
-                        })).build();
+                        }))
+                .then(CommandManager.literal("id")
+                        .then(CommandManager.argument("id", StringArgumentType.greedyString())
+                                .executes(context -> {
+                                    long id = LongArgumentType.getLong(context, "id");
+                                    MusicManager.del(context.getSource().getServer(), context.getSource(), id);
+                                    return 0;
+                                })))
+                .build();
         LiteralCommandNode<ServerCommandSource> listNode = CommandManager.literal("list")
                 .requires(Permissions.require("allmusic.list", 0))
                 .executes(context -> {

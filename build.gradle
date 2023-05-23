@@ -15,6 +15,7 @@ repositories {
 
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { name "Carpet"; url "https://masa.dy.fi/maven" }
+    maven { url "https://maven.bai.lol" }
     mavenCentral()
 }
 
@@ -38,6 +39,7 @@ dependencies {
     include implementation('xyz.dunjiao.cloud:qr-to-console:1.0')
     include implementation('com.google.zxing:javase:3.5.1')
     include implementation('com.google.zxing:core:3.5.1')
+    modImplementation "lol.bai:badpackets:fabric-${badpackets_version}"
 }
 
 processResources {

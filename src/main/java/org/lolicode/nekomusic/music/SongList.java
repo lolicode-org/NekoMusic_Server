@@ -33,8 +33,10 @@ public class SongList {
             songs.remove(0);
         }
         String url = Api.getMusicUrl(music);  // Don't use cached url, as the url may be expired
+        LyricObj lyric = music.lyric == null ? Api.getLyric(music) : music.lyric; // use cached lyric if available
         if (url != null) {
             music.url = url;
+            if (lyric != null) music.lyric = lyric;
 
             isPlaying = true;
             if (isPersistent)

@@ -7,10 +7,13 @@ import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.lolicode.nekomusic.NekoMusic;
+import org.lolicode.nekomusic.libs.lrcparser.parser.Sentence;
 import org.lolicode.nekomusic.music.Api;
 import org.lolicode.nekomusic.music.MusicObj;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class PacketHelper {
     public static PacketByteBuf getPlayPacket(@NotNull MusicObj musicObj) {
@@ -31,6 +34,85 @@ public class PacketHelper {
 
     public static PacketByteBuf getStopPacket() {
         byte[] bytes = "[Stop]".getBytes(StandardCharsets.UTF_8);
+        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
+        buf.writeByte(666);
+        buf.writeBytes(bytes);
+
+        return new PacketByteBuf(buf);
+    }
+
+    public static PacketByteBuf getInfoPacket(@NotNull MusicObj musicObj) {
+        if (musicObj.name == null || musicObj.name.equals(""))
+            return null;
+        StringBuilder list = new StringBuilder();
+        list.append("[Info]");
+        list.append(musicObj.name).append("\n");
+        list.append(musicObj.ar.stream().map(artistObj -> artistObj.name).reduce((a, b) -> a + " & " + b).orElse("")).append("\n");
+        list.append(musicObj.al.name).append("\n");
+        list.append("by: ").append(musicObj.player);
+
+        byte[] bytes = list.toString().getBytes(StandardCharsets.UTF_8);
+        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
+        buf.writeByte(666);
+        buf.writeBytes(bytes);
+
+        return new PacketByteBuf(buf);
+    }
+
+    public static PacketByteBuf getListPacket() {
+        StringBuilder list = new StringBuilder();
+        list.append("[List]");
+        if (NekoMusic.orderList.songs.size() == 0) {
+            list.append("No songs in the list");
+        } else {
+            int count = 0;
+            while (count < NekoMusic.orderList.songs.size() && count < 10) {
+                MusicObj musicObj = NekoMusic.orderList.songs.get(count);
+                list.append(count + 1).append(". ").append(musicObj.name).append(" - ").append(musicObj.ar.stream().map(artistObj -> artistObj.name).reduce((a, b) -> a + " & " + b).orElse("")).append("\n");
+                count++;
+            }
+        }
+
+        byte[] bytes = list.toString().getBytes(StandardCharsets.UTF_8);
+        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
+        buf.writeByte(666);
+        buf.writeBytes(bytes);
+
+        return new PacketByteBuf(buf);
+    }
+
+    public static PacketByteBuf getLyricPacket(ArrayList<Sentence> sentences, ArrayList<Sentence> translations) {
+        if (sentences == null || sentences.size() == 0)
+            return null;
+        StringBuilder lyric = new StringBuilder();
+        lyric.append("[Lyric]");
+        lyric.append(sentences.stream().map(sentence -> sentence.getContent() + " ").reduce((a, b) -> a + b).orElse(""));
+        if (translations != null && translations.size() != 0) {
+            lyric.append("/ ");
+            lyric.append(translations.stream().map(sentence -> sentence.getContent() + " ").reduce((a, b) -> a + b).orElse(""));
+        }
+
+        byte[] bytes = lyric.toString().getBytes(StandardCharsets.UTF_8);
+        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
+        buf.writeByte(666);
+        buf.writeBytes(bytes);
+
+        return new PacketByteBuf(buf);
+    }
+
+    public static PacketByteBuf getClearPacket() {
+        byte[] bytes = "[clear]".getBytes(StandardCharsets.UTF_8);
+        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
+        buf.writeByte(666);
+        buf.writeBytes(bytes);
+
+        return new PacketByteBuf(buf);
+    }
+
+    public static PacketByteBuf getCoverPacket(MusicObj music) {
+        if (music.al == null || music.al.picUrl == null || music.al.picUrl.equals(""))
+            return null;
+        byte[] bytes = ("[Img]" + music.al.picUrl).getBytes(StandardCharsets.UTF_8);
         ByteBuf buf = Unpooled.buffer(bytes.length + 1);
         buf.writeByte(666);
         buf.writeBytes(bytes);

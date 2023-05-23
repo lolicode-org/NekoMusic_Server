@@ -13,6 +13,12 @@ public class MusicObj {
         public int end;
     }
 
+    public static class AlbumObj {
+        public String name;
+        public String id;
+        public String picUrl;
+    }
+
     public List<ArtistObj> ar = List.of();
     public String name;
     public long id;
@@ -23,4 +29,6 @@ public class MusicObj {
     protected byte fee;
     protected byte payed;
     public String player;  // who ordered this song
+    public LyricObj lyric;
+    public AlbumObj al;
 }

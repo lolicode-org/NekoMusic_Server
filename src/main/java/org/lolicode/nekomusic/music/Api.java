@@ -312,4 +312,34 @@ public class Api {
         }
         return null;
     }
+
+    static LyricObj getLyric(long id) {
+        if (id == 0) return null;
+        HttpUrl.Builder url = HttpUrl.parse(NekoMusic.CONFIG.apiAddress + "/lyric").newBuilder()
+                .addQueryParameter("id", String.valueOf(id));
+        if (NekoMusic.CONFIG.cookie != null && !NekoMusic.CONFIG.cookie.isEmpty()) {
+            url.addQueryParameter("cookie", NekoMusic.CONFIG.cookie);
+        }
+        try (Response response = NekoMusic.HTTP_CLIENT.newCall(new Request.Builder()
+                        .url(url.build())
+                        .build())
+                .execute()) {
+            if (response.code() == 200 && response.body() != null) {
+                LyricObj lyric = NekoMusic.GSON.fromJson(response.body().string(), LyricObj.class);
+                if (lyric.getLyric() == null || lyric.getLyric().isEmpty()) {
+                    return null;
+                }
+                return lyric;
+            } else {
+                NekoMusic.LOGGER.error("Failed to get lyric: Invalid response " + response.code());
+            }
+        } catch (IOException e) {
+            NekoMusic.LOGGER.error("Failed to get lyric: Network error", e);
+        }
+        return null;
+    }
+
+    static LyricObj getLyric(MusicObj music) {
+        return music == null ? null : getLyric(music.id);
+    }
 }

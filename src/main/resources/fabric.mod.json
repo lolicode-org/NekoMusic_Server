@@ -26,6 +26,7 @@
     "fabric": "*",
     "minecraft": ">=1.19",
     "fabric-permissions-api-v0": "*",
-    "fabric-language-kotlin": "*"
+    "fabric-language-kotlin": "*",
+    "badpackets": ">=0.3.4"
   }
 }

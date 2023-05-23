@@ -51,7 +51,7 @@ public class ModConfig {
                     NekoMusic.CONFIG.cookie = config.cookie;
                     NekoMusic.CONFIG.idleList = config.idleList;
                     if (config.apiAddress == null || config.apiAddress.isEmpty()) {
-                        throw new RuntimeException("apiAddress is null in config.json");
+                        throw new RuntimeException("apiAddress is null in mod config");
                     }
                     NekoMusic.CONFIG.apiAddress = config.apiAddress;
                     if (config.idleList > 0) {
@@ -77,4 +77,20 @@ public class ModConfig {
         }
     }
 
+    public static boolean loadLegacy() {
+        File legacyFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "allmusic.json");
+        if (legacyFile.exists()) {
+            configFile = legacyFile;
+            if (load()) {
+                NekoMusic.LOGGER.warn("Found legacy config file, migrating...");
+                configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "nekomusic.json");
+                save();
+                if (!legacyFile.delete()) {
+                    NekoMusic.LOGGER.warn("Failed to delete legacy config file, you may need to delete 'allmusic.json' manually");
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 }

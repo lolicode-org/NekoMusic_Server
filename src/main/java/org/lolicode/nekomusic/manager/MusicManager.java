@@ -8,7 +8,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.lolicode.nekomusic.NekoMusic;
-import org.lolicode.nekomusic.helper.OnlineRealPlayerHelper;
+import org.lolicode.nekomusic.helper.PlayerHelper;
 import org.lolicode.nekomusic.helper.PacketHelper;
 import org.lolicode.nekomusic.music.Api;
 import org.lolicode.nekomusic.music.MusicObj;
@@ -27,7 +27,7 @@ public class MusicManager {
             NekoMusic.task.cancel();  // If user issues next command, cancel the current task in case it's not finished
             NekoMusic.task = null;
         }
-        if (OnlineRealPlayerHelper.getOnlineRealPlayerList(server).size() == 0)
+        if (PlayerHelper.getOnlineRealPlayerList(server).size() == 0)
             return;
 
         NekoMusic.currentVote.clear();
@@ -52,6 +52,7 @@ public class MusicManager {
                         }
                     };
                     NekoMusic.TIMER.schedule(NekoMusic.task, next.dt + 3000);  // Add 3 seconds to avoid the music starts before the previous one ends
+                    HudManager.sendNext();
                     success = true;
                 } catch (Exception e) {
                     NekoMusic.LOGGER.error("Play music failed", e);
@@ -69,15 +70,23 @@ public class MusicManager {
         });
     }
 
+    /*
+    * Always call this method in a new thread
+     */
     public static void play(@NotNull MusicObj musicObj, MinecraftServer server) {
-        List<ServerPlayerEntity> playerList = OnlineRealPlayerHelper.getOnlineRealPlayerList(server);
+        // for compatibility with allmusic, use the same id as it
+        List<ServerPlayerEntity> playerList = PlayerHelper.getOnlineRealPlayerList(server);
         if (playerList.size() == 0)
             return;
+//        List<ServerPlayerEntity> nekoPlayerList = PlayerHelper.getOnlineRealPlayerList(server);
+//        List<ServerPlayerEntity> allMusicPlayerList = PlayerHelper.getAllMusicCompatUserList(server);
+//        if (nekoPlayerList.size() + allMusicPlayerList.size() == 0)
+//            return;
 
         PacketByteBuf stopBuf = PacketHelper.getStopPacket();
         for (ServerPlayerEntity player : playerList) {
             try {
-                ServerPlayNetworking.send(player, NekoMusic.ID, stopBuf);
+                ServerPlayNetworking.send(player, NekoMusic.ALLMUSIC_COMPAT_ID, stopBuf);
             } catch (Exception e) {
                 NekoMusic.LOGGER.error("Send stop packet failed", e);
             }
@@ -88,7 +97,7 @@ public class MusicManager {
             throw new RuntimeException("Generate play packet failed");
         for (ServerPlayerEntity player : playerList) {
             try {
-                ServerPlayNetworking.send(player, NekoMusic.ID, playBuf);
+                ServerPlayNetworking.send(player, NekoMusic.ALLMUSIC_COMPAT_ID, playBuf);
             } catch (Exception e) {
                 NekoMusic.LOGGER.error("Send play packet failed", e);
             }
@@ -110,12 +119,12 @@ public class MusicManager {
         } else {
             NekoMusic.currentVote.add("console");
         }
-        if ( (float)(NekoMusic.currentVote.size()) / OnlineRealPlayerHelper.getOnlineRealPlayerList(server).size()
+        if ( (float)(NekoMusic.currentVote.size()) / PlayerHelper.getOnlineRealPlayerList(server).size()
                 >= NekoMusic.CONFIG.voteThreshold) {
             playNext(server);
         } else {
             server.getPlayerManager().broadcast(PacketHelper.getVoteMessage(
-                    NekoMusic.currentVote.size(), OnlineRealPlayerHelper.getOnlineRealPlayerList(server).size()), false);
+                    NekoMusic.currentVote.size(), PlayerHelper.getOnlineRealPlayerList(server).size()), false);
         }
     }
 
@@ -152,8 +161,10 @@ public class MusicManager {
                 NekoMusic.orderList.add(musicObj);
                 server.getPlayerManager().broadcast(PacketHelper.getOrderMessage(musicObj), false);
                 if (!NekoMusic.orderList.isPlaying
-                        && OnlineRealPlayerHelper.getOnlineRealPlayerList(server).size() > 0) {
+                        && PlayerHelper.getOnlineRealPlayerList(server).size() > 0) {
                     playNext(server);
+                } else {
+                    HudManager.sendList();
                 }
             } else {
                 source.sendFeedback(PacketHelper.getOrderMessage(), false);
@@ -167,13 +178,7 @@ public class MusicManager {
             return;
         }
         MusicObj musicObj = NekoMusic.orderList.songs.get(index - 1);
-        if (musicObj.player.equals(source.getName())
-                || Permissions.check(source, "nekomusic.del.other", 1)) {
-            NekoMusic.orderList.songs.remove(index - 1);
-            source.sendFeedback(PacketHelper.getDelMessage(musicObj), true);
-        } else {
-            source.sendFeedback(PacketHelper.getDelMessage(2), true);
-        }
+        del(server, source, musicObj);
     }
 
     public static void del(MinecraftServer server, ServerCommandSource source, long id) {
@@ -182,12 +187,17 @@ public class MusicManager {
             source.sendFeedback(PacketHelper.getDelMessage(1), true);
             return;
         }
+        del(server, source, musicObj);
+    }
+
+    static void del(MinecraftServer server, ServerCommandSource source, MusicObj musicObj) {
         if (musicObj.player.equals(source.getName())
                 || Permissions.check(source, "nekomusic.del.other", 1)) {
             NekoMusic.orderList.songs.remove(musicObj);
             source.sendFeedback(PacketHelper.getDelMessage(musicObj), true);
+            HudManager.sendList();
         } else {
-            source.sendFeedback(PacketHelper.getDelMessage(2), true);
+            source.sendFeedback(PacketHelper.getDelMessage(2), false);
         }
     }
 

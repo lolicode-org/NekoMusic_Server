@@ -2,6 +2,7 @@ package org.lolicode.nekomusic.helper;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
@@ -9,10 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.libs.lrcparser.parser.Sentence;
 import org.lolicode.nekomusic.music.Api;
+import org.lolicode.nekomusic.music.MusicList;
 import org.lolicode.nekomusic.music.MusicObj;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class PacketHelper {
     public static PacketByteBuf getPlayPacket(@NotNull MusicObj musicObj) {
@@ -114,6 +117,38 @@ public class PacketHelper {
         if (music.album == null || music.album.picUrl == null || music.album.picUrl.equals(""))
             return null;
         byte[] bytes = ("[Img]" + music.album.picUrl).getBytes(StandardCharsets.UTF_8);
+        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
+        buf.writeByte(666);
+        buf.writeBytes(bytes);
+
+        return new PacketByteBuf(buf);
+    }
+
+    public static PacketByteBuf getMetadataPacket(MusicObj music) {
+        if (music == null)
+            return null;
+        String serialized = NekoMusic.GSON.toJson(music);
+        byte[] bytes = (serialized).getBytes(StandardCharsets.UTF_8);
+        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
+        buf.writeByte(666);
+        buf.writeBytes(bytes);
+
+        return new PacketByteBuf(buf);
+    }
+
+    public static PacketByteBuf getPlayListPacket() {
+        if (NekoMusic.orderList.songs.size() == 0)
+            return null;
+        MusicList musicList = new MusicList();
+        musicList.musics = NekoMusic.orderList.songs.stream().limit(10).map(musicObj -> {
+            MusicList.Music music = new MusicList.Music();
+            music.name = musicObj.name;
+            music.artist = musicObj.ar.stream().map(artistObj -> artistObj.name).reduce((a, b) -> a + " & " + b).orElse("");
+            music.album = musicObj.album.name;
+            return music;
+        }).toArray(MusicList.Music[]::new);
+        String serialized = NekoMusic.GSON.toJson(musicList);
+        byte[] bytes = serialized.getBytes(StandardCharsets.UTF_8);
         ByteBuf buf = Unpooled.buffer(bytes.length + 1);
         buf.writeByte(666);
         buf.writeBytes(bytes);

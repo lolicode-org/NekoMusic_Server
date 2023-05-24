@@ -7,7 +7,7 @@ import org.lolicode.nekomusic.NekoMusic;
 public class PlayerLeave {
     public static void OnPlayerLeave(ServerPlayerEntity player, MinecraftServer server) {
         NekoMusic.nekoPlayerSet.remove(player);
-        if (NekoMusic.nekoPlayerSet.isEmpty()) {
+        if (NekoMusic.nekoPlayerSet.isEmpty() && NekoMusic.LYRIC_FUTURE != null) {
             NekoMusic.LYRIC_FUTURE.cancel(true);
         }
     }

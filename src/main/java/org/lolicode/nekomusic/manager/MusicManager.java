@@ -52,7 +52,7 @@ public class MusicManager {
                             }
                         };
                         NekoMusic.TIMER.schedule(NekoMusic.task, next.dt + 3000);  // Add 3 seconds to avoid the music starts before the previous one ends
-                        HudManager.sendNext();
+//                        HudManager.sendNext();
                         success = true;
                     } catch (Exception e) {
                         NekoMusic.LOGGER.error("Play music failed", e);
@@ -106,6 +106,9 @@ public class MusicManager {
             }
         }
         server.getPlayerManager().broadcast(PacketHelper.getPlayMessage(musicObj), false);
+
+        HudManager.sendMetadata(musicObj);
+        HudManager.sendPlayList();
     }
 
     public static void next(MinecraftServer server) {
@@ -167,7 +170,8 @@ public class MusicManager {
                         && PlayerManager.getOnlineRealPlayerList(server).size() > 0) {
                     playNext(server);
                 } else {
-                    HudManager.sendList();
+//                    HudManager.sendList();
+                    HudManager.sendPlayList();
                 }
             } else {
                 source.sendFeedback(PacketHelper.getOrderMessage(), false);
@@ -198,7 +202,8 @@ public class MusicManager {
                 || Permissions.check(source, "nekomusic.del.other", 1)) {
             NekoMusic.orderList.songs.remove(musicObj);
             source.sendFeedback(PacketHelper.getDelMessage(musicObj), true);
-            HudManager.sendList();
+//            HudManager.sendList();
+            HudManager.sendPlayList();
         } else {
             source.sendFeedback(PacketHelper.getDelMessage(2), false);
         }

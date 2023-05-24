@@ -30,7 +30,7 @@ import java.util.concurrent.*;
 public class NekoMusic implements DedicatedServerModInitializer {
     public static final String MOD_ID = "nekomusic";
     public static final String MOD_NAME = "NekoMusic";
-    public static final String MOD_VERSION = "1.0.0";
+    public static final String MOD_VERSION = "1.1.0";
     public static final Identifier ID = new Identifier(MOD_ID, "channel");
     public static final Identifier ALLMUSIC_COMPAT_ID = new Identifier("allmusic", "channel");
     public static final Logger LOGGER = LogManager.getLogger();
@@ -41,15 +41,11 @@ public class NekoMusic implements DedicatedServerModInitializer {
     public static volatile TimerTask task = null;
     public static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(
             new ThreadFactoryBuilder().setNameFormat("NekoMusic-Worker-Thread-%d").build());
-    public static final ExecutorService LYRIC_EXECUTOR = Executors.newSingleThreadExecutor(
-            new ThreadFactoryBuilder().setNameFormat("NekoMusic-Lyric-Thread-%d").build());
-    public static volatile Future<?> LYRIC_FUTURE = null;
 
     public static final SongList idleList = new SongList();
     public static final SongList orderList = new SongList();
     public static Set<String> currentVote = new HashSet<>();
     public static MusicObj currentMusic = null;
-//    public static List<ServerPlayerEntity> nekoPlayerList = new ArrayList<>();
     public static volatile Set<ServerPlayerEntity> nekoPlayerSet = new HashSet<>();
 
     @Override

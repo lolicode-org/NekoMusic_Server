@@ -2,6 +2,9 @@ package org.lolicode.nekomusic.music;
 
 import java.util.Arrays;
 
+/**
+ * The list of music that will be sent to the <strong>client</strong>.
+ */
 public class MusicList {
     public static class Music {
         public String name;

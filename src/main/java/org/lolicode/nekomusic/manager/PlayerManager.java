@@ -12,9 +12,4 @@ public class PlayerManager {
         return server.getPlayerManager().getPlayerList().stream()
                 .filter(player -> !CarpetHelper.isPlayerFake(player)).toList();
     }
-
-//    public static List<ServerPlayerEntity> getAllMusicCompatUserList(MinecraftServer server) {
-//        return server.getPlayerManager().getPlayerList().stream()
-//                .filter(player -> !CarpetHelper.isPlayerFake(player) && !NekoMusic.nekoPlayerList.contains(player)).toList();
-//    }
 }

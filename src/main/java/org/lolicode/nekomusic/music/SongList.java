@@ -5,6 +5,9 @@ import org.lolicode.nekomusic.NekoMusic;
 import java.util.LinkedList;
 import java.util.Random;
 
+/**
+ * The list of music that is only used in the <strong>server</strong>.
+ */
 public class SongList {
     public volatile LinkedList<MusicObj> songs = new LinkedList<>();
 

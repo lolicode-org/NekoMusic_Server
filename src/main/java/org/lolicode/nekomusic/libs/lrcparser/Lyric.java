@@ -1,9 +1,6 @@
 package org.lolicode.nekomusic.libs.lrcparser;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 import org.lolicode.nekomusic.libs.lrcparser.parser.Sentence;
 
@@ -21,15 +18,14 @@ public class Lyric{
 	/**
 	 * total duration of the lyric
 	 */
-	private final long duration;
+	private long duration;
 
 	
 	public Lyric(Hashtable<String,String> tags,ArrayList<Sentence> sentences){
 		super();
 		this.tags=tags;
 		this.sentences=sentences;
-		this.duration = sentences.stream().sorted(Comparator.comparing(Sentence::getToTime))
-				.mapToLong(Sentence::getToTime).max().orElseGet(sentences.get(sentences.size() - 1)::getToTime);
+		this.updateDuration();
 	}
 	
 
@@ -134,6 +130,19 @@ public class Lyric{
 	
 	public long getDuration(){
 		return duration;
+	}
+
+	/**
+	 * update duration of the lyric
+	 * <p>
+	 * a dirty hack to avoid calculate duration every time
+	 * </p>
+	 * <strong>SHOULD BE CALLED AFTER CHANGING SENTENCES</strong>
+	 */
+	public void updateDuration() {
+		this.duration = sentences == null || sentences.size() == 0 ? 0 :
+				sentences.stream().sorted(Comparator.comparing(Sentence::getToTime))
+				.mapToLong(Sentence::getToTime).max().orElseGet(sentences.get(sentences.size() - 1)::getToTime);
 	}
 	
 }

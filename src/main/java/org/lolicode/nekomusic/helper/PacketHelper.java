@@ -13,7 +13,6 @@ import org.lolicode.nekomusic.music.MusicObj;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class PacketHelper {
     public static PacketByteBuf getPlayPacket(@NotNull MusicObj musicObj) {
@@ -48,7 +47,7 @@ public class PacketHelper {
         list.append("[Info]");
         list.append(musicObj.name).append("\n");
         list.append(musicObj.ar.stream().map(artistObj -> artistObj.name).reduce((a, b) -> a + " & " + b).orElse("")).append("\n");
-        list.append(musicObj.al.name).append("\n");
+        list.append(musicObj.album.name).append("\n");
         list.append("by: ").append(musicObj.player);
 
         byte[] bytes = list.toString().getBytes(StandardCharsets.UTF_8);
@@ -81,16 +80,18 @@ public class PacketHelper {
         return new PacketByteBuf(buf);
     }
 
-    public static PacketByteBuf getLyricPacket(ArrayList<Sentence> sentences, ArrayList<Sentence> translations) {
+//    public static PacketByteBuf getLyricPacket(ArrayList<Sentence> sentences, ArrayList<Sentence> translations) {
+    public static PacketByteBuf getLyricPacket(ArrayList<Sentence> sentences) {
         if (sentences == null || sentences.size() == 0)
             return null;
         StringBuilder lyric = new StringBuilder();
         lyric.append("[Lyric]");
-        lyric.append(sentences.stream().map(sentence -> sentence.getContent() + " ").reduce((a, b) -> a + b).orElse(""));
-        if (translations != null && translations.size() != 0) {
-            lyric.append("/ ");
-            lyric.append(translations.stream().map(sentence -> sentence.getContent() + " ").reduce((a, b) -> a + b).orElse(""));
-        }
+//        lyric.append(sentences.stream().map(sentence -> sentence.getContent() + " ").reduce((a, b) -> a + b).orElse(""));
+        lyric.append(sentences.stream().map(sentence -> sentence.getContent() + "\n").reduce((a, b) -> a + b).orElse(""));
+//        if (translations != null && translations.size() != 0) {
+//            lyric.append("/ ");
+//            lyric.append(translations.stream().map(sentence -> sentence.getContent() + " ").reduce((a, b) -> a + b).orElse(""));
+//        }
 
         byte[] bytes = lyric.toString().getBytes(StandardCharsets.UTF_8);
         ByteBuf buf = Unpooled.buffer(bytes.length + 1);
@@ -110,9 +111,9 @@ public class PacketHelper {
     }
 
     public static PacketByteBuf getCoverPacket(MusicObj music) {
-        if (music.al == null || music.al.picUrl == null || music.al.picUrl.equals(""))
+        if (music.album == null || music.album.picUrl == null || music.album.picUrl.equals(""))
             return null;
-        byte[] bytes = ("[Img]" + music.al.picUrl).getBytes(StandardCharsets.UTF_8);
+        byte[] bytes = ("[Img]" + music.album.picUrl).getBytes(StandardCharsets.UTF_8);
         ByteBuf buf = Unpooled.buffer(bytes.length + 1);
         buf.writeByte(666);
         buf.writeBytes(bytes);

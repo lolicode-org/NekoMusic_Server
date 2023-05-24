@@ -1,5 +1,7 @@
 package org.lolicode.nekomusic.music;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class MusicObj {
@@ -16,6 +18,7 @@ public class MusicObj {
     public static class AlbumObj {
         public String name;
         public String id;
+        @SerializedName("picUrl")
         public String picUrl;
     }
 
@@ -30,5 +33,6 @@ public class MusicObj {
     protected byte payed;
     public String player;  // who ordered this song
     public LyricObj lyric;
-    public AlbumObj al;
+    @SerializedName("al")
+    public AlbumObj album;
 }

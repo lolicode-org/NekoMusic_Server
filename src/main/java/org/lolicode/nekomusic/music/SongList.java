@@ -22,7 +22,7 @@ public class SongList {
         return songs.stream().filter(musicObj -> musicObj.id == id).findFirst().orElse(null);
     }
 
-    public MusicObj next() {
+    public MusicObj next() throws InterruptedException {
         if (songs.size() == 0) return null;
 
         MusicObj music;
@@ -47,6 +47,7 @@ public class SongList {
         } else {
             if (isPersistent)
                 songs.remove(music);  // Remove the song from the list if it's not available
+            Thread.sleep(1000);
             return next();
         }
     }

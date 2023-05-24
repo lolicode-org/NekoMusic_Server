@@ -8,7 +8,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.lolicode.nekomusic.NekoMusic;
-import org.lolicode.nekomusic.helper.PlayerHelper;
 import org.lolicode.nekomusic.helper.PacketHelper;
 import org.lolicode.nekomusic.music.Api;
 import org.lolicode.nekomusic.music.MusicObj;
@@ -27,45 +26,49 @@ public class MusicManager {
             NekoMusic.task.cancel();  // If user issues next command, cancel the current task in case it's not finished
             NekoMusic.task = null;
         }
-        if (PlayerHelper.getOnlineRealPlayerList(server).size() == 0)
+        if (PlayerManager.getOnlineRealPlayerList(server).size() == 0)
             return;
 
         NekoMusic.currentVote.clear();
         NekoMusic.EXECUTOR.execute(() -> {
-            boolean success = false;
+            try {
+                boolean success = false;
 
-            MusicObj next = NekoMusic.orderList.next();
-            if (next == null) {
-                next = NekoMusic.idleList.next();
-            }
-            if (next == null) {
-                NekoMusic.LOGGER.error("Get next music failed");
-                return;  // In case runs forever if idleList is empty
-            } else {
-                try {
-                    play(next, server);
-                    NekoMusic.currentMusic = next;
+                MusicObj next = NekoMusic.orderList.next();
+                if (next == null) {
+                    next = NekoMusic.idleList.next();
+                }
+                if (next == null) {
+                    NekoMusic.LOGGER.error("Get next music failed");
+                    return;  // In case runs forever if idleList is empty
+                } else {
+                    try {
+                        play(next, server);
+                        NekoMusic.currentMusic = next;
+                        NekoMusic.task = new TimerTask() {
+                            @Override
+                            public void run() {
+                                playNext(server);
+                            }
+                        };
+                        NekoMusic.TIMER.schedule(NekoMusic.task, next.dt + 3000);  // Add 3 seconds to avoid the music starts before the previous one ends
+                        HudManager.sendNext();
+                        success = true;
+                    } catch (Exception e) {
+                        NekoMusic.LOGGER.error("Play music failed", e);
+                    }
+                }
+                if (!success) {
                     NekoMusic.task = new TimerTask() {
                         @Override
                         public void run() {
                             playNext(server);
                         }
                     };
-                    NekoMusic.TIMER.schedule(NekoMusic.task, next.dt + 3000);  // Add 3 seconds to avoid the music starts before the previous one ends
-                    HudManager.sendNext();
-                    success = true;
-                } catch (Exception e) {
-                    NekoMusic.LOGGER.error("Play music failed", e);
+                    NekoMusic.TIMER.schedule(NekoMusic.task, 5000);
                 }
-            }
-            if (!success) {
-                NekoMusic.task = new TimerTask() {
-                    @Override
-                    public void run() {
-                        playNext(server);
-                    }
-                };
-                NekoMusic.TIMER.schedule(NekoMusic.task, 5000);
+            } catch (InterruptedException e) {
+                NekoMusic.LOGGER.info("Interrupted");
             }
         });
     }
@@ -75,7 +78,7 @@ public class MusicManager {
      */
     public static void play(@NotNull MusicObj musicObj, MinecraftServer server) {
         // for compatibility with allmusic, use the same id as it
-        List<ServerPlayerEntity> playerList = PlayerHelper.getOnlineRealPlayerList(server);
+        List<ServerPlayerEntity> playerList = PlayerManager.getOnlineRealPlayerList(server);
         if (playerList.size() == 0)
             return;
 //        List<ServerPlayerEntity> nekoPlayerList = PlayerHelper.getOnlineRealPlayerList(server);
@@ -119,12 +122,12 @@ public class MusicManager {
         } else {
             NekoMusic.currentVote.add("console");
         }
-        if ( (float)(NekoMusic.currentVote.size()) / PlayerHelper.getOnlineRealPlayerList(server).size()
+        if ( (float)(NekoMusic.currentVote.size()) / PlayerManager.getOnlineRealPlayerList(server).size()
                 >= NekoMusic.CONFIG.voteThreshold) {
             playNext(server);
         } else {
             server.getPlayerManager().broadcast(PacketHelper.getVoteMessage(
-                    NekoMusic.currentVote.size(), PlayerHelper.getOnlineRealPlayerList(server).size()), false);
+                    NekoMusic.currentVote.size(), PlayerManager.getOnlineRealPlayerList(server).size()), false);
         }
     }
 
@@ -161,7 +164,7 @@ public class MusicManager {
                 NekoMusic.orderList.add(musicObj);
                 server.getPlayerManager().broadcast(PacketHelper.getOrderMessage(musicObj), false);
                 if (!NekoMusic.orderList.isPlaying
-                        && PlayerHelper.getOnlineRealPlayerList(server).size() > 0) {
+                        && PlayerManager.getOnlineRealPlayerList(server).size() > 0) {
                     playNext(server);
                 } else {
                     HudManager.sendList();

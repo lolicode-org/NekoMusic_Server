@@ -14,25 +14,25 @@ public class LoginHelper {
             try {
                 if (Api.genLoginKey()) {
                     if (source.isExecutedByPlayer()) {
-                        source.sendFeedback(Text.of("§ePlease open the link below and scan the QR code displayed in your browser:"), false);
+                        source.sendFeedback(() -> Text.of("§ePlease open the link below and scan the QR code displayed in your browser:"), false);
                         MutableText link = Text.literal("§bhttps://qrcode.lolicode.org/?text=" + Api.getLoginKey());
                         link.setStyle(link.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://qrcode.lolicode.org/?text=" + Api.getLoginKey())));
-                        source.sendFeedback(link, false);
+                        source.sendFeedback(() -> link, false);
                         return;
                     }
                     String qrCode = Api.genLoginQrcode();
                     if (qrCode != null) {
-                        source.sendFeedback(Text.of("§ePlease scan the QR code below to login"), false);
-                        source.sendFeedback(Text.of(qrCode), false);
-                        source.sendFeedback(Text.of("§eAfter login, please run §b/music login check§e to check login status"), false);
+                        source.sendFeedback(() -> Text.of("§ePlease scan the QR code below to login"), false);
+                        source.sendFeedback(() -> Text.of(qrCode), false);
+                        source.sendFeedback(() -> Text.of("§eAfter login, please run §b/music login check§e to check login status"), false);
                     } else {
-                        source.sendFeedback(Text.of("§cFailed to generate QR code"), false);
+                        source.sendFeedback(() -> Text.of("§cFailed to generate QR code"), false);
                     }
                 } else {
-                    source.sendFeedback(Text.of("§cFailed to get login key"), false);
+                    source.sendFeedback(() -> Text.of("§cFailed to get login key"), false);
                 }
             } catch (Exception e) {
-                source.sendFeedback(Text.of("§cFailed to generate QR code"), false);
+                source.sendFeedback(() -> Text.of("§cFailed to generate QR code"), false);
                 NekoMusic.LOGGER.error("Failed to generate QR code", e);
             }
         });
@@ -43,18 +43,18 @@ public class LoginHelper {
             try {
                 switch (Api.checkLoginStatus()) {
                     case Api.LOGIN_STATUS.NO_KEY ->
-                            source.sendFeedback(Text.of("§cFailed: Please generate QR code first"), false);
+                            source.sendFeedback(() -> Text.of("§cFailed: Please generate QR code first"), false);
                     case Api.LOGIN_STATUS.FAILED ->
-                            source.sendFeedback(Text.of("§cFailed to check login status: Unknown error"), false);
-                    case Api.LOGIN_STATUS.EXPIRED -> source.sendFeedback(Text.of("§cFailed: Login key expired"), false);
+                            source.sendFeedback(() -> Text.of("§cFailed to check login status: Unknown error"), false);
+                    case Api.LOGIN_STATUS.EXPIRED -> source.sendFeedback(() -> Text.of("§cFailed: Login key expired"), false);
                     case Api.LOGIN_STATUS.WAITING ->
-                            source.sendFeedback(Text.of("§cFailed: Please scan the QR code first"), false);
+                            source.sendFeedback(() -> Text.of("§cFailed: Please scan the QR code first"), false);
                     case Api.LOGIN_STATUS.SCANNED ->
-                            source.sendFeedback(Text.of("§cFailed: Please confirm login on your phone"), false);
-                    case Api.LOGIN_STATUS.SUCCESS -> source.sendFeedback(Text.of("§aLogin success"), false);
+                            source.sendFeedback(() -> Text.of("§cFailed: Please confirm login on your phone"), false);
+                    case Api.LOGIN_STATUS.SUCCESS -> source.sendFeedback(() -> Text.of("§aLogin success"), false);
                 }
             } catch (Exception e) {
-                source.sendFeedback(Text.of("§cFailed to check login status: Internal error"), false);
+                source.sendFeedback(() -> Text.of("§cFailed to check login status: Internal error"), false);
                 NekoMusic.LOGGER.error("Failed to check login status", e);
             }
         });
@@ -65,18 +65,18 @@ public class LoginHelper {
             try {
                 Api.UserInfo.Data.Profile profile = Api.getUserInfo();
                 if (profile != null) {
-                    source.sendFeedback(Text.of("§eLogin status: §aLogged in"), false);
-                    source.sendFeedback(Text.of("§eUser ID: §b" + profile.userId), false);
-                    source.sendFeedback(Text.of("§eNickname: §b" + profile.nickname), false);
-                    source.sendFeedback(Text.of("§eVip type: §b" + profile.vipType), false);
+                    source.sendFeedback(() -> Text.of("§eLogin status: §aLogged in"), false);
+                    source.sendFeedback(() -> Text.of("§eUser ID: §b" + profile.userId), false);
+                    source.sendFeedback(() -> Text.of("§eNickname: §b" + profile.nickname), false);
+                    source.sendFeedback(() -> Text.of("§eVip type: §b" + profile.vipType), false);
                 } else {
-                    source.sendFeedback(Text.of("§cFailed to get user info"), false);
+                    source.sendFeedback(() -> Text.of("§cFailed to get user info"), false);
                 }
             } catch (RuntimeException e) {
                 if (e.getMessage().equals("Not logged in")) {
-                    source.sendFeedback(Text.of("§eLogin status: §cNot logged in"), false);
+                    source.sendFeedback(() -> Text.of("§eLogin status: §cNot logged in"), false);
                 } else {
-                    source.sendFeedback(Text.of("§cFailed to get user info: Internal error"), false);
+                    source.sendFeedback(() -> Text.of("§cFailed to get user info: Internal error"), false);
                     NekoMusic.LOGGER.error("Failed to get user info", e);
                 }
             }

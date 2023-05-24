@@ -12,6 +12,7 @@ import org.lolicode.nekomusic.music.MusicList;
 import org.lolicode.nekomusic.music.MusicObj;
 
 import java.nio.charset.StandardCharsets;
+import java.util.function.Supplier;
 
 public class PacketHelper {
     public static PacketByteBuf getPlayPacket(@NotNull MusicObj musicObj) {
@@ -93,31 +94,33 @@ public class PacketHelper {
                 + " §eby §d" + musicObj.player);
     }
 
-    public static Text getOrderMessage() {
-        return Text.of("§cGet music info failed.");
+    public static Supplier<Text> getOrderMessage() {
+        return () -> Text.of("§cGet music info failed.");
     }
 
-    public static Text getOrderedMessage() {
-        return Text.of("§cThis song has been ordered.");
+    public static Supplier<Text> getOrderedMessage() {
+        return () -> Text.of("§cThis song has been ordered.");
     }
 
-    public static Text getDelMessage(MusicObj musicObj) {
-        return Text.of("§eDeleted: §a" + musicObj.name);
+    public static Supplier<Text> getDelMessage(MusicObj musicObj) {
+        return () -> Text.of("§eDeleted: §a" + musicObj.name);
     }
 
-    public static Text getDelMessage(int error) {
+    public static Supplier<Text> getDelMessage(int error) {
+        Text result;
         if (error == 1) {
-            return Text.of("§cInvalid index or id.");
+            result = Text.of("§cInvalid index or id.");
         } else if (error == 2) {
-            return Text.of("§cYou don't have sufficient permissions.");
+            result = Text.of("§cYou don't have sufficient permissions.");
         } else {
-            return Text.of("§cDelete music failed.");
+            result = Text.of("§cDelete music failed.");
         }
+        return () -> result;
     }
 
-    public static Text getListMessage() {
+    public static Supplier<Text> getListMessage() {
         if (NekoMusic.orderList.songs.size() == 0) {
-            return Text.of("§cNo music in playing list.");
+            return () -> Text.of("§cNo music in playing list.");
         } else {
             MutableText text = Text.literal("§ePlaying list: \n");
             int num = 0;
@@ -132,13 +135,13 @@ public class PacketHelper {
                 if (num != NekoMusic.orderList.songs.size())
                     text.append(Text.literal("\n"));
             }
-            return text;
+            return () -> text;
         }
     }
 
-    public static Text getSearchMessage(Api.SearchResult result) {
+    public static Supplier<Text> getSearchMessage(Api.SearchResult result) {
         if (result.result.songs == null || result.result.songs.length == 0) {
-            return Text.of("§cNo result found.");
+            return () -> Text.of("§cNo result found.");
         } else {
             MutableText text = Text.literal("§aName §e-§9 Artist §e- §dAlbum" + "\n")
                     .setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.YELLOW)));
@@ -183,11 +186,11 @@ public class PacketHelper {
             text.append(pagePrev).append(Text.of(
                             "§r ---- §ePage §a" + result.result.page + " §r/ §a" + (result.result.songCount + 9) / 10 + "§r ---- "))
                     .append(pageNext);
-            return text;
+            return () -> text;
         }
     }
 
-    public static Text getSearchMessage() {
-        return Text.of("§cSearch failed.");
+    public static Supplier<Text> getSearchMessage() {
+        return () -> Text.of("§cSearch failed.");
     }
 }

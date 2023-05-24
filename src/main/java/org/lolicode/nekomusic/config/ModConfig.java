@@ -71,9 +71,9 @@ public class ModConfig {
 
     public static void reload(MinecraftServer server, ServerCommandSource source) {
         if (load()) {
-            source.sendFeedback(Text.of("§aNekoMusic: Config reloaded"), true);
+            source.sendFeedback(() -> Text.of("§aNekoMusic: Config reloaded"), true);
         } else {
-            source.sendFeedback(Text.of("§cNekoMusic: Config reload failed"), true);
+            source.sendFeedback(() -> Text.of("§cNekoMusic: Config reload failed"), true);
         }
     }
 

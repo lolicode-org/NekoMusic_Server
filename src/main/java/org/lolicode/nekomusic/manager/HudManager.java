@@ -15,7 +15,7 @@ public class HudManager {
         if (metadataBuf == null)
             throw new RuntimeException("Generate metadata packet failed");
         Identifier NEKO_META_ID = new Identifier(NekoMusic.MOD_ID, "metadata");
-        for (ServerPlayerEntity player : NekoMusic.nekoPlayerSet) {
+        for (ServerPlayerEntity player : PlayerManager.getNekoPlayerSet()) {
             try {
                 PacketSender.s2c(player).send(NEKO_META_ID, metadataBuf);
             } catch (Exception e) {
@@ -29,7 +29,7 @@ public class HudManager {
         if (playListBuf == null)
             return;
         Identifier NEKO_PLAY_LIST_ID = new Identifier(NekoMusic.MOD_ID, "list");
-        for (ServerPlayerEntity player : NekoMusic.nekoPlayerSet) {
+        for (ServerPlayerEntity player : PlayerManager.getNekoPlayerSet()) {
             try {
                 PacketSender.s2c(player).send(NEKO_PLAY_LIST_ID, playListBuf);
             } catch (Exception e) {

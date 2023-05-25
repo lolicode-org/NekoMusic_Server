@@ -1,3 +1,7 @@
+<p style="text-align: center">
+    <img src="./src/main/resources/assets/nekomusic/icon.png" alt="Icon" style="max-width: 50%; max-height: 300px;">
+</p>
+
 # NekoMusic Server
 
 适用于Fabric服务端的点歌Mod

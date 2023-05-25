@@ -44,10 +44,12 @@ public class TempPlayerSet {
     public Set<ServerPlayerEntity> getPlayers() {
         try {
             lock.lock();
-            this.players.stream().filter(player -> System.currentTimeMillis() - this.loginTime.get(player.getUuid().toString()) > 3000).forEach(player -> {
-                this.players.remove(player);
-                this.loginTime.remove(player.getUuid().toString());
-            });
+            for (ServerPlayerEntity player : this.players) {
+                if (System.currentTimeMillis() - this.loginTime.get(player.getUuid().toString()) > 3000) {
+                    this.players.remove(player);
+                    this.loginTime.remove(player.getUuid().toString());
+                }
+            }
         } finally {
             lock.unlock();
         }

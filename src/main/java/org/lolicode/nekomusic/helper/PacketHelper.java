@@ -52,10 +52,10 @@ public class PacketHelper {
     }
 
     public static PacketByteBuf getPlayListPacket() {
-        if (NekoMusic.orderList.songs.size() == 0)
+        if (NekoMusic.orderList.size() == 0)
             return null;
         MusicList musicList = new MusicList();
-        musicList.musics = NekoMusic.orderList.songs.stream().limit(10).map(musicObj -> {
+        musicList.musics = NekoMusic.orderList.getSongs().stream().limit(10).map(musicObj -> {
             MusicList.Music music = new MusicList.Music();
             music.name = musicObj.name;
             music.artist = musicObj.ar.stream().map(artistObj -> artistObj.name).reduce((a, b) -> a + " & " + b).orElse("");
@@ -116,12 +116,12 @@ public class PacketHelper {
     }
 
     public static Text getListMessage() {
-        if (NekoMusic.orderList.songs.size() == 0) {
+        if (NekoMusic.orderList.size() == 0) {
             return Text.of("§cNo music in playing list.");
         } else {
             MutableText text = Text.literal("§ePlaying list: \n");
             int num = 0;
-            for (MusicObj musicObj : NekoMusic.orderList.songs) {
+            for (MusicObj musicObj : NekoMusic.orderList.getSongs()) {
                 text.append(Text.literal("§e" + (++num) + ". " + "§a" + musicObj.name + " §e-§9 "
                         + String.join(" & ",
                         musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
@@ -129,7 +129,7 @@ public class PacketHelper {
                         .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music del id " + musicObj.id))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to delete it.")))));
-                if (num != NekoMusic.orderList.songs.size())
+                if (num != NekoMusic.orderList.size())
                     text.append(Text.literal("\n"));
             }
             return text;

@@ -180,11 +180,11 @@ public class MusicManager {
     }
 
     public static void del(MinecraftServer server, ServerCommandSource source, int index) {
-        if (index <= 0 || index > NekoMusic.orderList.songs.size()) {
+        if (index <= 0 || index > NekoMusic.orderList.size()) {
             source.sendFeedback(PacketHelper.getDelMessage(1), true);
             return;
         }
-        MusicObj musicObj = NekoMusic.orderList.songs.get(index - 1);
+        MusicObj musicObj = NekoMusic.orderList.get(index - 1);
         del(server, source, musicObj);
     }
 
@@ -200,7 +200,7 @@ public class MusicManager {
     static void del(MinecraftServer server, ServerCommandSource source, MusicObj musicObj) {
         if (musicObj.player.equals(source.getName())
                 || Permissions.check(source, "nekomusic.del.other", 1)) {
-            NekoMusic.orderList.songs.remove(musicObj);
+            NekoMusic.orderList.remove(musicObj);
             source.sendFeedback(PacketHelper.getDelMessage(musicObj), true);
 //            HudManager.sendList();
             HudManager.sendPlayList();

@@ -3,22 +3,31 @@ package org.lolicode.nekomusic.music;
 import org.lolicode.nekomusic.NekoMusic;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The list of music that is only used in the <strong>server</strong>.
  */
 public class SongList {
-    public volatile LinkedList<MusicObj> songs = new LinkedList<>();
+    private LinkedList<MusicObj> songs = new LinkedList<>();
 
     protected volatile long id = 0;
 
     protected volatile boolean isPersistent = false;
 
     public volatile boolean isPlaying = false;
+    private Lock lock = new ReentrantLock();
 
     public void add(MusicObj musicObj) {
-        songs.add(musicObj);
+        try {
+            lock.lock();
+            songs.add(musicObj);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public MusicObj get(long id) {
@@ -33,7 +42,7 @@ public class SongList {
             music = songs.get(new Random().nextInt(songs.size()));
         } else {
             music = songs.get(0);
-            songs.remove(0);
+            remove(music);
         }
         String url = Api.getMusicUrl(music);  // Don't use cached url, as the url may be expired
         LyricObj lyric = music.lyric == null ? Api.getLyric(music) : music.lyric; // use cached lyric if available
@@ -49,28 +58,37 @@ public class SongList {
             return music;
         } else {
             if (isPersistent)
-                songs.remove(music);  // Remove the song from the list if it's not available
+                remove(music);  // Remove the song from the list if it's not available
             Thread.sleep(1000);
             return next();
         }
     }
 
     public boolean remove(MusicObj musicObj) {
-        if (!songs.contains(musicObj)) return false;
-        songs.remove(musicObj);
+        try {
+            lock.lock();
+            if (!songs.contains(musicObj)) return false;
+            songs.remove(musicObj);
+        } finally {
+            lock.unlock();
+        }
         return true;
     }
 
     public boolean remove(int index) {
         if (index < 0 || index >= songs.size()) return false;
-        songs.remove(index);
-        return true;
+        return remove(songs.get(index));
     }
 
     public void load(SongList newSongList) {
-        songs.clear();
-        songs.addAll(newSongList.songs);
-        id = newSongList.id;
+        try {
+            lock.lock();
+            songs.clear();
+            songs.addAll(newSongList.songs);
+            id = newSongList.id;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public static void loadIdleList() {
@@ -98,5 +116,13 @@ public class SongList {
             if (musicObj.id == id) return true;
         }
         return false;
+    }
+
+    public int size() {
+        return songs.size();
+    }
+
+    public List<MusicObj> getSongs() {
+        return List.copyOf(songs);
     }
 }

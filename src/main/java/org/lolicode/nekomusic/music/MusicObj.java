@@ -35,4 +35,5 @@ public class MusicObj {
     public LyricObj lyric;
     @SerializedName("al")
     public AlbumObj album;
+    public int br;
 }

@@ -44,11 +44,13 @@ public class SongList {
             music = songs.get(0);
             remove(music);
         }
-        String url = Api.getMusicUrl(music);  // Don't use cached url, as the url may be expired
+//        String url = Api.getMusicUrl(music);  // Don't use cached url, as the url may be expired
+        MusicObj newObj = Api.getMusicForPlay(music);
         LyricObj lyric = music.lyric == null ? Api.getLyric(music) : music.lyric; // use cached lyric if available
-        if (url != null) {
-            music.url = url;
+        if (newObj != null && newObj.url != null && !newObj.url.isBlank()) {
+            music.url = newObj.url;
             if (lyric != null) music.lyric = lyric;
+            music.br = newObj.br;
 
             isPlaying = true;
             if (isPersistent)

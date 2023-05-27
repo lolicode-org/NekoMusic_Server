@@ -81,10 +81,6 @@ public class MusicManager {
         List<ServerPlayerEntity> playerList = PlayerManager.getOnlineRealPlayerList(server);
         if (playerList.size() == 0)
             return;
-//        List<ServerPlayerEntity> nekoPlayerList = PlayerHelper.getOnlineRealPlayerList(server);
-//        List<ServerPlayerEntity> allMusicPlayerList = PlayerHelper.getAllMusicCompatUserList(server);
-//        if (nekoPlayerList.size() + allMusicPlayerList.size() == 0)
-//            return;
 
         PacketByteBuf stopBuf = PacketHelper.getStopPacket();
         for (ServerPlayerEntity player : playerList) {
@@ -94,6 +90,9 @@ public class MusicManager {
                 NekoMusic.LOGGER.error("Send stop packet failed", e);
             }
         }
+
+        HudManager.sendMetadata(musicObj);  // send metadata first, so that the client can determine whether this is a neko server
+        HudManager.sendPlayList();
 
         PacketByteBuf playBuf = PacketHelper.getPlayPacket(musicObj);
         if (playBuf == null)
@@ -106,9 +105,6 @@ public class MusicManager {
             }
         }
         server.getPlayerManager().broadcast(PacketHelper.getPlayMessage(musicObj), false);
-
-        HudManager.sendMetadata(musicObj);
-        HudManager.sendPlayList();
     }
 
     public static void next(MinecraftServer server) {

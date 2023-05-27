@@ -2,6 +2,7 @@ package org.lolicode.nekomusic.helper;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
@@ -43,12 +44,8 @@ public class PacketHelper {
         if (music == null)
             return null;
         String serialized = NekoMusic.GSON.toJson(music);
-        byte[] bytes = (serialized).getBytes(StandardCharsets.UTF_8);
-        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
-        buf.writeByte(666);
-        buf.writeBytes(bytes);
 
-        return new PacketByteBuf(buf);
+        return PacketByteBufs.create().writeString(serialized);
     }
 
     public static PacketByteBuf getPlayListPacket() {
@@ -63,12 +60,8 @@ public class PacketHelper {
             return music;
         }).toArray(MusicList.Music[]::new);
         String serialized = NekoMusic.GSON.toJson(musicList);
-        byte[] bytes = serialized.getBytes(StandardCharsets.UTF_8);
-        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
-        buf.writeByte(666);
-        buf.writeBytes(bytes);
 
-        return new PacketByteBuf(buf);
+        return PacketByteBufs.create().writeString(serialized);
     }
 
     public static Text getPlayMessage(@NotNull MusicObj musicObj) {

@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import okhttp3.OkHttpClient;
@@ -51,6 +52,9 @@ public class NekoMusic implements DedicatedServerModInitializer {
 
     @Override
     public void onInitializeServer() {
+        if (FabricLoader.getInstance().isModLoaded("allmusic_server")) {
+            throw new RuntimeException("NekoMusic is not compatible with AllMusic");
+        }
         if (ModConfig.load() || ModConfig.loadLegacy()) {
             CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> MusicCommand.register(dispatcher));
             PlayerJoinCallback.EVENT.register(PlayerJoin::OnPlayerJoin);

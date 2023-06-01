@@ -57,7 +57,7 @@ public class MusicCommand {
         LiteralCommandNode<ServerCommandSource> nextNode = CommandManager.literal("next")
                 .requires(Permissions.require("nekomusic.next", 1))
                 .executes(context -> {
-                    MusicManager.next(context.getSource().getServer());
+                    MusicManager.next(context.getSource().getServer(), context.getSource());
                     return 0;
                 }).build();
         LiteralCommandNode<ServerCommandSource> searchNode = CommandManager.literal("search")

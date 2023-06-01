@@ -6,6 +6,12 @@
 
 适用于Fabric服务端的点歌Mod
 
+> 2023.6.1更新：
+> 
+> 客户端基本重构完成，请使用[配套客户端](https://github.com/KoishiMoe/NekoMusic_Cli)以使用全部功能。
+> 
+> 与AllMusic **客户端** 的基本兼容性暂时保留。服务端因通道冲突，将不再允许共存（其实之前也不可以，只是不会直接抛异常）
+> 
 > 2023.05.27更新：
 > 
 > 目前本项目已与上游项目脱钩，仅 **暂时** 保留最低限度的兼容，因此请不要在本项目的issues中反馈与原项目的兼容问题。同样，请 **不要** 因此打扰原项目的开发者。
@@ -36,7 +42,10 @@
   "idle_list": 0,  // 空闲列表的歌单ID
   "api_address": "http://127.0.0.1:3000",  // 某云Nodejs api的地址
   "vote_threshold": 0.5,  // 投票切歌所需的人数百分比
-  "max_quality": 320000  // 最大音质，默认为320k，如需无损或Hi-res音质，请修改为999000
+  "max_quality": 320000,  // 最大音质，默认为320k，如需无损或Hi-res音质，请修改为999000
+  "banned_songs": [  // 封禁歌曲列表
+    "123456789"
+  ],
 }
 ```
 4. 重启服务端即可正常使用。
@@ -56,6 +65,9 @@
 | `/music next`         | `nekomusic.next`         | 强制切歌                                   |
 | `/music del`          | `nekomusic.del`          | 删除当前播放列表中的歌曲                           |
 | `/music del`          | `nekomusic.del.other`    | 删除别人点的歌曲                               |
+| `/music ban`          | `nekomusic.ban`          | 封禁歌曲（默认列表中的不受影响）                       |
+| `/music unban`        | `nekomusic.unban`        | 取消歌曲封禁                                 |
+|                       | `nekomusic.bypassban`    | 允许点被封禁的歌                               |
 | `/music search`       | `nekomusic.search`       | 搜索歌曲                                   |
 | `/music reload`       | `nekomusic.reload`       | 重新加载配置文件                               |
 | `/music login`        | `nekomusic.login`        | 登陆命令根节点                                |
@@ -121,11 +133,13 @@ Cookie是可选的，如果不填写，会导致无法获取更高音质或者�
 
 [NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)：音乐API
 
-[AllMusic_M](https://github.com/Coloryr/AllMusic_M)：客户端以及部分参考
+[AllMusic_M](https://github.com/Coloryr/AllMusic_M)：原客户端以及部分参考
 
 [Qr Code to Console](https://github.com/yuanyouxi/qr-code-to-console): 二维码生成
 
 [Fabric Permissions API](https://github.com/lucko/fabric-permissions-api): 权限API
+
+[BadPackets](https://github.com/badasintended/badpackets): 客户端、服务端通信
 
 ## 许可证
 ```text

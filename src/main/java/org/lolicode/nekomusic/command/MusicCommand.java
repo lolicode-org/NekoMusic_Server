@@ -41,12 +41,30 @@ public class MusicCommand {
                             return 0;
                         }))
                 .then(CommandManager.literal("id")
-                        .then(CommandManager.argument("id", StringArgumentType.greedyString())
+                        .then(CommandManager.argument("id", LongArgumentType.longArg())
                                 .executes(context -> {
                                     long id = LongArgumentType.getLong(context, "id");
                                     MusicManager.del(context.getSource().getServer(), context.getSource(), id);
                                     return 0;
                                 })))
+                .build();
+        LiteralCommandNode<ServerCommandSource> banNode = CommandManager.literal("ban")
+                .requires(Permissions.require("nekomusic.ban", 1))
+                    .then(CommandManager.argument("id", LongArgumentType.longArg())
+                            .executes(context -> {
+                                long id = LongArgumentType.getLong(context, "id");
+                                MusicManager.ban(context.getSource().getServer(), context.getSource(), id);
+                                return 0;
+                            }))
+                .build();
+        LiteralCommandNode<ServerCommandSource> unbanNode = CommandManager.literal("unban")
+                .requires(Permissions.require("nekomusic.unban", 1))
+                .then(CommandManager.argument("id", LongArgumentType.longArg())
+                        .executes(context -> {
+                            long id = LongArgumentType.getLong(context, "id");
+                            MusicManager.unban(context.getSource().getServer(), context.getSource(), id);
+                            return 0;
+                        }))
                 .build();
         LiteralCommandNode<ServerCommandSource> listNode = CommandManager.literal("list")
                 .requires(Permissions.require("nekomusic.list", 0))
@@ -113,6 +131,8 @@ public class MusicCommand {
 
         rootNode.addChild(addNode);
         rootNode.addChild(delNode);
+        rootNode.addChild(banNode);
+        rootNode.addChild(unbanNode);
         rootNode.addChild(listNode);
         rootNode.addChild(nextNode);
         rootNode.addChild(searchNode);

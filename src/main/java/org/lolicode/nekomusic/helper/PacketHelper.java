@@ -68,7 +68,7 @@ public class PacketHelper {
         String player = musicObj.player;
         if (player == null || player.equals(""))
             player = "Default";
-        return Text.of("§eNow playing: §a" + musicObj.name + " §e-§9 "
+        return Text.of("§ePlaying: §a" + musicObj.name + " §e-§9 "
                 + String.join(" & ",
                 musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                 + " §eby §d" + player);
@@ -182,5 +182,9 @@ public class PacketHelper {
 
     public static Text getSearchMessage() {
         return Text.of("§cSearch failed.");
+    }
+
+    public static Text getWorkingMessage() {
+        return Text.of("§bPlease wait for a moment...");
     }
 }

@@ -107,23 +107,25 @@ public class MusicManager {
         server.getPlayerManager().broadcast(PacketHelper.getPlayMessage(musicObj), false);
     }
 
-    public static void next(MinecraftServer server) {
+    public static void next(MinecraftServer server, ServerCommandSource source) {
+        source.sendFeedback(PacketHelper.getWorkingMessage(), false);
         playNext(server);
     }
 
     public static void vote(MinecraftServer server,  ServerCommandSource source) {
         if (Permissions.check(source, "nekomusic.next", 1)) {
-            next(server);
+            next(server, source);
             return;
         }
         if (source.isExecutedByPlayer()) {
             NekoMusic.currentVote.add(source.getName());
         } else {
             NekoMusic.currentVote.add("console");
+            NekoMusic.LOGGER.warn("Got vote from console, this should not happen, please check your permission manager.");
         }
         if ( (float)(NekoMusic.currentVote.size()) / PlayerManager.getOnlineRealPlayerList(server).size()
                 >= NekoMusic.CONFIG.voteThreshold) {
-            playNext(server);
+            next(server, source);
         } else {
             server.getPlayerManager().broadcast(PacketHelper.getVoteMessage(
                     NekoMusic.currentVote.size(), PlayerManager.getOnlineRealPlayerList(server).size()), false);
@@ -151,6 +153,8 @@ public class MusicManager {
             source.sendFeedback(PacketHelper.getOrderedMessage(), false);
             return;
         }
+
+        source.sendFeedback(PacketHelper.getWorkingMessage(), false);
 
         NekoMusic.EXECUTOR.execute(() -> {
             MusicObj musicObj = Api.getMusicInfo(id);
@@ -210,6 +214,7 @@ public class MusicManager {
     }
 
     public static void search(MinecraftServer server, ServerCommandSource source, String keyword, int page) {
+        source.sendFeedback(PacketHelper.getWorkingMessage(), false);
         NekoMusic.EXECUTOR.execute(() -> {
             Api.SearchResult result = Api.search(keyword, page, 10);
             if (result != null && result.result != null) {

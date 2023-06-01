@@ -50,8 +50,6 @@ public class PacketHelper {
     }
 
     public static PacketByteBuf getPlayListPacket() {
-        if (NekoMusic.orderList.size() == 0)
-            return null;
         MusicList musicList = new MusicList();
         musicList.musics = NekoMusic.orderList.getSongs().stream().limit(10).map(musicObj -> {
             MusicList.Music music = new MusicList.Music();
@@ -95,6 +93,10 @@ public class PacketHelper {
         return () -> Text.of("§cThis song has been ordered.");
     }
 
+    public static Supplier<Text> getBannedMessage() {
+        return () -> Text.of("§cThis song has been banned.");
+    }
+
     public static Supplier<Text> getDelMessage(MusicObj musicObj) {
         return () -> Text.of("§eDeleted: §a" + musicObj.name);
     }
@@ -124,7 +126,10 @@ public class PacketHelper {
                         + " §eby §d" + musicObj.player))
                         .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music del id " + musicObj.id))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to delete it.")))));
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to delete it.")))))
+                        .append(Text.literal(" [B]").setStyle(Style.EMPTY.withColor(Formatting.RED)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music ban " + musicObj.id))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to ban it.")))));
                 if (num != NekoMusic.orderList.size())
                     text.append(Text.literal("\n"));
             }
@@ -187,7 +192,24 @@ public class PacketHelper {
         return () -> Text.of("§cSearch failed.");
     }
 
-    public static Text getWorkingMessage() {
-        return Text.of("§bPlease wait for a moment...");
+    public static Supplier<Text> getWorkingMessage() {
+        return () -> Text.of("§bPlease wait for a moment...");
+    }
+
+    public static Supplier<Text> getBanMessage(int result) {
+        return () -> switch (result) {
+            case 1 -> Text.of("§cThis song has already been banned.");
+            case 2 -> Text.of("§cInvalid id.");
+            case 3 -> Text.of("§aSuccessfully banned.");
+            default -> Text.of("§cUnknown error.");
+        };
+    }
+
+    public static Supplier<Text> getUnbanMessage(int result) {
+        return () -> switch (result) {
+            case 1 -> Text.of("§cNot found.");
+            case 2 -> Text.of("§aSuccessfully unbanned.");
+            default -> Text.of("§cUnknown error.");
+        };
     }
 }

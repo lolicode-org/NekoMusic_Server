@@ -8,6 +8,8 @@ import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.music.SongList;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ModConfig {
     public String cookie = "";
@@ -15,6 +17,7 @@ public class ModConfig {
     public String apiAddress = "";
     public float voteThreshold = 0.5f;
     public int maxQuality = 320000;
+    public List<Long> bannedSongs = new ArrayList<>();
 
     private static File configFile;
 
@@ -50,6 +53,7 @@ public class ModConfig {
                 if (config != null) {
                     NekoMusic.CONFIG.cookie = config.cookie;
                     NekoMusic.CONFIG.idleList = config.idleList;
+                    NekoMusic.CONFIG.bannedSongs = config.bannedSongs;
                     if (config.apiAddress == null || config.apiAddress.isEmpty()) {
                         throw new RuntimeException("apiAddress is null in mod config");
                     }

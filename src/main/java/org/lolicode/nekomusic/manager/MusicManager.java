@@ -8,10 +8,12 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.NotNull;
 import org.lolicode.nekomusic.NekoMusic;
+import org.lolicode.nekomusic.config.ModConfig;
 import org.lolicode.nekomusic.helper.PacketHelper;
 import org.lolicode.nekomusic.music.Api;
 import org.lolicode.nekomusic.music.MusicObj;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
@@ -153,6 +155,11 @@ public class MusicManager {
             source.sendFeedback(PacketHelper.getOrderedMessage(), false);
             return;
         }
+        if (NekoMusic.CONFIG.bannedSongs != null && NekoMusic.CONFIG.bannedSongs.contains(id)
+                && !Permissions.check(source, "nekomusic.bypassban", 1)) {
+            source.sendFeedback(PacketHelper.getBannedMessage(), false);
+            return;
+        }
 
         source.sendFeedback(PacketHelper.getWorkingMessage(), false);
 
@@ -223,5 +230,32 @@ public class MusicManager {
                 source.sendFeedback(PacketHelper.getSearchMessage(), false);
             }
         });
+    }
+
+    public static void ban(MinecraftServer server, ServerCommandSource source, long id) {
+        if (NekoMusic.CONFIG.bannedSongs == null) {
+            NekoMusic.CONFIG.bannedSongs = new ArrayList<>();
+        }
+        if (NekoMusic.CONFIG.bannedSongs.contains(id)) {
+            source.sendFeedback(PacketHelper.getBanMessage(1), false);
+            return;
+        }
+        if (id <= 0) {
+            source.sendFeedback(PacketHelper.getBanMessage(2), false);
+            return;
+        }
+        NekoMusic.CONFIG.bannedSongs.add(id);
+        ModConfig.save();
+        source.sendFeedback(PacketHelper.getBanMessage(3), false);
+    }
+
+    public static void unban(MinecraftServer server, ServerCommandSource source, long id) {
+        if (NekoMusic.CONFIG.bannedSongs == null || !NekoMusic.CONFIG.bannedSongs.contains(id)) {
+            source.sendFeedback(PacketHelper.getUnbanMessage(1), false);
+            return;
+        }
+        NekoMusic.CONFIG.bannedSongs.remove(id);
+        ModConfig.save();
+        source.sendFeedback(PacketHelper.getUnbanMessage(2), false);
     }
 }

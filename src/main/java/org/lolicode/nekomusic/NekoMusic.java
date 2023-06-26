@@ -43,11 +43,11 @@ public class NekoMusic implements DedicatedServerModInitializer {
     public static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(
             new ThreadFactoryBuilder().setNameFormat("NekoMusic-Worker-Thread-%d").build());
 
-    public static final SongList idleList = new SongList();
-    public static final SongList orderList = new SongList();
+    public static final SongList idleList = new SongList(true);
+    public static final SongList orderList = new SongList(false);
     public static Set<String> currentVote = new HashSet<>();
     public static MusicObj currentMusic = null;
-    public static volatile Set<ServerPlayerEntity> nekoPlayerSet = new HashSet<>();
+    public static final Set<ServerPlayerEntity> nekoPlayerSet = new HashSet<>();
     public static final TempPlayerSet tempNekoPlayerSet = new TempPlayerSet();
 
     @Override

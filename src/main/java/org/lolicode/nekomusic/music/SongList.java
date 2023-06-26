@@ -12,14 +12,18 @@ import java.util.concurrent.locks.ReentrantLock;
  * The list of music that is only used in the <strong>server</strong>.
  */
 public class SongList {
-    private LinkedList<MusicObj> songs = new LinkedList<>();
+    private final LinkedList<MusicObj> songs = new LinkedList<>();
 
     protected volatile long id = 0;
 
-    protected volatile boolean isPersistent = false;
+    protected final boolean isPersistent;
 
     public volatile boolean isPlaying = false;
-    private Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
+
+    public SongList(boolean isPersistent) {
+        this.isPersistent = isPersistent;
+    }
 
     public void add(MusicObj musicObj) {
         try {
@@ -31,18 +35,26 @@ public class SongList {
     }
 
     public MusicObj get(long id) {
-        return songs.stream().filter(musicObj -> musicObj.id == id).findFirst().orElse(null);
+        try {
+            lock.lock();
+            return songs.stream().filter(musicObj -> musicObj.id == id).findFirst().orElse(null);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public MusicObj next() throws InterruptedException {
-        if (songs.size() == 0) return null;
-
         MusicObj music;
-        if (isPersistent) {
-            music = songs.get(new Random().nextInt(songs.size()));
-        } else {
-            music = songs.get(0);
-            remove(music);
+        try {
+            lock.lock();
+            if (songs.size() == 0) return null;
+            if (isPersistent) {
+                music = songs.get(new Random().nextInt(songs.size()));
+            } else {
+                music = songs.pollFirst();
+            }
+        } finally {
+            lock.unlock();
         }
 //        String url = Api.getMusicUrl(music);  // Don't use cached url, as the url may be expired
         MusicObj newObj = Api.getMusicForPlay(music);
@@ -61,25 +73,19 @@ public class SongList {
         } else {
             if (isPersistent)
                 remove(music);  // Remove the song from the list if it's not available
+            NekoMusic.LOGGER.error("Failed to get url of music " + music.id + ", retrying in 1 second");
             Thread.sleep(1000);
-            return next();
+            return next();  // FIXME: if we're stuck retrying, the user might not be able to order music until it succeeds or the list is empty, or even worse, stack overflow
         }
     }
 
     public boolean remove(MusicObj musicObj) {
         try {
             lock.lock();
-            if (!songs.contains(musicObj)) return false;
-            songs.remove(musicObj);
+            return songs.remove(musicObj);
         } finally {
             lock.unlock();
         }
-        return true;
-    }
-
-    public boolean remove(int index) {
-        if (index < 0 || index >= songs.size()) return false;
-        return remove(songs.get(index));
     }
 
     public void load(SongList newSongList) {
@@ -94,13 +100,16 @@ public class SongList {
     }
 
     public static void loadIdleList() {
-        if (NekoMusic.CONFIG.idleList == 0) return;
+        if (NekoMusic.CONFIG.idleList == 0) {
+            NekoMusic.idleList.load(new SongList(true));
+            NekoMusic.idleList.id = 0;
+            return;
+        }
         NekoMusic.EXECUTOR.execute(() -> {
             try {
                 SongList songList = Api.getSongList(NekoMusic.CONFIG.idleList);
                 if (songList != null) {
                     NekoMusic.idleList.load(songList);
-                    NekoMusic.idleList.isPersistent = true;
                     NekoMusic.idleList.id = NekoMusic.CONFIG.idleList;
                 }
             } catch (Exception e) {
@@ -109,22 +118,30 @@ public class SongList {
         });
     }
 
-    public boolean hasSong(MusicObj musicObj) {
-        return songs.contains(musicObj);
-    }
-
     public boolean hasSong(long id) {
-        for (MusicObj musicObj : songs) {
-            if (musicObj.id == id) return true;
+        try {
+            lock.lock();
+            return songs.stream().anyMatch(musicObj -> musicObj.id == id);
+        } finally {
+            lock.unlock();
         }
-        return false;
     }
 
     public int size() {
-        return songs.size();
+        try {
+            lock.lock();
+            return songs.size();
+        } finally {
+            lock.unlock();
+        }
     }
 
     public List<MusicObj> getSongs() {
-        return List.copyOf(songs);
+        try {
+            lock.lock();
+            return new LinkedList<>(songs);
+        } finally {
+            lock.unlock();
+        }
     }
 }

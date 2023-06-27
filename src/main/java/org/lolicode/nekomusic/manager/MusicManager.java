@@ -12,6 +12,7 @@ import org.lolicode.nekomusic.config.ModConfig;
 import org.lolicode.nekomusic.helper.PacketHelper;
 import org.lolicode.nekomusic.music.Api;
 import org.lolicode.nekomusic.music.MusicObj;
+import org.lolicode.nekomusic.music.MusicUrlGetException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,17 +35,31 @@ public class MusicManager {
         NekoMusic.currentVote.clear();
         NekoMusic.EXECUTOR.execute(() -> {
             try {
-                boolean success = false;
+                boolean playSuccess = false;
+                boolean urlGetSuccess = false;
 
-                MusicObj next = NekoMusic.orderList.next();
-                if (next == null) {
-                    next = NekoMusic.idleList.next();
+                MusicObj next = null;
+                try {
+                    next = NekoMusic.orderList.next();
+                    if (next == null) {  // Empty order list
+                        try {
+                            next = NekoMusic.idleList.next();
+                            urlGetSuccess = true;
+                            if (next == null) { // Empty idle list
+                                NekoMusic.LOGGER.info("No music to play");
+                                return;
+                            }
+                        } catch (MusicUrlGetException ignored) {  // Idle list fails, dont send broadcast. The error log has already been sent
+                        }
+                    } else {
+                        urlGetSuccess = true;
+                    }
+                } catch (MusicUrlGetException e) {  // Music order list fails, send broadcast
+                    server.getPlayerManager().broadcast(PacketHelper.getGetMusicErrorMessage(e.getMusicDescription()), false);
                 }
-                if (next == null) {
-                    NekoMusic.LOGGER.error("Get next music failed");
-                    return;  // In case runs forever if idleList is empty
-                } else {
+                if (urlGetSuccess) {
                     try {
+                        assert next != null;
                         play(next, server);
                         NekoMusic.currentMusic = next;
                         NekoMusic.task = new TimerTask() {
@@ -55,12 +70,12 @@ public class MusicManager {
                         };
                         NekoMusic.TIMER.schedule(NekoMusic.task, next.dt + 3000);  // Add 3 seconds to avoid the music starts before the previous one ends
 //                        HudManager.sendNext();
-                        success = true;
+                        playSuccess = true;
                     } catch (Exception e) {
                         NekoMusic.LOGGER.error("Play music failed", e);
                     }
                 }
-                if (!success) {
+                if (!playSuccess) {
                     NekoMusic.task = new TimerTask() {
                         @Override
                         public void run() {

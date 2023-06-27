@@ -242,11 +242,16 @@ public class Api {
      */
     public static MusicObj getMusicForPlay(MusicObj musicObj) {
         MusicObj music = getMusic(musicObj.id);
-        if (music != null && (music.freeTrialInfo == null || (music.fee != 0 && music.payed != 1))
-                && ((musicObj.dt == 0) || music.time == musicObj.dt)) {  // Check if time matches
-            return music;
+        if (music != null && music.url != null && !(music.url.isBlank())) {
+            if ((music.freeTrialInfo == null || music.fee != 0 && music.payed != 1) && (musicObj.dt == 0 || music.time == musicObj.dt)) {  // Check if time matches
+                return music;
+            } else {
+                NekoMusic.LOGGER.info("Music " + musicObj.id + " is trial, skipping");
+            }
+        } else {
+            NekoMusic.LOGGER.info("Music " + musicObj.id + " is not playable (no url), skipping");
         }
-        return null;
+        throw new MusicUrlGetException(musicObj);
     }
 
     public static MusicObj getMusicInfo(long id) {

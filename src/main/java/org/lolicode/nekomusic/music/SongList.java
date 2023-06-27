@@ -57,26 +57,25 @@ public class SongList {
             lock.unlock();
         }
 //        String url = Api.getMusicUrl(music);  // Don't use cached url, as the url may be expired
-        MusicObj newObj = Api.getMusicForPlay(music);
-        LyricObj lyric = music.lyric == null ? Api.getLyric(music) : music.lyric; // use cached lyric if available
-        if (newObj != null && newObj.url != null && !newObj.url.isBlank()) {
-            music.url = newObj.url;
-            if (lyric != null) music.lyric = lyric;
-            music.br = newObj.br;
-
-            isPlaying = true;
-            if (isPersistent)
-                NekoMusic.orderList.isPlaying = false;
-            else
-                NekoMusic.idleList.isPlaying = false;
-            return music;
-        } else {
+        MusicObj newObj;
+        try {
+            newObj = Api.getMusicForPlay(music);
+        } catch (MusicUrlGetException e) {
             if (isPersistent)
                 remove(music);  // Remove the song from the list if it's not available
-            NekoMusic.LOGGER.error("Failed to get url of music " + music.id + ", retrying in 1 second");
-            Thread.sleep(1000);
-            return next();  // FIXME: if we're stuck retrying, the user might not be able to order music until it succeeds or the list is empty, or even worse, stack overflow
+            throw e;
         }
+        LyricObj lyric = music.lyric == null ? Api.getLyric(music) : music.lyric; // use cached lyric if available
+        music.url = newObj.url;
+        if (lyric != null) music.lyric = lyric;
+        music.br = newObj.br;
+
+        isPlaying = true;
+        if (isPersistent)
+            NekoMusic.orderList.isPlaying = false;
+        else
+            NekoMusic.idleList.isPlaying = false;
+        return music;
     }
 
     public boolean remove(MusicObj musicObj) {

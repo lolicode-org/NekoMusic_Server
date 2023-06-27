@@ -4,6 +4,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.music.Api;
 
@@ -15,16 +16,17 @@ public class LoginHelper {
                 if (Api.genLoginKey()) {
                     if (source.isExecutedByPlayer()) {
                         source.sendFeedback(Text.of("§ePlease open the link below and scan the QR code displayed in your browser:"), false);
-                        MutableText link = Text.literal("§bhttps://qrcode.lolicode.org/?text=" + Api.getLoginKey());
-                        link.setStyle(link.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://qrcode.lolicode.org/?text=" + Api.getLoginKey())));
+                        MutableText link = Text.literal("https://qrcode.lolicode.org/?text=https://music.163.com/login?codekey=" + Api.getLoginKey());
+                        link.setStyle(link.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, link.getString())).withColor(Formatting.AQUA));
                         source.sendFeedback(link, false);
+                        source.sendFeedback(Text.of("§eAfter scanning, please run §b/music login check§e to continue"), false);
                         return;
                     }
                     String qrCode = Api.genLoginQrcode();
                     if (qrCode != null) {
                         source.sendFeedback(Text.of("§ePlease scan the QR code below to login"), false);
                         source.sendFeedback(Text.of(qrCode), false);
-                        source.sendFeedback(Text.of("§eAfter login, please run §b/music login check§e to check login status"), false);
+                        source.sendFeedback(Text.of("§eAfter scanning, please run §b/music login check§e to continue"), false);
                     } else {
                         source.sendFeedback(Text.of("§cFailed to generate QR code"), false);
                     }

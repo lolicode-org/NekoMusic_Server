@@ -212,4 +212,8 @@ public class PacketHelper {
             default -> Text.of("§cUnknown error.");
         };
     }
+
+    public static Text getGetMusicErrorMessage(String music) {
+        return Text.of("§cFailed to get " + music + "'s url, please check if the information is correct. If it is a premium song, please make sure you have logged in with a valid VIP account.");
+    }
 }

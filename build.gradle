@@ -28,7 +28,7 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    include(modImplementation('me.lucko:fabric-permissions-api:0.2-SNAPSHOT'))
+    include(modImplementation("me.lucko:fabric-permissions-api:${project.fabric_permissions_api_version}"))
     modImplementation "carpet:fabric-carpet:${project.carpet_branch}-${project.carpet_core_version}"
 
     include implementation("com.squareup.okhttp3:okhttp:4.10.0")

@@ -6,29 +6,6 @@
 
 适用于Fabric服务端的点歌Mod
 
-> 2023.6.1更新：
-> 
-> 客户端基本重构完成，请使用[配套客户端](https://github.com/KoishiMoe/NekoMusic_Cli)以使用全部功能。
-> 
-> 与AllMusic **客户端** 的基本兼容性暂时保留。服务端因通道冲突，将不再允许共存（其实之前也不可以，只是不会直接抛异常）
-> 
-> 2023.05.27更新：
-> 
-> 目前本项目已与上游项目脱钩，仅 **暂时** 保留最低限度的兼容，因此请不要在本项目的issues中反馈与原项目的兼容问题。同样，请 **不要** 因此打扰原项目的开发者。
-> 
-> 2023.04.04更新：
-> 
-> [上游项目](https://github.com/Coloryr/AllMusic_Server)已适配了forge和fabric服务端，如果需要所有原版功能或者保持与上游客户端的兼容性，建议使用上游项目。
-> 
-> 本项目将继续维护，但原则上仅留作自用。同时，本项目将**不再**保证与上游客户端的兼容性。为了与上游项目区分，已更改仓库名、modid、包名等。
-> 
-> 本项目**目前**和上游项目的区别有：
-> * 使用了外置的API
-> * 只允许扫码登陆
-> * 仅支持fabric 1.19及以上版本的服务端
-> * 使用Fabric-Permission-API作为权限管理
-> * ~~目前不支持歌词、封面等功能~~
-
 ## 使用
 
 ### 服务端
@@ -77,9 +54,9 @@
 
 ### API
 
-本项目并不直接与网易的API交互，而是通过 [社区维护的API](https://github.com/Binaryify/NeteaseCloudMusicApi) 来获取音乐信息。这是为了防止因API变动而导致MOD需要频繁更新。
+本项目并不直接与网易的API交互，而是通过 [社区维护的API](https://gitlab.com/Binaryify/neteasecloudmusicapi) 来获取音乐信息。这是为了防止因API变动而导致MOD需要频繁更新。
 
-关于本API的使用方法，请参考其[文档](https://binaryify.github.io/NeteaseCloudMusicApi/#/)。
+关于本API的使用方法，请参考其[文档](https://docs-neteasecloudmusicapi.vercel.app//)。
 
 如果API因异常而频繁退出，可以使用 [PM2](https://pm2.keymetrics.io/) 来保证持续运行，具体请参考官方文档。
 
@@ -93,9 +70,9 @@ Requires=network.target
 [Service]
 Type=simple
 # 改成你的服务端运行的用户
-User=minecraft
+DynamicUser=true
 # 改成你的API所在的目录
-WorkingDirectory=/home/minecraft/NeteaseCloudMusicApi
+WorkingDirectory=/opt/ncm/NeteaseCloudMusicApi
 ExecStart=/usr/bin/node app.js
 Restart=always
 RestartSec=5s
@@ -103,7 +80,7 @@ RestartSec=5s
 [Install]
 WantedBy=multi-user.target
 ```
-将以上内容保存为 `/etc/systemd/system/NeteaseCloudMusicApi.service` ，然后以root用户执行 `systemctl enable --now NeteaseCloudMusicApi` 即可。
+将以上内容保存为 `/etc/systemd/system/ncm.service` ，然后以root用户执行 `systemctl enable --now ncm` 即可。
 
 对于Windows Server，可以使用系统的 [计划任务](https://docs.microsoft.com/zh-cn/windows/win32/taskschd/task-scheduler-start-page) 来实现开机自启和自动重启。
 

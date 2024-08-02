@@ -243,7 +243,7 @@ public class Api {
     public static MusicObj getMusicForPlay(MusicObj musicObj) {
         MusicObj music = getMusic(musicObj.id);
         if (music != null && music.url != null && !(music.url.isBlank())) {
-            if ((music.freeTrialInfo == null || music.fee != 0 && music.payed != 1) && (musicObj.dt == 0 || music.time == musicObj.dt)) {  // Check if time matches
+            if (music.freeTrialInfo == null) {
                 return music;
             } else {
                 NekoMusic.LOGGER.info("Music " + musicObj.id + " is trial, skipping");

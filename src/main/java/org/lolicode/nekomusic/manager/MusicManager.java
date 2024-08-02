@@ -1,8 +1,6 @@
 package org.lolicode.nekomusic.manager;
 
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -94,33 +92,13 @@ public class MusicManager {
     * Always call this method in a new thread
      */
     public static void play(@NotNull MusicObj musicObj, MinecraftServer server) {
-        // for compatibility with allmusic, use the same id as it
         List<ServerPlayerEntity> playerList = PlayerManager.getOnlineRealPlayerList(server);
         if (playerList.size() == 0)
             return;
 
-        PacketByteBuf stopBuf = PacketHelper.getStopPacket();
-        for (ServerPlayerEntity player : playerList) {
-            try {
-                ServerPlayNetworking.send(player, NekoMusic.ALLMUSIC_COMPAT_ID, stopBuf);
-            } catch (Exception e) {
-                NekoMusic.LOGGER.error("Send stop packet failed", e);
-            }
-        }
-
         HudManager.sendMetadata(musicObj);  // send metadata first, so that the client can determine whether this is a neko server
         HudManager.sendPlayList();
 
-        PacketByteBuf playBuf = PacketHelper.getPlayPacket(musicObj);
-        if (playBuf == null)
-            throw new RuntimeException("Generate play packet failed");
-        for (ServerPlayerEntity player : playerList) {
-            try {
-                ServerPlayNetworking.send(player, NekoMusic.ALLMUSIC_COMPAT_ID, playBuf);
-            } catch (Exception e) {
-                NekoMusic.LOGGER.error("Send play packet failed", e);
-            }
-        }
         server.getPlayerManager().broadcast(PacketHelper.getPlayMessage(musicObj), false);
     }
 

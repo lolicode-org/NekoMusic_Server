@@ -1,21 +1,21 @@
 package org.lolicode.nekomusic.receiver;
 
-import lol.bai.badpackets.api.C2SPacketReceiver;
-import lol.bai.badpackets.api.PacketSender;
+import lol.bai.badpackets.api.PacketReceiver;
+import lol.bai.badpackets.api.play.PlayPackets;
+import lol.bai.badpackets.api.play.ServerPlayContext;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import org.lolicode.nekomusic.NekoMusic;
 
-public class ClientHelloReceiver implements C2SPacketReceiver {
+public class ClientHelloReceiver implements PacketReceiver<ServerPlayContext, PacketByteBuf> {
     @Override
-    public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
-        NekoMusic.nekoPlayerSet.add(player);
+    public void receive(ServerPlayContext context, PacketByteBuf buf) {
+        NekoMusic.nekoPlayerSet.add(context.player());
     }
 
     public static void register() {
-        C2SPacketReceiver.register(Identifier.of(NekoMusic.MOD_ID, "client_hello"), new ClientHelloReceiver());
+        final Identifier CLIENT_HELLO_PACKET_ID = Identifier.of(NekoMusic.MOD_ID, "client_hello");
+        PlayPackets.registerServerChannel(CLIENT_HELLO_PACKET_ID);
+        PlayPackets.registerServerReceiver(CLIENT_HELLO_PACKET_ID, new ClientHelloReceiver());
     }
 }

@@ -1,6 +1,7 @@
 package org.lolicode.nekomusic.manager;
 
 import lol.bai.badpackets.api.PacketSender;
+import lol.bai.badpackets.api.play.PlayPackets;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -10,11 +11,19 @@ import org.lolicode.nekomusic.helper.PacketHelper;
 import org.lolicode.nekomusic.music.MusicObj;
 
 public class HudManager {
+
+    private static final Identifier NEKO_META_ID = Identifier.of(NekoMusic.MOD_ID, "metadata");
+    private static final Identifier NEKO_PLAY_LIST_ID = Identifier.of(NekoMusic.MOD_ID, "list");
+
+    public static void registerChannel() {
+        PlayPackets.registerClientChannel(NEKO_META_ID);
+        PlayPackets.registerClientChannel(NEKO_PLAY_LIST_ID);
+    }
+
     static void sendMetadata(@NotNull MusicObj musicObj) {
         PacketByteBuf metadataBuf = PacketHelper.getMetadataPacket(musicObj);
         if (metadataBuf == null)
             throw new RuntimeException("Generate metadata packet failed");
-        Identifier NEKO_META_ID = new Identifier(NekoMusic.MOD_ID, "metadata");
         for (ServerPlayerEntity player : PlayerManager.getNekoPlayerSet()) {
             try {
                 PacketSender.s2c(player).send(NEKO_META_ID, metadataBuf);
@@ -28,7 +37,6 @@ public class HudManager {
         PacketByteBuf playListBuf = PacketHelper.getPlayListPacket();
         if (playListBuf == null)
             return;
-        Identifier NEKO_PLAY_LIST_ID = new Identifier(NekoMusic.MOD_ID, "list");
         for (ServerPlayerEntity player : PlayerManager.getNekoPlayerSet()) {
             try {
                 PacketSender.s2c(player).send(NEKO_PLAY_LIST_ID, playListBuf);

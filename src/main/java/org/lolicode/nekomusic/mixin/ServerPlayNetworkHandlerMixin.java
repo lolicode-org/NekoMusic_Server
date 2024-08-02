@@ -1,5 +1,6 @@
 package org.lolicode.nekomusic.mixin;
 
+import net.minecraft.network.DisconnectionInfo;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -15,8 +16,8 @@ public class ServerPlayNetworkHandlerMixin {
     @Shadow
     public ServerPlayerEntity player;
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;onDisconnect()V"), method = "onDisconnected")
-    private void onPlayerLeave(Text reason, CallbackInfo info) {
+    @Inject(at = @At(value = "TAIL"), method = "onDisconnected")
+    private void onPlayerLeave(DisconnectionInfo info, CallbackInfo ci) {
         PlayerLeaveCallback.EVENT.invoker().leaveServer(this.player, this.player.getServer());
     }
 }

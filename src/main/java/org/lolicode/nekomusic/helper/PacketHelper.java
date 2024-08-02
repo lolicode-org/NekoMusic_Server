@@ -1,7 +1,5 @@
 package org.lolicode.nekomusic.helper;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.*;
@@ -12,35 +10,9 @@ import org.lolicode.nekomusic.music.Api;
 import org.lolicode.nekomusic.music.MusicList;
 import org.lolicode.nekomusic.music.MusicObj;
 
-import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 public class PacketHelper {
-    public static PacketByteBuf getPlayPacket(@NotNull MusicObj musicObj) {
-        if (musicObj.url == null || musicObj.url.equals(""))
-            return null;
-
-        // What's these?
-        // IDK, just copy from coloryr's code
-        String data = "[Play]" + musicObj.url;
-
-        byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
-        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
-        buf.writeByte(666);
-        buf.writeBytes(bytes);
-
-        return new PacketByteBuf(buf);
-    }
-
-    public static PacketByteBuf getStopPacket() {
-        byte[] bytes = "[Stop]".getBytes(StandardCharsets.UTF_8);
-        ByteBuf buf = Unpooled.buffer(bytes.length + 1);
-        buf.writeByte(666);
-        buf.writeBytes(bytes);
-
-        return new PacketByteBuf(buf);
-    }
-
     public static PacketByteBuf getMetadataPacket(MusicObj music) {
         if (music == null)
             return null;

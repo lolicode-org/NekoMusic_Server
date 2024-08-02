@@ -17,6 +17,7 @@ import org.lolicode.nekomusic.command.MusicCommand;
 import org.lolicode.nekomusic.config.ModConfig;
 import org.lolicode.nekomusic.event.PlayerJoinCallback;
 import org.lolicode.nekomusic.event.PlayerLeaveCallback;
+import org.lolicode.nekomusic.manager.HudManager;
 import org.lolicode.nekomusic.music.MusicObj;
 import org.lolicode.nekomusic.music.SongList;
 import org.lolicode.nekomusic.receiver.ClientByeReceiver;
@@ -31,9 +32,8 @@ import java.util.concurrent.*;
 public class NekoMusic implements DedicatedServerModInitializer {
     public static final String MOD_ID = "nekomusic";
     public static final String MOD_NAME = "NekoMusic";
-    public static final String MOD_VERSION = "1.1.0";
-    public static final Identifier ID = new Identifier(MOD_ID, "channel");
-    public static final Identifier ALLMUSIC_COMPAT_ID = new Identifier("allmusic", "channel");
+    public static final String MOD_VERSION = "3.0.0";
+    public static final Identifier ID = Identifier.of(MOD_ID, "channel");
     public static final Logger LOGGER = LogManager.getLogger();
     public static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).setPrettyPrinting().create();
     public static final ModConfig CONFIG = new ModConfig();
@@ -66,5 +66,6 @@ public class NekoMusic implements DedicatedServerModInitializer {
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> ServerStop.onServerStop());
         ClientHelloReceiver.register();
         ClientByeReceiver.register();
+        HudManager.registerChannel();
     }
 }

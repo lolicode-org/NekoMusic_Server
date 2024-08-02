@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.1-SNAPSHOT'
+    id 'fabric-loom' version '1.7-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -31,14 +31,15 @@ dependencies {
     include(modImplementation("me.lucko:fabric-permissions-api:${project.fabric_permissions_api_version}"))
     modImplementation "carpet:fabric-carpet:${project.carpet_branch}-${project.carpet_core_version}"
 
-    include implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    include implementation("com.squareup.okio:okio-jvm:3.3.0") //okio-jvm, not okio. This cost me like 1hr of debugging
     modLocalRuntime("net.fabricmc:fabric-language-kotlin:${project.fabric_language_kotlin_version}") { // includes kotlin for squareup libs
         exclude module: "fabric-loader"
     }
-    include implementation('xyz.dunjiao.cloud:qr-to-console:1.0')
-    include implementation('com.google.zxing:javase:3.5.1')
-    include implementation('com.google.zxing:core:3.5.1')
+
+    include implementation("com.squareup.okhttp3:okhttp:${project.okhttp_version}")
+    include implementation("com.squareup.okio:okio-jvm:${project.okio_version}") //okio-jvm, not okio. This cost me like 1hr of debugging
+    include implementation("xyz.dunjiao.cloud:qr-to-console:${project.qr_to_console_version}")
+    include implementation("com.google.zxing:javase:${project.zxing_javase_version}")
+    include implementation("com.google.zxing:core:${project.zxing_core_version}")
     modImplementation "lol.bai:badpackets:fabric-${badpackets_version}"
 }
 

@@ -32,7 +32,7 @@ import java.util.concurrent.*;
 public class NekoMusic implements DedicatedServerModInitializer {
     public static final String MOD_ID = "nekomusic";
     public static final String MOD_NAME = "NekoMusic";
-    public static final String MOD_VERSION = "3.0.0";
+    public static final String MOD_VERSION = "1.1.4";
     public static final Identifier ID = Identifier.of(MOD_ID, "channel");
     public static final Logger LOGGER = LogManager.getLogger();
     public static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).setPrettyPrinting().create();

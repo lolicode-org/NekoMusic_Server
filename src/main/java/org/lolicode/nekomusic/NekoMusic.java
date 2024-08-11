@@ -15,14 +15,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lolicode.nekomusic.command.MusicCommand;
 import org.lolicode.nekomusic.config.ModConfig;
-import org.lolicode.nekomusic.event.PlayerJoinCallback;
 import org.lolicode.nekomusic.event.PlayerLeaveCallback;
 import org.lolicode.nekomusic.manager.HudManager;
 import org.lolicode.nekomusic.music.MusicObj;
 import org.lolicode.nekomusic.music.SongList;
 import org.lolicode.nekomusic.receiver.ClientByeReceiver;
 import org.lolicode.nekomusic.receiver.ClientHelloReceiver;
-import org.lolicode.nekomusic.task.PlayerJoin;
 import org.lolicode.nekomusic.task.PlayerLeave;
 import org.lolicode.nekomusic.task.ServerStop;
 
@@ -58,7 +56,6 @@ public class NekoMusic implements DedicatedServerModInitializer {
         }
         if (ModConfig.load() || ModConfig.loadLegacy()) {
             CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> MusicCommand.register(dispatcher));
-            PlayerJoinCallback.EVENT.register(PlayerJoin::OnPlayerJoin);
             PlayerLeaveCallback.EVENT.register(PlayerLeave::OnPlayerLeave);
             LOGGER.info("NekoMusic mod loaded");
         } else {

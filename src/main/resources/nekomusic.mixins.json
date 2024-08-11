@@ -9,7 +9,6 @@
   "client": [
   ],
   "server": [
-    "PlayerManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

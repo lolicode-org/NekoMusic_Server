@@ -6,11 +6,13 @@ import lol.bai.badpackets.api.play.ServerPlayContext;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import org.lolicode.nekomusic.NekoMusic;
+import org.lolicode.nekomusic.task.PlayerJoin;
 
 public class ClientHelloReceiver implements PacketReceiver<ServerPlayContext, PacketByteBuf> {
     @Override
     public void receive(ServerPlayContext context, PacketByteBuf buf) {
         NekoMusic.nekoPlayerSet.add(context.player());
+        PlayerJoin.OnPlayerJoin(context.player(), context.server(), false);
     }
 
     public static void register() {

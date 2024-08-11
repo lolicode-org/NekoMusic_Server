@@ -38,8 +38,8 @@
 | `/music`              | `nekomusic`              | 命令根节点。后面可以直接加歌曲ID或者链接来快速点歌（需要点歌权限）     |
 | `/music add`          | `nekomusic.add`          | 点歌，后面可以加歌曲ID或者链接                       |
 | `/music list`         | `nekomusic.list`         | 查看当前播放列表                               |
-| `/music vote`         | `nekomusic.vote`         | 投票切歌                                   |
-| `/music next`         | `nekomusic.next`         | 强制切歌                                   |
+| `/music next`         | `nekomusic.vote`         | （非管理员）投票切歌                             |
+| `/music next`         | `nekomusic.next`         | （管理员）强制切歌                              |
 | `/music del`          | `nekomusic.del`          | 删除当前播放列表中的歌曲                           |
 | `/music del`          | `nekomusic.del.other`    | 删除别人点的歌曲                               |
 | `/music ban`          | `nekomusic.ban`          | 封禁歌曲（默认列表中的不受影响）                       |

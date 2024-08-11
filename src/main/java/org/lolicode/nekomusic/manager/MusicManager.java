@@ -108,10 +108,6 @@ public class MusicManager {
     }
 
     public static void vote(MinecraftServer server,  ServerCommandSource source) {
-        if (Permissions.check(source, "nekomusic.next", 1)) {
-            next(server, source);
-            return;
-        }
         if (source.isExecutedByPlayer()) {
             NekoMusic.currentVote.add(source.getName());
         } else {

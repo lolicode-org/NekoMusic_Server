@@ -73,9 +73,13 @@ public class MusicCommand {
                     return 0;
                 }).build();
         LiteralCommandNode<ServerCommandSource> nextNode = CommandManager.literal("next")
-                .requires(Permissions.require("nekomusic.next", 1))
+                .requires(Permissions.require("nekomusic.next", 1)
+                        .or(Permissions.require("nekomusic.vote", 0)))
                 .executes(context -> {
-                    MusicManager.next(context.getSource().getServer(), context.getSource());
+                    if (Permissions.check(context.getSource(), "nekomusic.next", 1))
+                        MusicManager.next(context.getSource().getServer(), context.getSource());
+                    else
+                        MusicManager.vote(context.getSource().getServer(), context.getSource());
                     return 0;
                 }).build();
         LiteralCommandNode<ServerCommandSource> searchNode = CommandManager.literal("search")
@@ -95,12 +99,6 @@ public class MusicCommand {
                             MusicManager.search(context.getSource().getServer(), context.getSource(), keyword, 1);
                             return 0;
                         })).build();
-        LiteralCommandNode<ServerCommandSource> voteNode = CommandManager.literal("vote")
-                .requires(Permissions.require("nekomusic.vote", 0))
-                .executes(context -> {
-                    MusicManager.vote(context.getSource().getServer(), context.getSource());
-                    return 0;
-                }).build();
         LiteralCommandNode<ServerCommandSource> reloadNode = CommandManager.literal("reload")
                 .requires(Permissions.require("nekomusic.reload", 2))
                 .executes(context -> {
@@ -136,7 +134,6 @@ public class MusicCommand {
         rootNode.addChild(listNode);
         rootNode.addChild(nextNode);
         rootNode.addChild(searchNode);
-        rootNode.addChild(voteNode);
         rootNode.addChild(reloadNode);
         rootNode.addChild(loginNode);
         dispatcher.getRoot().addChild(rootNode);

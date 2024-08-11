@@ -11,8 +11,8 @@ public class MusicObj {
     }
 
     protected static class FreeTrialInfoObj {
-        public int start;
-        public int end;
+        public String level;
+        public String encodeType;
     }
 
     public static class AlbumObj {
@@ -28,6 +28,7 @@ public class MusicObj {
     public String url;
     public long dt;
     protected long time; // should be equal to dt, to determine if the song is trial (fuck netease)
+    @SerializedName("freeTrialInfo")
     protected FreeTrialInfoObj freeTrialInfo;
     protected byte fee;
     protected byte payed;

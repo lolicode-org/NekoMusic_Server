@@ -38,6 +38,7 @@ public class NekoMusic implements DedicatedServerModInitializer {
     public static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).setPrettyPrinting().create();
     public static final ModConfig CONFIG = new ModConfig();
     public static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
+    public static final OkHttpClient HTTP_CLIENT_NO_REDIRECT = new OkHttpClient.Builder().followRedirects(false).followSslRedirects(false).build();
     public static final Timer TIMER = new Timer();
     public static volatile TimerTask task = null;
     public static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor(

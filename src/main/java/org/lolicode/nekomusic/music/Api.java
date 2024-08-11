@@ -11,6 +11,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.config.ModConfig;
+import org.lolicode.nekomusic.utils.RandomChineseIP;
 import xyz.dunjiao.cloud.commons.lang.QRCodeUtils;
 
 import java.io.IOException;
@@ -327,6 +328,25 @@ public class Api {
             }
         } catch (IOException e) {
             NekoMusic.LOGGER.error("Failed to search songs: Network error", e);
+        }
+        return null;
+    }
+
+    public static String getRealUrl(String url) {
+        if (url == null || url.isBlank()) return null;
+        try (Response response = NekoMusic.HTTP_CLIENT_NO_REDIRECT.newCall(new Request.Builder()
+                        .url(url)
+                        .header("User-Agent", "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/22B5007p Safari/604.1")
+                        .header("X-Real-IP", RandomChineseIP.getRandomChineseIP())
+                        .build())
+                .execute()) {
+            if (response.code() == 302) {
+                return response.header("Location");
+            } else {
+                NekoMusic.LOGGER.error("Failed to get real url: Invalid response {}\n{}", response.code(), response.body() != null ? response.body().string() : "");
+            }
+        } catch (IOException e) {
+            NekoMusic.LOGGER.error("Failed to get real url: Network error", e);
         }
         return null;
     }

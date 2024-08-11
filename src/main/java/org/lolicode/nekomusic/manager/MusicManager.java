@@ -22,6 +22,7 @@ public class MusicManager {
     private static final Pattern intPattern = Pattern.compile("\\d+");
     private static final Pattern urlPattern1 = Pattern.compile("song/(\\d+)");
     private static final Pattern urlPattern2 = Pattern.compile("[?&]id=(\\d+)");
+    private static final Pattern urlPatternShort = Pattern.compile("https?://163cn\\.tv/[a-zA-Z0-9]+");
     public static void playNext(MinecraftServer server) {
         if (NekoMusic.task != null) {
             NekoMusic.task.cancel();  // If user issues next command, cancel the current task in case it's not finished
@@ -140,20 +141,46 @@ public class MusicManager {
                 id = 0;
             }
         }
-        if (NekoMusic.currentMusic.id == id || NekoMusic.orderList.hasSong(id)) {
-            source.sendFeedback(PacketHelper.getOrderedMessage(), false);
-            return;
-        }
-        if (NekoMusic.CONFIG.bannedSongs != null && NekoMusic.CONFIG.bannedSongs.contains(id)
-                && !Permissions.check(source, "nekomusic.bypassban", 1)) {
-            source.sendFeedback(PacketHelper.getBannedMessage(), false);
-            return;
-        }
 
         source.sendFeedback(PacketHelper.getWorkingMessage(), false);
 
         NekoMusic.EXECUTOR.execute(() -> {
-            MusicObj musicObj = Api.getMusicInfo(id);
+            long real_id = 0;
+            if (id <= 0 && url.contains("163cn.tv")) {
+                try {
+                    var extracted = urlPatternShort.matcher(url);
+                    if (extracted.find()) {
+                        var real_url = Api.getRealUrl(extracted.group());
+                        if (real_url != null) {
+                            var matcher = urlPattern2.matcher(real_url);
+                            if (matcher.find()) {
+                                real_id = Long.parseLong(matcher.group(1));
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    source.sendFeedback(PacketHelper.getOrderMessage(), false);
+                    return;
+                }
+            }
+            if (real_id <= 0) {
+                if (id <= 0) {
+                    source.sendFeedback(PacketHelper.getOrderMessage(), false);
+                    return;
+                } else {
+                    real_id = id;
+                }
+            }
+            if (NekoMusic.currentMusic.id == real_id || NekoMusic.orderList.hasSong(real_id)) {
+                source.sendFeedback(PacketHelper.getOrderedMessage(), false);
+                return;
+            }
+            if (NekoMusic.CONFIG.bannedSongs != null && NekoMusic.CONFIG.bannedSongs.contains(real_id)
+                    && !Permissions.check(source, "nekomusic.bypassban", 1)) {
+                source.sendFeedback(PacketHelper.getBannedMessage(), false);
+                return;
+            }
+            MusicObj musicObj = Api.getMusicInfo(real_id);
             if (musicObj != null) {
                 if (source.isExecutedByPlayer()) {
                     musicObj.player = source.getName();

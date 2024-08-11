@@ -12,7 +12,7 @@ public class PlayerJoin {
         if (CarpetHelper.isPlayerFake(player))
             return;
         NekoMusic.tempNekoPlayerSet.add(player);
-        if (PlayerManager.getOnlineRealPlayerList(server).size() == 1) {
+        if (PlayerManager.getNekoPlayerSet().size() == 1) {
             try {
                 MusicManager.playNext(server);
             } catch (Exception e) {

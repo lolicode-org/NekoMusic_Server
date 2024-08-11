@@ -13,7 +13,7 @@ import org.lolicode.nekomusic.music.MusicObj;
 import org.lolicode.nekomusic.music.MusicUrlGetException;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +28,7 @@ public class MusicManager {
             NekoMusic.task.cancel();  // If user issues next command, cancel the current task in case it's not finished
             NekoMusic.task = null;
         }
-        if (PlayerManager.getOnlineRealPlayerList(server).size() == 0)
+        if (PlayerManager.getNekoPlayerSet().isEmpty())
             return;
 
         NekoMusic.currentVote.clear();
@@ -93,11 +93,11 @@ public class MusicManager {
     * Always call this method in a new thread
      */
     public static void play(@NotNull MusicObj musicObj, MinecraftServer server) {
-        List<ServerPlayerEntity> playerList = PlayerManager.getOnlineRealPlayerList(server);
-        if (playerList.size() == 0)
+        Set<ServerPlayerEntity> playerList = PlayerManager.getNekoPlayerSet();
+        if (playerList.isEmpty())
             return;
 
-        HudManager.sendMetadata(musicObj);  // send metadata first, so that the client can determine whether this is a neko server
+        HudManager.sendMetadata(musicObj);
         HudManager.sendPlayList();
 
         server.getPlayerManager().broadcast(PacketHelper.getPlayMessage(musicObj), false);
@@ -190,7 +190,7 @@ public class MusicManager {
                 NekoMusic.orderList.add(musicObj);
                 server.getPlayerManager().broadcast(PacketHelper.getOrderMessage(musicObj), false);
                 if (!NekoMusic.orderList.isPlaying
-                        && PlayerManager.getOnlineRealPlayerList(server).size() > 0) {
+                        && !PlayerManager.getNekoPlayerSet().isEmpty()) {
                     playNext(server);
                 } else {
 //                    HudManager.sendList();

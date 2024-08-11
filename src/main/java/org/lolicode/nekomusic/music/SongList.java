@@ -2,9 +2,10 @@ package org.lolicode.nekomusic.music;
 
 import org.lolicode.nekomusic.NekoMusic;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -13,6 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class SongList {
     private final LinkedList<MusicObj> songs = new LinkedList<>();
+    private final AtomicInteger currentItem = new AtomicInteger(-1);
 
     protected volatile long id = 0;
 
@@ -26,6 +28,7 @@ public class SongList {
     }
 
     public void add(MusicObj musicObj) {
+        // add won't be called on idleList, no update item
         try {
             lock.lock();
             songs.add(musicObj);
@@ -47,9 +50,13 @@ public class SongList {
         MusicObj music;
         try {
             lock.lock();
-            if (songs.size() == 0) return null;
+            if (songs.isEmpty()) return null;
             if (isPersistent) {
-                music = songs.get(new Random().nextInt(songs.size()));
+                if (currentItem.get() < 0) {
+                    currentItem.set(songs.size() - 1);
+                    Collections.shuffle(songs);
+                }
+                music = songs.get(currentItem.getAndDecrement());
             } else {
                 music = songs.pollFirst();
             }
@@ -88,10 +95,12 @@ public class SongList {
     }
 
     public void load(SongList newSongList) {
+        // only used by idleList
         try {
             lock.lock();
             songs.clear();
             songs.addAll(newSongList.songs);
+            currentItem.set(-1);
             id = newSongList.id;
         } finally {
             lock.unlock();

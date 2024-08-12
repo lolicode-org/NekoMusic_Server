@@ -16,8 +16,6 @@ public class PlayerManager {
     }
 
     public static Set<ServerPlayerEntity> getNekoPlayerSet() {
-        var players = NekoMusic.tempNekoPlayerSet.getPlayers();
-        players.addAll(NekoMusic.nekoPlayerSet);  // This is a shadow copy, so it's safe to add elements to it.
-        return players;
+        return NekoMusic.nekoPlayerSet;
     }
 }

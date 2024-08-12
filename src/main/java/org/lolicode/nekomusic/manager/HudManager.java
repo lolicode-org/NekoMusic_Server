@@ -33,6 +33,17 @@ public class HudManager {
         }
     }
 
+    static void sendMetadata(@NotNull MusicObj musicObj, @NotNull ServerPlayerEntity player, boolean seek) {
+        PacketByteBuf metadataBuf = PacketHelper.getMetadataPacket(musicObj, seek);
+        if (metadataBuf == null)
+            throw new RuntimeException("Generate metadata packet failed");
+        try {
+            PacketSender.s2c(player).send(NEKO_META_ID, metadataBuf);
+        } catch (Exception e) {
+            NekoMusic.LOGGER.error("Send metadata packet failed", e);
+        }
+    }
+
     static void sendPlayList() {
         PacketByteBuf playListBuf = PacketHelper.getPlayListPacket();
         if (playListBuf == null)
@@ -43,6 +54,17 @@ public class HudManager {
             } catch (Exception e) {
                 NekoMusic.LOGGER.error("Send play list packet failed", e);
             }
+        }
+    }
+
+    static void sendPlayList(@NotNull ServerPlayerEntity player) {
+        PacketByteBuf playListBuf = PacketHelper.getPlayListPacket();
+        if (playListBuf == null)
+            return;
+        try {
+            PacketSender.s2c(player).send(NEKO_PLAY_LIST_ID, playListBuf);
+        } catch (Exception e) {
+            NekoMusic.LOGGER.error("Send play list packet failed", e);
         }
     }
 }

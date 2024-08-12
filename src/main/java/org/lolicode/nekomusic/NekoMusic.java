@@ -46,6 +46,7 @@ public class NekoMusic implements DedicatedServerModInitializer {
     public static final SongList orderList = new SongList(false);
     public static Set<String> currentVote = new HashSet<>();
     public static MusicObj currentMusic = null;
+    public static long currentStartTime = 0;
     public static final Set<ServerPlayerEntity> nekoPlayerSet = new HashSet<>();
 
     @Override

@@ -220,23 +220,6 @@ public class Api {
         return null;
     }
 
-    public static String getMusicUrl(long id) {
-        MusicObj music = getMusic(id);
-        if (music != null && (music.freeTrialInfo == null || (music.fee != 0 && music.payed != 1))) {  // Don't play trial music
-            return music.url;
-        }
-        return null;
-    }
-
-    public static String getMusicUrl(MusicObj musicObj) {
-        MusicObj music = getMusic(musicObj.id);
-        if (music != null && (music.freeTrialInfo == null || (music.fee != 0 && music.payed != 1))
-                && ((musicObj.dt == 0) || music.time == musicObj.dt)) {  // Check if time matches
-            return music.url;
-        }
-        return null;
-    }
-
     /**
      * To replace the above method. Similar to getMusicInfo, but will check if it's trial first.
      * This method is add to support the new feature of the new client, which requires the br to correctly use cache.

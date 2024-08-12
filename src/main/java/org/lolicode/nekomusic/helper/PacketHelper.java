@@ -14,9 +14,14 @@ import java.util.function.Supplier;
 
 public class PacketHelper {
     public static PacketByteBuf getMetadataPacket(MusicObj music) {
-        if (music == null)
+        return getMetadataPacket(music, false);
+    }
+
+    public static PacketByteBuf getMetadataPacket(MusicObj musicObj, boolean seek) {
+        if (musicObj == null)
             return null;
-        String serialized = NekoMusic.GSON.toJson(music);
+        musicObj.seekTo = seek ? (System.currentTimeMillis() - NekoMusic.currentStartTime) / 1000 : 0;
+        String serialized = NekoMusic.GSON.toJson(musicObj);
 
         return PacketByteBufs.create().writeString(serialized);
     }

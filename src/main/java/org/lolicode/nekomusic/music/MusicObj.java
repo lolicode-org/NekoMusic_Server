@@ -37,4 +37,7 @@ public class MusicObj {
     @SerializedName("al")
     public AlbumObj album;
     public int br;
+
+    @SerializedName("seek_to")
+    public long seekTo;
 }

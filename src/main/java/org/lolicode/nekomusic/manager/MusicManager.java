@@ -61,6 +61,7 @@ public class MusicManager {
                         assert next != null;
                         play(next, server);
                         NekoMusic.currentMusic = next;
+                        NekoMusic.currentStartTime = System.currentTimeMillis();
                         NekoMusic.task = new TimerTask() {
                             @Override
                             public void run() {
@@ -101,6 +102,12 @@ public class MusicManager {
         HudManager.sendPlayList();
 
         server.getPlayerManager().broadcast(PacketHelper.getPlayMessage(musicObj), false);
+    }
+
+    public static void playToPlayer(@NotNull MusicObj musicObj, ServerPlayerEntity player, boolean seek) {
+        HudManager.sendMetadata(musicObj, player, seek);
+        HudManager.sendPlayList(player);
+        player.sendMessage(PacketHelper.getPlayMessage(musicObj), false);
     }
 
     public static void next(MinecraftServer server, ServerCommandSource source) {

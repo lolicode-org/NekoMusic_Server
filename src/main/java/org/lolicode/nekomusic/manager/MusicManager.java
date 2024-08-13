@@ -110,6 +110,11 @@ public class MusicManager {
         player.sendMessage(PacketHelper.getPlayMessage(musicObj), false);
     }
 
+    public static void resumeToPlayer(ServerPlayerEntity player) {
+        if (NekoMusic.currentMusic == null) return;
+        playToPlayer(NekoMusic.currentMusic, player, System.currentTimeMillis() - NekoMusic.currentStartTime > 5000);  // don't seek if the audio has been playing for less than 5 seconds
+    }
+
     public static void next(MinecraftServer server, ServerCommandSource source) {
         source.sendFeedback(PacketHelper.getWorkingMessage(), false);
         playNext(server);

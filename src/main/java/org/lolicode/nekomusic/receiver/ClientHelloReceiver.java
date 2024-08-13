@@ -19,8 +19,8 @@ public class ClientHelloReceiver implements PacketReceiver<ServerPlayContext, Pa
             } catch (Exception e) {
                 NekoMusic.LOGGER.error("Play music failed", e);
             }
-        } else if (NekoMusic.currentMusic != null && (System.currentTimeMillis() - NekoMusic.currentStartTime + 3000 < NekoMusic.currentMusic.dt)) {
-            MusicManager.playToPlayer(NekoMusic.currentMusic, context.player(), System.currentTimeMillis() - NekoMusic.currentStartTime > 5000);  // don't seek if the audio has been playing for less than 5 seconds
+        } else if (NekoMusic.currentMusic != null && (System.currentTimeMillis() - NekoMusic.currentStartTime + 10000 < NekoMusic.currentMusic.dt)) {
+            MusicManager.resumeToPlayer(context.player());
         }
     }
 

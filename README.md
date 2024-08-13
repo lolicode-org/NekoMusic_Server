@@ -33,24 +33,28 @@
 
 ### 命令
 
-| 命令                    | 权限                       | 用途                                     |
-|:----------------------|:-------------------------|:---------------------------------------|
-| `/music`              | `nekomusic`              | 命令根节点。后面可以直接加歌曲ID或者链接来快速点歌（需要点歌权限）     |
-| `/music add`          | `nekomusic.add`          | 点歌，后面可以加歌曲ID或者链接                       |
-| `/music list`         | `nekomusic.list`         | 查看当前播放列表                               |
-| `/music next`         | `nekomusic.vote`         | （非管理员）投票切歌                             |
-| `/music next`         | `nekomusic.next`         | （管理员）强制切歌                              |
-| `/music del`          | `nekomusic.del`          | 删除当前播放列表中的歌曲                           |
-| `/music del`          | `nekomusic.del.other`    | 删除别人点的歌曲                               |
-| `/music ban`          | `nekomusic.ban`          | 封禁歌曲（默认列表中的不受影响）                       |
-| `/music unban`        | `nekomusic.unban`        | 取消歌曲封禁                                 |
-|                       | `nekomusic.bypassban`    | 允许点被封禁的歌                               |
-| `/music search`       | `nekomusic.search`       | 搜索歌曲                                   |
-| `/music reload`       | `nekomusic.reload`       | 重新加载配置文件                               |
-| `/music login`        | `nekomusic.login`        | 登陆命令根节点                                |
-| `/music login start`  | `nekomusic.login.start`  | 开始登陆，会在**控制台**打印登陆二维码，或者在**聊天栏**显示登陆链接 |
-| `/music login check`  | `nekomusic.login.check`  | 检查登陆状态，如果登陆成功，会将cookie写入配置文件           |
-| `/music login status` | `nekomusic.login.status` | 显示当前登陆的用户信息                            |
+| 命令                    | 权限                       | 用途                                          |
+|:----------------------|:-------------------------|:--------------------------------------------|
+| `/music`              | `nekomusic`              | 命令根节点。后面可以直接加歌曲ID或者链接来快速点歌（需要点歌权限）          |
+| `/music now`          | `nekomusic.add.now`      | 后面可以加歌曲ID或者链接来点歌。如果当前正在播放空闲列表，则会跳过空闲列表立即播放。 |
+| `/music forceNow`     | `nekomusic.add.forceNow` | 后面可以加歌曲ID或者链接来点歌。强制结束当前播放的歌曲，立即播放这首歌。       |
+| `/music add`          | `nekomusic.add`          | 点歌，后面可以加歌曲ID或者链接                            |
+| `/music add now`      | `nekomusic.add.now`      | 和`/music now`一样，用于跳过空闲列表立即播放                |
+| `/music add forceNow` | `nekomusic.add.forceNow` | 和`/music forceNow`一样，用于强制结束当前播放的歌曲，立即播放这首歌  |
+| `/music list`         | `nekomusic.list`         | 查看当前播放列表                                    |
+| `/music next`         | `nekomusic.vote`         | （非管理员）投票切歌                                  |
+| `/music next`         | `nekomusic.next`         | （管理员）强制切歌                                   |
+| `/music del`          | `nekomusic.del`          | 删除当前播放列表中的歌曲                                |
+| `/music del`          | `nekomusic.del.other`    | 删除别人点的歌曲                                    |
+| `/music ban`          | `nekomusic.ban`          | 封禁歌曲（默认列表中的不受影响）                            |
+| `/music unban`        | `nekomusic.unban`        | 取消歌曲封禁                                      |
+|                       | `nekomusic.bypassban`    | 允许点被封禁的歌                                    |
+| `/music search`       | `nekomusic.search`       | 搜索歌曲                                        |
+| `/music reload`       | `nekomusic.reload`       | 重新加载配置文件                                    |
+| `/music login`        | `nekomusic.login`        | 登陆命令根节点                                     |
+| `/music login start`  | `nekomusic.login.start`  | 开始登陆，会在**控制台**打印登陆二维码，或者在**聊天栏**显示登陆链接      |
+| `/music login check`  | `nekomusic.login.check`  | 检查登陆状态，如果登陆成功，会将cookie写入配置文件                |
+| `/music login status` | `nekomusic.login.status` | 显示当前登陆的用户信息                                 |
 
 ### API
 

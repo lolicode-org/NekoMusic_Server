@@ -37,6 +37,15 @@ public class SongList {
         }
     }
 
+    public void addToFirst(MusicObj musicObj) {
+        try {
+            lock.lock();
+            songs.addFirst(musicObj);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public MusicObj get(long id) {
         try {
             lock.lock();

@@ -122,17 +122,45 @@ public class PacketHelper {
                     .setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.YELLOW)));
             int num = 0;
             for (Api.SearchResult.Result.OneSong song : result.result.songs) {
-                text.append(Text.literal( "§e" + (++num) + ". " + "§a" + song.name + " §e-§9 "
-                        + String.join(" & ",
-                        song.artists.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
-                        + "§e - §d" + song.album.name + "\n").setStyle(
-                        Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.GREEN))
-                                .withClickEvent(new ClickEvent(
-                                        ClickEvent.Action.RUN_COMMAND,
-                                        "/music add " + song.id))
-                                .withHoverEvent(new HoverEvent(
+                text.append(
+                        Text.literal(
+                                "§e" + (++num) + ". " + "§a" + song.name + " §e-§9 "
+                                        + String.join(" & ", song.artists.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
+                                        + "§e - §d" + song.album.name + " §6[+]"
+                        ).setStyle(Text.empty().getStyle()
+//                                .withColor(TextColor.fromFormatting(Formatting.GREEN))
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add " + song.id))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("Click to add it to playlist.")))));
+                text.append(Text.literal(" [▶]").setStyle(Text.empty().getStyle()
+                        .withColor(TextColor.fromFormatting(Formatting.GOLD))
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add now " + song.id))
+                        .withHoverEvent(
+                                new HoverEvent(
                                         HoverEvent.Action.SHOW_TEXT,
-                                        Text.of("Click to add it to playing list.")))));
+                                        Text.of("Click to add it to playlist and skip current song (if current song is not ordered by player).")
+                                ))
+                ));
+                text.append(Text.literal(" [⏩]").setStyle(Text.empty().getStyle()
+                        .withColor(TextColor.fromFormatting(Formatting.GOLD))
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add forceNow " + song.id))
+                        .withHoverEvent(
+                                new HoverEvent(
+                                        HoverEvent.Action.SHOW_TEXT,
+                                        Text.of("Click to add it to playlist and force skip current song.")
+                                ))
+                ));
+                if (NekoMusic.CONFIG.bannedSongs.contains(song.id)) {
+                    text.append(Text.literal(" [✔]").setStyle(Text.empty().getStyle()
+                            .withColor(TextColor.fromFormatting(Formatting.RED))
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music unban " + song.id))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("Click to unban it.")))));
+                } else {
+                    text.append(Text.literal(" [X]").setStyle(Text.empty().getStyle()
+                            .withColor(TextColor.fromFormatting(Formatting.RED))
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music ban " + song.id))
+                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("Click to ban it.")))));
+                }
+                text.append(Text.literal("\n"));
             }
             MutableText pagePrev = Text.literal("<<");
             if (result.result.page == 1) {

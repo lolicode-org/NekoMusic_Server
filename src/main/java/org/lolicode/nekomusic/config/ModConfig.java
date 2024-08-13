@@ -11,6 +11,8 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: radio
+
 public class ModConfig {
     public String cookie = "";
     public long idleList = 0;

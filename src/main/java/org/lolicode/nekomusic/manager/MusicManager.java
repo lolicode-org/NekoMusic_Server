@@ -131,7 +131,7 @@ public class MusicManager {
         }
     }
 
-    public static void order(MinecraftServer server, ServerCommandSource source, String url) {
+    public static void order(MinecraftServer server, ServerCommandSource source, String url, boolean skipIdle, boolean addToFirst) {
         long id;
         if (intPattern.matcher(url).matches()) {
             id = Long.parseLong(url);
@@ -194,9 +194,12 @@ public class MusicManager {
                 } else {
                     musicObj.player = "console";
                 }
-                NekoMusic.orderList.add(musicObj);
+                if (addToFirst)
+                    NekoMusic.orderList.addToFirst(musicObj);
+                else
+                    NekoMusic.orderList.add(musicObj);
                 server.getPlayerManager().broadcast(PacketHelper.getOrderMessage(musicObj), false);
-                if (!NekoMusic.orderList.isPlaying
+                if (((!NekoMusic.orderList.isPlaying && skipIdle) || addToFirst)
                         && !PlayerManager.getNekoPlayerSet().isEmpty()) {
                     playNext(server);
                 } else {

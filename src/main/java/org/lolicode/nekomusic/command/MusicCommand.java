@@ -20,18 +20,51 @@ public class MusicCommand {
                         .requires(Permissions.require("nekomusic.add", 0))
                         .executes(context -> {
                             String url = StringArgumentType.getString(context, "url");
-                            MusicManager.order(context.getSource().getServer(), context.getSource(), url);
+                            MusicManager.order(context.getSource().getServer(), context.getSource(), url, false, false);
                             return 0;
                         }))
+                .then(CommandManager.literal("now")
+                        .requires(Permissions.require("nekomusic.add.now", 0))
+                        .then(CommandManager.argument("url", StringArgumentType.greedyString())
+                                .executes(context -> {
+                                    String url = StringArgumentType.getString(context, "url");
+                                    MusicManager.order(context.getSource().getServer(), context.getSource(), url, true, false);
+                                    return 0;
+                                })))
+                .then(CommandManager.literal("forceNow")
+                        .requires(Permissions.require("nekomusic.add.forceNow", 1))
+                        .then(CommandManager.argument("url", StringArgumentType.greedyString())
+                                .executes(context -> {
+                                    String url = StringArgumentType.getString(context, "url");
+                                    MusicManager.order(context.getSource().getServer(), context.getSource(), url, true, true);
+                                    return 0;
+                                })))
                 .build();
         LiteralCommandNode<ServerCommandSource> addNode = CommandManager.literal("add")
                 .requires(Permissions.require("nekomusic.add", 0))
                 .then(CommandManager.argument("url", StringArgumentType.greedyString())
                         .executes(context -> {
                             String url = StringArgumentType.getString(context, "url");
-                            MusicManager.order(context.getSource().getServer(), context.getSource(), url);
+                            MusicManager.order(context.getSource().getServer(), context.getSource(), url, false, false);
                             return 0;
-                        })).build();
+                        }))
+                .then(CommandManager.literal("now")
+                        .requires(Permissions.require("nekomusic.add.now", 0))
+                        .then(CommandManager.argument("url", StringArgumentType.greedyString())
+                                .executes(context -> {
+                                    String url = StringArgumentType.getString(context, "url");
+                                    MusicManager.order(context.getSource().getServer(), context.getSource(), url, true, false);
+                                    return 0;
+                                })))
+                .then(CommandManager.literal("forceNow")
+                        .requires(Permissions.require("nekomusic.add.forceNow", 1))
+                        .then(CommandManager.argument("url", StringArgumentType.greedyString())
+                                .executes(context -> {
+                                    String url = StringArgumentType.getString(context, "url");
+                                    MusicManager.order(context.getSource().getServer(), context.getSource(), url, true, true);
+                                    return 0;
+                                })))
+                .build();
         LiteralCommandNode<ServerCommandSource> delNode = CommandManager.literal("del")
                 .requires(Permissions.require("nekomusic.del", 0))
                 .then(CommandManager.argument("index", IntegerArgumentType.integer())

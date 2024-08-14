@@ -23,7 +23,7 @@ public class MusicCommand {
                             MusicManager.order(context.getSource().getServer(), context.getSource(), url, false, false);
                             return 0;
                         }))
-                .then(CommandManager.literal("now")
+                .then(CommandManager.literal("--now")
                         .requires(Permissions.require("nekomusic.add.now", 0))
                         .then(CommandManager.argument("url", StringArgumentType.greedyString())
                                 .executes(context -> {
@@ -31,8 +31,8 @@ public class MusicCommand {
                                     MusicManager.order(context.getSource().getServer(), context.getSource(), url, true, false);
                                     return 0;
                                 })))
-                .then(CommandManager.literal("forceNow")
-                        .requires(Permissions.require("nekomusic.add.forceNow", 1))
+                .then(CommandManager.literal("--replace")
+                        .requires(Permissions.require("nekomusic.add.replace", 1))
                         .then(CommandManager.argument("url", StringArgumentType.greedyString())
                                 .executes(context -> {
                                     String url = StringArgumentType.getString(context, "url");
@@ -48,7 +48,7 @@ public class MusicCommand {
                             MusicManager.order(context.getSource().getServer(), context.getSource(), url, false, false);
                             return 0;
                         }))
-                .then(CommandManager.literal("now")
+                .then(CommandManager.literal("--now")
                         .requires(Permissions.require("nekomusic.add.now", 0))
                         .then(CommandManager.argument("url", StringArgumentType.greedyString())
                                 .executes(context -> {
@@ -56,8 +56,8 @@ public class MusicCommand {
                                     MusicManager.order(context.getSource().getServer(), context.getSource(), url, true, false);
                                     return 0;
                                 })))
-                .then(CommandManager.literal("forceNow")
-                        .requires(Permissions.require("nekomusic.add.forceNow", 1))
+                .then(CommandManager.literal("--replace")
+                        .requires(Permissions.require("nekomusic.add.replace", 1))
                         .then(CommandManager.argument("url", StringArgumentType.greedyString())
                                 .executes(context -> {
                                     String url = StringArgumentType.getString(context, "url");

@@ -94,7 +94,21 @@ public class PacketHelper {
         if (NekoMusic.orderList.size() == 0) {
             return () -> Text.of("§cNo music in playing list.");
         } else {
-            MutableText text = Text.literal("§ePlaying list: \n");
+            MutableText text = Text.literal("§ePlaylist: \n");
+            if (NekoMusic.currentMusic != null) {
+                var current = NekoMusic.currentMusic;
+                text.append(Text.literal("§eCurrent: §a" + current.name + " §e-§9 "
+                        + String.join(" & ",
+                        current.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
+                        + " §eby §d" + current.player))
+                        .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music next"))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to delete it.")))))
+                        .append(Text.literal(" [B]").setStyle(Style.EMPTY.withColor(Formatting.RED)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music ban " + current.id))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to ban it.")))))
+                        .append(Text.literal("\n"));
+            }
             int num = 0;
             for (MusicObj musicObj : NekoMusic.orderList.getSongs()) {
                 text.append(Text.literal("§e" + (++num) + ". " + "§a" + musicObj.name + " §e-§9 "

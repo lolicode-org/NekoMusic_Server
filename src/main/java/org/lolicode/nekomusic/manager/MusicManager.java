@@ -277,6 +277,15 @@ public class MusicManager {
         }
         NekoMusic.CONFIG.bannedSongs.add(id);
         ModConfig.save();
+        if (NekoMusic.currentMusic != null && NekoMusic.currentMusic.id == id) {
+            playNext(server);
+        }
+        if (NekoMusic.orderList.hasSong(id)) {
+            MusicObj musicObj = NekoMusic.orderList.get(id);
+            if (musicObj != null) {
+                NekoMusic.orderList.remove(musicObj);
+            }
+        }
         source.sendFeedback(PacketHelper.getBanMessage(3), false);
     }
 

@@ -42,7 +42,7 @@ public class PacketHelper {
 
     public static Text getPlayMessage(@NotNull MusicObj musicObj) {
         String player = musicObj.player;
-        if (player == null || player.equals(""))
+        if (player == null || player.isBlank())
             player = "Default";
         return Text.of("§ePlaying: §a" + musicObj.name + " §e-§9 "
                 + String.join(" & ",
@@ -91,7 +91,7 @@ public class PacketHelper {
     }
 
     public static Supplier<Text> getListMessage() {
-        if (NekoMusic.orderList.size() == 0) {
+        if (NekoMusic.orderList.size() == 0 && NekoMusic.currentMusic == null) {
             return () -> Text.of("§cNo music in playing list.");
         } else {
             MutableText text = Text.literal("§ePlaylist: \n");
@@ -100,7 +100,7 @@ public class PacketHelper {
                 text.append(Text.literal("§eCurrent: §a" + current.name + " §e-§9 "
                         + String.join(" & ",
                         current.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
-                        + " §eby §d" + current.player))
+                        + " §eby §d" + (current.player == null ? "Default" : current.player)))
                         .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music next"))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to delete it.")))))
@@ -114,7 +114,7 @@ public class PacketHelper {
                 text.append(Text.literal("§e" + (++num) + ". " + "§a" + musicObj.name + " §e-§9 "
                         + String.join(" & ",
                         musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
-                        + " §eby §d" + musicObj.player))
+                        + " §eby §d" + (musicObj.player == null ? "Default" : musicObj.player)))
                         .append(Text.literal(" [⏩]").setStyle(Style.EMPTY.withColor(Formatting.GOLD)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --replace " + musicObj.id))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§eClick to play it now.")))))

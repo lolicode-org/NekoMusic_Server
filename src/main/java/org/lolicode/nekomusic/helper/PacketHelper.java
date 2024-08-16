@@ -115,6 +115,9 @@ public class PacketHelper {
                         + String.join(" & ",
                         musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                         + " §eby §d" + musicObj.player))
+                        .append(Text.literal(" [⏩]").setStyle(Style.EMPTY.withColor(Formatting.GOLD)
+                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --replace " + musicObj.id))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§eClick to play it now.")))))
                         .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music del id " + musicObj.id))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to delete it.")))))
@@ -147,7 +150,7 @@ public class PacketHelper {
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("Click to add it to playlist.")))));
                 text.append(Text.literal(" [▶]").setStyle(Text.empty().getStyle()
                         .withColor(TextColor.fromFormatting(Formatting.GOLD))
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add now " + song.id))
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --now " + song.id))
                         .withHoverEvent(
                                 new HoverEvent(
                                         HoverEvent.Action.SHOW_TEXT,
@@ -156,7 +159,7 @@ public class PacketHelper {
                 ));
                 text.append(Text.literal(" [⏩]").setStyle(Text.empty().getStyle()
                         .withColor(TextColor.fromFormatting(Formatting.GOLD))
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add forceNow " + song.id))
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --replace " + song.id))
                         .withHoverEvent(
                                 new HoverEvent(
                                         HoverEvent.Action.SHOW_TEXT,

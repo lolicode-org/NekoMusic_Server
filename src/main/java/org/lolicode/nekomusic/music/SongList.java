@@ -103,6 +103,15 @@ public class SongList {
         }
     }
 
+    public boolean remove(long id) {
+        try {
+            lock.lock();
+            return songs.removeIf(musicObj -> musicObj.id == id);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public void load(SongList newSongList) {
         // only used by idleList
         try {

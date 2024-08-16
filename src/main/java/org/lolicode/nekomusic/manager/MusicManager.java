@@ -183,7 +183,7 @@ public class MusicManager {
                     real_id = id;
                 }
             }
-            if (NekoMusic.currentMusic.id == real_id || NekoMusic.orderList.hasSong(real_id)) {
+            if (NekoMusic.currentMusic.id == real_id || (NekoMusic.orderList.hasSong(real_id) && !(addToFirst && skipIdle))) {
                 source.sendFeedback(PacketHelper.getOrderedMessage(), false);
                 return;
             }
@@ -199,10 +199,12 @@ public class MusicManager {
                 } else {
                     musicObj.player = "console";
                 }
-                if (addToFirst)
+                if (addToFirst) {
+                    NekoMusic.orderList.remove(real_id);
                     NekoMusic.orderList.addToFirst(musicObj);
-                else
+                } else {
                     NekoMusic.orderList.add(musicObj);
+                }
                 server.getPlayerManager().broadcast(PacketHelper.getOrderMessage(musicObj), false);
                 if (((!NekoMusic.orderList.isPlaying && skipIdle) || addToFirst)
                         && !PlayerManager.getNekoPlayerSet().isEmpty()) {
@@ -280,12 +282,7 @@ public class MusicManager {
         if (NekoMusic.currentMusic != null && NekoMusic.currentMusic.id == id) {
             playNext(server);
         }
-        if (NekoMusic.orderList.hasSong(id)) {
-            MusicObj musicObj = NekoMusic.orderList.get(id);
-            if (musicObj != null) {
-                NekoMusic.orderList.remove(musicObj);
-            }
-        }
+        NekoMusic.orderList.remove(id);
         source.sendFeedback(PacketHelper.getBanMessage(3), false);
     }
 

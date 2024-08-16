@@ -82,21 +82,4 @@ public class ModConfig {
             source.sendFeedback(() -> Text.of("§cNekoMusic: Config reload failed"), true);
         }
     }
-
-    public static boolean loadLegacy() {
-        File legacyFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "allmusic.json");
-        if (legacyFile.exists()) {
-            configFile = legacyFile;
-            if (load()) {
-                NekoMusic.LOGGER.warn("Found legacy config file, migrating...");
-                configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "nekomusic.json");
-                save();
-                if (!legacyFile.delete()) {
-                    NekoMusic.LOGGER.warn("Failed to delete legacy config file, you may need to delete 'allmusic.json' manually");
-                }
-                return true;
-            }
-        }
-        return false;
-    }
 }

@@ -54,7 +54,7 @@ public class NekoMusic implements DedicatedServerModInitializer {
         if (FabricLoader.getInstance().isModLoaded("allmusic_server")) {
             throw new RuntimeException("NekoMusic is not compatible with AllMusic");
         }
-        if (ModConfig.load() || ModConfig.loadLegacy()) {
+        if (ModConfig.load()) {
             CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> MusicCommand.register(dispatcher));
             PlayerLeaveCallback.EVENT.register(PlayerLeave::OnPlayerLeave);
             LOGGER.info("NekoMusic mod loaded");

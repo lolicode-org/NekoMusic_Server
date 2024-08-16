@@ -101,9 +101,9 @@ public class PacketHelper {
                         + String.join(" & ",
                         current.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                         + " §eby §d" + (current.player == null ? "Default" : current.player)))
-                        .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
+                        .append(Text.literal(" [⏭]").setStyle(Style.EMPTY.withColor(Formatting.RED)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music next"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to delete it.")))))
+                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to play next song.")))))
                         .append(Text.literal(" [B]").setStyle(Style.EMPTY.withColor(Formatting.RED)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music ban " + current.id))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("§cClick to ban it.")))))

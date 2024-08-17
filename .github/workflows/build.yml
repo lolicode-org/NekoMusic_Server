@@ -28,6 +28,10 @@ jobs:
         with:
           java-version: 21
           distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@main
+        with:
+          dependency-graph: generate-and-submit
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
       - name: build

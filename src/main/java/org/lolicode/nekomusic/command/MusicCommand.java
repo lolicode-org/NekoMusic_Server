@@ -8,9 +8,12 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
+import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.config.ModConfig;
 import org.lolicode.nekomusic.helper.LoginHelper;
 import org.lolicode.nekomusic.manager.MusicManager;
+import org.lolicode.nekomusic.music.SongList;
 
 public class MusicCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
@@ -133,11 +136,23 @@ public class MusicCommand {
                             return 0;
                         })).build();
         LiteralCommandNode<ServerCommandSource> reloadNode = CommandManager.literal("reload")
-                .requires(Permissions.require("nekomusic.reload", 2))
-                .executes(context -> {
-                    ModConfig.reload(context.getSource().getServer(), context.getSource());
-                    return 0;
-                }).build();
+                .requires(Permissions.require("nekomusic.reload", 1))
+                .then(CommandManager.literal("all")
+                        .requires(Permissions.require("nekomusic.reload.all", 2))
+                        .executes(context -> {
+                            ModConfig.reload(context.getSource().getServer(), context.getSource());
+                            return 0;
+                        }))
+                .then(CommandManager.literal("list")
+                        .requires(Permissions.require("nekomusic.reload.list", 1))
+                        .executes(context -> {
+                            if (NekoMusic.CONFIG.idleList > 0) {
+                                SongList.loadIdleList();
+                            }
+                            context.getSource().sendFeedback(() -> Text.of("§aNekoMusic: Refreshing playlist"), true);
+                            return 0;
+                        }))
+                .build();
         LiteralCommandNode<ServerCommandSource> loginNode = CommandManager.literal("login")
                 .requires(Permissions.require("nekomusic.login", 4))
                 .then(CommandManager.literal("start")

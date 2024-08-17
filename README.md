@@ -48,7 +48,8 @@
 | `/music unban`                            | `nekomusic.unban`        | 取消歌曲封禁                                      |
 |                                           | `nekomusic.bypassban`    | 允许点被封禁的歌                                    |
 | `/music search`                           | `nekomusic.search`       | 搜索歌曲                                        |
-| `/music reload`                           | `nekomusic.reload`       | 重新加载配置文件                                    |
+| `/music reload all`                       | `nekomusic.reload.all`   | 重新加载配置文件                                    |
+| `/music reload list`                      | `nekomusic.reload.list`  | 重新加载空闲列表                                    |
 | `/music login`                            | `nekomusic.login`        | 登陆命令根节点                                     |
 | `/music login start`                      | `nekomusic.login.start`  | 开始登陆，会在**控制台**打印登陆二维码，或者在**聊天栏**显示登陆链接      |
 | `/music login check`                      | `nekomusic.login.check`  | 检查登陆状态，如果登陆成功，会将cookie写入配置文件                |

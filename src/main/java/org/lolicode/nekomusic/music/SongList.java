@@ -117,7 +117,7 @@ public class SongList {
         try {
             lock.lock();
             songs.clear();
-            songs.addAll(newSongList.songs);
+            newSongList.songs.stream().filter(musicObj -> !NekoMusic.CONFIG.bannedSongs.contains(musicObj.id)).forEach(songs::add);
             currentItem.set(-1);
             id = newSongList.id;
         } finally {

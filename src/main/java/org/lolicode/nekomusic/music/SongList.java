@@ -61,9 +61,17 @@ public class SongList {
             lock.lock();
             if (songs.isEmpty()) return null;
             if (isPersistent) {
-                if (currentItem.get() < 0) {
-                    currentItem.set(songs.size() - 1);
-                    Collections.shuffle(songs);
+                switch (currentItem.get()) {
+                    case -1:
+                        currentItem.set(songs.size() - 1);
+                        Collections.shuffle(songs);
+                        break;
+                    case 0:
+                        // next() method will always run in the EXECUTOR, so this task will not block current thread and always run AFTER we get the last song
+                        NekoMusic.EXECUTOR.execute(SongList::loadIdleList);
+                        break;
+                    default:
+                        break;
                 }
                 music = songs.get(currentItem.getAndDecrement());
             } else {

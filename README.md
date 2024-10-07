@@ -1,10 +1,23 @@
 <p style="text-align: center">
-    <img src="./src/main/resources/assets/nekomusic/icon.png" alt="Icon" style="max-width: 50%; max-height: 300px;">
+    <img src="./src/main/resources/assets/nekomusic/icon.png" alt="Icon" width=128>
 </p>
 
 # NekoMusic Server
 
 适用于Fabric服务端的点歌Mod
+
+## 重要通知
+
+近期某云强化了风控策略，**强烈不建议在本Mod内登陆自己的帐号**，以防帐号被封禁
+
+如果你之前已经在本Mod内登陆并成功获取了cookie，你可以：
+* 如果目前一切正常：
+  * a) 如果你想要继续以自己的帐号使用：将Api更新到最新版后继续使用
+  * b) 如果你想要使用游客帐号：删除`nekomusic.json`中的`cookie`字段并重载
+* 如果你的帐号已经收到了安全警告：
+  * 请立即删除`nekomusic.json`中的`cookie`字段并重载，在上游得出可靠解决方案前，不要以任何形式尝试再次登陆
+
+详见[上游的相关讨论](https://gitlab.com/Binaryify/neteasecloudmusicapi/-/issues/25)
 
 ## 使用
 
@@ -90,6 +103,8 @@ WantedBy=multi-user.target
 对于没有ssh权限的面板服，可以参考官方文档的Serverless部署方式在公网部署API，此处不再赘述。
 
 ### Cookie
+
+> 目前不建议带cookie使用，参见[前文](#重要通知)
 
 本Mod并不要求填写您的帐号密码，这一方面是为了保护您的隐私，另一方面是因为某云的登录接口已经添加了验证码，大部分情况下使用帐号密码会登陆失败。
 

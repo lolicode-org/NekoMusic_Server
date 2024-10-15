@@ -183,7 +183,8 @@ public class MusicManager {
                     real_id = id;
                 }
             }
-            if (NekoMusic.currentMusic.id == real_id || (NekoMusic.orderList.hasSong(real_id) && !(addToFirst && skipIdle))) {
+            if ((NekoMusic.currentMusic != null && NekoMusic.currentMusic.id == real_id)
+                    || (NekoMusic.orderList.hasSong(real_id) && !(addToFirst && skipIdle))) {
                 source.sendFeedback(PacketHelper.getOrderedMessage(), false);
                 return;
             }

@@ -259,7 +259,7 @@ public class MusicManager {
         NekoMusic.EXECUTOR.execute(() -> {
             Api.SearchResult result = Api.search(keyword, page, 10);
             if (result != null && result.result != null) {
-                source.sendFeedback(PacketHelper.getSearchMessage(result), false);
+                source.sendFeedback(PacketHelper.getSearchMessage(result, source), false);
             } else {
                 source.sendFeedback(PacketHelper.getSearchMessage(), false);
             }

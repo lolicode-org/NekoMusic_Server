@@ -1,7 +1,9 @@
 package org.lolicode.nekomusic.helper;
 
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
@@ -131,7 +133,7 @@ public class PacketHelper {
         }
     }
 
-    public static Supplier<Text> getSearchMessage(Api.SearchResult result) {
+    public static Supplier<Text> getSearchMessage(Api.SearchResult result, ServerCommandSource source) {
         if (result.result.songs == null || result.result.songs.length == 0) {
             return () -> Text.of("§cNo result found.");
         } else {
@@ -139,6 +141,11 @@ public class PacketHelper {
                     .setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.YELLOW)));
             int num = 0;
             for (Api.SearchResult.Result.OneSong song : result.result.songs) {
+                if (NekoMusic.CONFIG.bannedSongs.contains(song.id) &&
+                        !(Permissions.check(source, "nekomusic.bypassban", 1) ||
+                                Permissions.check(source, "nekomusic.unban", 1))) {
+                    continue;
+                }
                 text.append(
                         Text.literal(
                                 "§e" + (++num) + ". " + "§a" + song.name + " §e-§9 "
@@ -148,30 +155,34 @@ public class PacketHelper {
 //                                .withColor(TextColor.fromFormatting(Formatting.GREEN))
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add " + song.id))
                                 .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("Click to add it to playlist.")))));
-                text.append(Text.literal(" [▶]").setStyle(Text.empty().getStyle()
-                        .withColor(TextColor.fromFormatting(Formatting.GOLD))
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --now " + song.id))
-                        .withHoverEvent(
-                                new HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        Text.of("Click to add it to playlist and skip current song (if current song is not ordered by player).")
-                                ))
-                ));
-                text.append(Text.literal(" [⏩]").setStyle(Text.empty().getStyle()
-                        .withColor(TextColor.fromFormatting(Formatting.GOLD))
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --replace " + song.id))
-                        .withHoverEvent(
-                                new HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        Text.of("Click to add it to playlist and force skip current song.")
-                                ))
-                ));
-                if (NekoMusic.CONFIG.bannedSongs.contains(song.id)) {
+                if (Permissions.check(source, "nekomusic.add.now", 0)) {
+                    text.append(Text.literal(" [▶]").setStyle(Text.empty().getStyle()
+                            .withColor(TextColor.fromFormatting(Formatting.GOLD))
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --now " + song.id))
+                            .withHoverEvent(
+                                    new HoverEvent(
+                                            HoverEvent.Action.SHOW_TEXT,
+                                            Text.of("Click to add it to playlist and skip current song (if current song is not ordered by player).")
+                                    ))
+                    ));
+                }
+                if (Permissions.check(source, "nekomusic.add.replace", 1)) {
+                    text.append(Text.literal(" [⏩]").setStyle(Text.empty().getStyle()
+                            .withColor(TextColor.fromFormatting(Formatting.GOLD))
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --replace " + song.id))
+                            .withHoverEvent(
+                                    new HoverEvent(
+                                            HoverEvent.Action.SHOW_TEXT,
+                                            Text.of("Click to add it to playlist and force skip current song.")
+                                    ))
+                    ));
+                }
+                if (NekoMusic.CONFIG.bannedSongs.contains(song.id) && Permissions.check(source, "nekomusic.unban", 1)) {
                     text.append(Text.literal(" [✔]").setStyle(Text.empty().getStyle()
                             .withColor(TextColor.fromFormatting(Formatting.RED))
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music unban " + song.id))
                             .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("Click to unban it.")))));
-                } else {
+                } else if (Permissions.check(source, "nekomusic.ban", 1)) {
                     text.append(Text.literal(" [X]").setStyle(Text.empty().getStyle()
                             .withColor(TextColor.fromFormatting(Formatting.RED))
                             .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music ban " + song.id))

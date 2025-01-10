@@ -207,7 +207,7 @@ public class MusicManager {
                     NekoMusic.orderList.add(musicObj);
                 }
                 server.getPlayerManager().broadcast(PacketHelper.getOrderMessage(musicObj), false);
-                if (((!NekoMusic.orderList.isPlaying && skipIdle) || addToFirst)
+                if ((NekoMusic.idleList.size() <= 0 || (!NekoMusic.orderList.isPlaying && skipIdle) || addToFirst)
                         && !PlayerManager.getNekoPlayerSet().isEmpty()) {
                     playNext(server);
                 } else {

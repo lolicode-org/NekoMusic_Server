@@ -5,13 +5,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import org.lolicode.nekomusic.NekoMusic;
+import org.lolicode.nekomusic.manager.LanguageManager;
 import org.lolicode.nekomusic.music.SongList;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-
-// TODO: radio
 
 public class ModConfig {
     public String cookie = "";
@@ -19,6 +18,7 @@ public class ModConfig {
     public String apiAddress = "";
     public float voteThreshold = 0.5f;
     public int maxQuality = 320000;
+    public String language = "zh-CN";
     public List<Long> bannedSongs = new ArrayList<>();
 
     private static File configFile;
@@ -60,6 +60,7 @@ public class ModConfig {
                         throw new RuntimeException("apiAddress is null in mod config");
                     }
                     NekoMusic.CONFIG.apiAddress = config.apiAddress;
+                    NekoMusic.CONFIG.language = config.language;
                     if (config.idleList > 0) {
                         SongList.loadIdleList();
                     }
@@ -77,9 +78,9 @@ public class ModConfig {
 
     public static void reload(MinecraftServer server, ServerCommandSource source) {
         if (load()) {
-            source.sendFeedback(() -> Text.of("§aNekoMusic: Config reloaded"), true);
+            source.sendFeedback(() -> Text.of(LanguageManager.getMessage("config.reloaded")), true);
         } else {
-            source.sendFeedback(() -> Text.of("§cNekoMusic: Config reload failed"), true);
+            source.sendFeedback(() -> Text.of(LanguageManager.getMessage("config.reload_failed")), true);
         }
     }
 }

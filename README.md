@@ -6,19 +6,6 @@
 
 适用于Fabric服务端的点歌Mod
 
-## 重要通知
-
-近期某云强化了风控策略，**强烈不建议在本Mod内登陆自己的帐号**，以防帐号被封禁
-
-如果你之前已经在本Mod内登陆并成功获取了cookie，你可以：
-* 如果目前一切正常：
-  * a) 如果你想要继续以自己的帐号使用：将Api更新到最新版后继续使用
-  * b) 如果你想要使用游客帐号：删除`nekomusic.json`中的`cookie`字段并重载
-* 如果你的帐号已经收到了安全警告：
-  * 请立即删除`nekomusic.json`中的`cookie`字段并重载，在上游得出可靠解决方案前，不要以任何形式尝试再次登陆
-
-详见[上游的相关讨论](https://gitlab.com/Binaryify/neteasecloudmusicapi/-/issues/25)
-
 ## 使用
 
 ### 服务端
@@ -30,7 +17,8 @@
 {
   "cookie": "",  // 某云的cookie，用于获取音乐信息
   "idle_list": 0,  // 空闲列表的歌单ID
-  "api_address": "http://127.0.0.1:3000",  // 某云Nodejs api的地址
+  "api_address": "http://127.0.0.1:3000",  // 某云Nodejs api的地址。参见下文#API
+  "api_auth": "Bearer xxxxxx",  // 如果你部署的API需要认证，请填写此项，否则留空。该值会被添加到请求头中`Authorization`字段
   "vote_threshold": 0.5,  // 投票切歌所需的人数百分比
   "max_quality": 320000,  // 最大音质，默认为320k，如需无损或Hi-res音质，请修改为999000
   "banned_songs": [  // 封禁歌曲列表
@@ -70,41 +58,9 @@
 
 ### API
 
-本项目并不直接与网易的API交互，而是通过 [社区维护的API](https://gitlab.com/Binaryify/neteasecloudmusicapi) 来获取音乐信息。这是为了防止因API变动而导致MOD需要频繁更新。
-
-关于本API的使用方法，请参考其[文档](https://docs-neteasecloudmusicapi.vercel.app//)。
-
-如果API因异常而频繁退出，可以使用 [PM2](https://pm2.keymetrics.io/) 来保证持续运行，具体请参考官方文档。
-
-此外在Linux上可以使用 `systemd` 来实现自动重启。参考以下配置文件：
-```ini
-[Unit]
-Description=NeteaseCloudMusicApi
-After=network.target
-Requires=network.target
-
-[Service]
-Type=simple
-# 改成你的服务端运行的用户
-DynamicUser=true
-# 改成你的API所在的目录
-WorkingDirectory=/opt/ncm/NeteaseCloudMusicApi
-ExecStart=/usr/bin/node app.js
-Restart=always
-RestartSec=5s
-
-[Install]
-WantedBy=multi-user.target
-```
-将以上内容保存为 `/etc/systemd/system/ncm.service` ，然后以root用户执行 `systemctl enable --now ncm` 即可。
-
-对于Windows Server，可以使用系统的 [计划任务](https://docs.microsoft.com/zh-cn/windows/win32/taskschd/task-scheduler-start-page) 来实现开机自启和自动重启。
-
-对于没有ssh权限的面板服，可以参考官方文档的Serverless部署方式在公网部署API，此处不再赘述。
+> 2025-03：由于上游仓库已被开发者设为私有（原因不明），API仓库的链接和直接部署方式不再可用。如果你此前没有保存原项目的代码，可以使用docker部署，详情参见[官方文档中的 #docker容器运行 章节](https://neteasecloudmusicapi.vercel.app/docs/#/?id=docker-%e5%ae%b9%e5%99%a8%e8%bf%90%e8%a1%8c)
 
 ### Cookie
-
-> 目前不建议带cookie使用，参见[前文](#重要通知)
 
 本Mod并不要求填写您的帐号密码，这一方面是为了保护您的隐私，另一方面是因为某云的登录接口已经添加了验证码，大部分情况下使用帐号密码会登陆失败。
 

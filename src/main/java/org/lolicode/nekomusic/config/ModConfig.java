@@ -10,13 +10,15 @@ import org.lolicode.nekomusic.music.SongList;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ModConfig {
     public String cookie = "";
     public long idleList = 0;
     public String apiAddress = "";
-    public String apiAuth = "";
+    public Map<String, String> apiHeaders = new HashMap<>();
     public float voteThreshold = 0.5f;
     public int maxQuality = 320000;
     public String language = "zh-CN";
@@ -61,7 +63,7 @@ public class ModConfig {
                         throw new RuntimeException("apiAddress is null in mod config");
                     }
                     NekoMusic.CONFIG.apiAddress = config.apiAddress;
-                    NekoMusic.CONFIG.apiAuth = config.apiAuth == null ? "" : config.apiAuth;
+                    NekoMusic.CONFIG.apiHeaders = config.apiHeaders;
                     NekoMusic.CONFIG.language = config.language;
                     if (config.idleList > 0) {
                         SongList.loadIdleList();

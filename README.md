@@ -18,7 +18,10 @@
   "cookie": "",  // 某云的cookie，用于获取音乐信息
   "idle_list": 0,  // 空闲列表的歌单ID
   "api_address": "http://127.0.0.1:3000",  // 某云Nodejs api的地址。参见下文#API
-  "api_auth": "Bearer xxxxxx",  // 如果你部署的API需要认证，请填写此项，否则留空。该值会被添加到请求头中`Authorization`字段
+  "api_headers": {
+    "Authorization": "Bearer xxx",
+    "Content-Type": "application/json"
+  },  // 向API发送请求时添加的自定义Header，可用于鉴权等
   "vote_threshold": 0.5,  // 投票切歌所需的人数百分比
   "max_quality": 320000,  // 最大音质，默认为320k，如需无损或Hi-res音质，请修改为999000
   "banned_songs": [  // 封禁歌曲列表

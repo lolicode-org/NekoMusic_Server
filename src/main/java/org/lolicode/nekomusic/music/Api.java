@@ -106,8 +106,11 @@ public class Api {
     }
 
     public static boolean genLoginKey() {
-        try (Response response = NekoMusic.HTTP_CLIENT.newCall(new Request.Builder()
-                .header("Authorization", NekoMusic.CONFIG.apiAuth)
+        var builder = new Request.Builder();
+        if (!NekoMusic.CONFIG.apiHeaders.isEmpty()) {
+            NekoMusic.CONFIG.apiHeaders.forEach(builder::header);
+        }
+        try (Response response = NekoMusic.HTTP_CLIENT.newCall(builder
                 .url(NekoMusic.CONFIG.apiAddress + "/login/qr/key")
                 .build()).execute()) {
             if (response.code() == 200 && response.body() != null) {
@@ -129,8 +132,11 @@ public class Api {
 
     public static String genLoginQrcode() {
         if (key == null || key.isEmpty()) return null;
-        try (Response response = NekoMusic.HTTP_CLIENT.newCall(new Request.Builder()
-                .header("Authorization", NekoMusic.CONFIG.apiAuth)
+        var builder = new Request.Builder();
+        if (!NekoMusic.CONFIG.apiHeaders.isEmpty()) {
+            NekoMusic.CONFIG.apiHeaders.forEach(builder::header);
+        }
+        try (Response response = NekoMusic.HTTP_CLIENT.newCall(builder
                 .url(NekoMusic.CONFIG.apiAddress + "/login/qr/create?key=" + key)
                 .build()).execute()) {
             if (response.code() == 200 && response.body() != null) {
@@ -152,8 +158,11 @@ public class Api {
 
     public static int checkLoginStatus() {
         if (key == null || key.isEmpty()) return LOGIN_STATUS.NO_KEY;
-        try (Response response = NekoMusic.HTTP_CLIENT.newCall(new Request.Builder()
-                .header("Authorization", NekoMusic.CONFIG.apiAuth)
+        var builder = new Request.Builder();
+        if (!NekoMusic.CONFIG.apiHeaders.isEmpty()) {
+            NekoMusic.CONFIG.apiHeaders.forEach(builder::header);
+        }
+        try (Response response = NekoMusic.HTTP_CLIENT.newCall(builder
                 .url(NekoMusic.CONFIG.apiAddress + "/login/qr/check?key=" + key)
                 .build()).execute()) {
             if (response.code() == 200 && response.body() != null) {
@@ -177,8 +186,11 @@ public class Api {
 
     public static UserInfo.Data.Profile getUserInfo() {
         if (NekoMusic.CONFIG.cookie == null || NekoMusic.CONFIG.cookie.isEmpty()) throw new RuntimeException("Not logged in");
-        try (Response response = NekoMusic.HTTP_CLIENT.newCall(new Request.Builder()
-                .header("Authorization", NekoMusic.CONFIG.apiAuth)
+        var builder = new Request.Builder();
+        if (!NekoMusic.CONFIG.apiHeaders.isEmpty()) {
+            NekoMusic.CONFIG.apiHeaders.forEach(builder::header);
+        }
+        try (Response response = NekoMusic.HTTP_CLIENT.newCall(builder
                 .url(NekoMusic.CONFIG.apiAddress + "/login/status?cookie=" + NekoMusic.CONFIG.cookie)
                 .build()).execute()) {
             if (response.code() == 200 && response.body() != null) {
@@ -206,8 +218,11 @@ public class Api {
             url.addQueryParameter("cookie", NekoMusic.CONFIG.cookie);
         }
 
-        try (Response response = NekoMusic.HTTP_CLIENT.newCall(new Request.Builder()
-                        .header("Authorization", NekoMusic.CONFIG.apiAuth)
+        var builder = new Request.Builder();
+        if (!NekoMusic.CONFIG.apiHeaders.isEmpty()) {
+            NekoMusic.CONFIG.apiHeaders.forEach(builder::header);
+        }
+        try (Response response = NekoMusic.HTTP_CLIENT.newCall(builder
                         .url(url.build())
                         .build())
                 .execute()) {
@@ -250,8 +265,11 @@ public class Api {
         if (NekoMusic.CONFIG.cookie != null && !NekoMusic.CONFIG.cookie.isEmpty()) {
             url.addQueryParameter("cookie", NekoMusic.CONFIG.cookie);
         }
-        try (Response response = NekoMusic.HTTP_CLIENT.newCall(new Request.Builder()
-                        .header("Authorization", NekoMusic.CONFIG.apiAuth)
+        var builder = new Request.Builder();
+        if (!NekoMusic.CONFIG.apiHeaders.isEmpty()) {
+            NekoMusic.CONFIG.apiHeaders.forEach(builder::header);
+        }
+        try (Response response = NekoMusic.HTTP_CLIENT.newCall(builder
                         .url(url.build())
                         .build())
                 .execute()) {
@@ -276,8 +294,11 @@ public class Api {
         if (NekoMusic.CONFIG.cookie != null && !NekoMusic.CONFIG.cookie.isEmpty()) {
             url.addQueryParameter("cookie", NekoMusic.CONFIG.cookie);
         }
-        try (Response response = NekoMusic.HTTP_CLIENT.newCall(new Request.Builder()
-                        .header("Authorization", NekoMusic.CONFIG.apiAuth)
+        var builder = new Request.Builder();
+        if (!NekoMusic.CONFIG.apiHeaders.isEmpty()) {
+            NekoMusic.CONFIG.apiHeaders.forEach(builder::header);
+        }
+        try (Response response = NekoMusic.HTTP_CLIENT.newCall(builder
                         .url(url.build())
                         .build())
                 .execute()) {
@@ -304,8 +325,11 @@ public class Api {
         if (NekoMusic.CONFIG.cookie != null && !NekoMusic.CONFIG.cookie.isEmpty()) {
             url.addQueryParameter("cookie", NekoMusic.CONFIG.cookie);
         }
-        try (Response response = NekoMusic.HTTP_CLIENT.newCall(new Request.Builder()
-                        .header("Authorization", NekoMusic.CONFIG.apiAuth)
+        var builder = new Request.Builder();
+        if (!NekoMusic.CONFIG.apiHeaders.isEmpty()) {
+            NekoMusic.CONFIG.apiHeaders.forEach(builder::header);
+        }
+        try (Response response = NekoMusic.HTTP_CLIENT.newCall(builder
                         .url(url.build())
                         .build())
                 .execute()) {
@@ -349,8 +373,11 @@ public class Api {
         if (NekoMusic.CONFIG.cookie != null && !NekoMusic.CONFIG.cookie.isEmpty()) {
             url.addQueryParameter("cookie", NekoMusic.CONFIG.cookie);
         }
-        try (Response response = NekoMusic.HTTP_CLIENT.newCall(new Request.Builder()
-                        .header("Authorization", NekoMusic.CONFIG.apiAuth)
+        var builder = new Request.Builder();
+        if (!NekoMusic.CONFIG.apiHeaders.isEmpty()) {
+            NekoMusic.CONFIG.apiHeaders.forEach(builder::header);
+        }
+        try (Response response = NekoMusic.HTTP_CLIENT.newCall(builder
                         .url(url.build())
                         .build())
                 .execute()) {

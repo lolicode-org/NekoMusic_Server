@@ -105,11 +105,11 @@ public class PacketHelper {
                                 current.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                                 + " §eby §d" + (current.player == null ? LanguageManager.getMessage("player.default") : current.player)))
                         .append(Text.literal(" [⏭]").setStyle(Style.EMPTY.withColor(Formatting.RED)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music next"))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(LanguageManager.getMessage("music.click_next"))))))
+                                .withClickEvent(new ClickEvent.RunCommand("/music next"))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.click_next"))))))
                         .append(Text.literal(" [B]").setStyle(Style.EMPTY.withColor(Formatting.RED)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music ban " + current.id))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(LanguageManager.getMessage("music.click_ban"))))))
+                                .withClickEvent(new ClickEvent.RunCommand("/music ban " + current.id))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.click_ban"))))))
                         .append(Text.literal("\n"));
             }
             int num = 0;
@@ -119,14 +119,14 @@ public class PacketHelper {
                         musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                         + " §eby §d" + (musicObj.player == null ? LanguageManager.getMessage("player.default") : musicObj.player)))
                         .append(Text.literal(" [⏩]").setStyle(Style.EMPTY.withColor(Formatting.GOLD)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --replace " + musicObj.id))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(LanguageManager.getMessage("music.click_next"))))))
+                                .withClickEvent(new ClickEvent.RunCommand("/music add --replace " + musicObj.id))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.click_next"))))))
                         .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music del id " + musicObj.id))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(LanguageManager.getMessage("music.click_delete"))))))
+                                .withClickEvent(new ClickEvent.RunCommand("/music del id " + musicObj.id))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.click_delete"))))))
                         .append(Text.literal(" [B]").setStyle(Style.EMPTY.withColor(Formatting.RED)
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music ban " + musicObj.id))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(LanguageManager.getMessage("music.click_ban"))))));
+                                .withClickEvent(new ClickEvent.RunCommand("/music ban " + musicObj.id))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.click_ban"))))));
                 if (num != NekoMusic.orderList.size())
                     text.append(Text.literal("\n"));
             }
@@ -153,40 +153,32 @@ public class PacketHelper {
                                         + String.join(" & ", song.artists.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                                         + "§e - §d" + song.album.name + " §6[+]"
                         ).setStyle(Text.empty().getStyle()
-                                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add " + song.id))
-                                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(LanguageManager.getMessage("music.add"))))));
+                                .withClickEvent(new ClickEvent.RunCommand("/music add " + song.id))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.add"))))));
                 if (Permissions.check(source, "nekomusic.add.now", 0)) {
                     text.append(Text.literal(" [▶]").setStyle(Text.empty().getStyle()
                             .withColor(TextColor.fromFormatting(Formatting.GOLD))
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --now " + song.id))
-                            .withHoverEvent(
-                                    new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
-                                            Text.of(LanguageManager.getMessage("music.add_now"))
-                                    ))
+                            .withClickEvent(new ClickEvent.RunCommand("/music add --now " + song.id))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.add_now"))))
                     ));
                 }
                 if (Permissions.check(source, "nekomusic.add.replace", 1)) {
                     text.append(Text.literal(" [⏩]").setStyle(Text.empty().getStyle()
                             .withColor(TextColor.fromFormatting(Formatting.GOLD))
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music add --replace " + song.id))
-                            .withHoverEvent(
-                                    new HoverEvent(
-                                            HoverEvent.Action.SHOW_TEXT,
-                                            Text.of(LanguageManager.getMessage("music.add_force_now"))
-                                    ))
+                            .withClickEvent(new ClickEvent.RunCommand("/music add --replace " + song.id))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.add_force_now"))))
                     ));
                 }
                 if (NekoMusic.CONFIG.bannedSongs.contains(song.id) && Permissions.check(source, "nekomusic.unban", 1)) {
                     text.append(Text.literal(" [✔]").setStyle(Text.empty().getStyle()
                             .withColor(TextColor.fromFormatting(Formatting.RED))
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music unban " + song.id))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(LanguageManager.getMessage("music.unban"))))));
+                            .withClickEvent(new ClickEvent.RunCommand("/music unban " + song.id))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.unban"))))));
                 } else if (Permissions.check(source, "nekomusic.ban", 1)) {
                     text.append(Text.literal(" [X]").setStyle(Text.empty().getStyle()
                             .withColor(TextColor.fromFormatting(Formatting.RED))
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/music ban " + song.id))
-                            .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(LanguageManager.getMessage("music.ban"))))));
+                            .withClickEvent(new ClickEvent.RunCommand("/music ban " + song.id))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.ban"))))));
                 }
                 text.append(Text.literal("\n"));
             }
@@ -195,24 +187,16 @@ public class PacketHelper {
                 pagePrev.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.GRAY)));
             } else {
                 pagePrev.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.BLUE))
-                        .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/music search page " + (result.result.page - 1) + " " + result.result.keyword))
-                        .withHoverEvent(new HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                Text.of(LanguageManager.getMessage("list.previous_page")))));
+                        .withClickEvent(new ClickEvent.RunCommand("/music search page " + (result.result.page - 1) + " " + result.result.keyword))
+                        .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("list.previous_page")))));
             }
             MutableText pageNext = Text.literal(">>");
             if (result.result.page == (result.result.songCount + 9) / 10) {
                 pageNext.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.GRAY)));
             } else {
                 pageNext.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.BLUE))
-                        .withClickEvent(new ClickEvent(
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/music search page " + (result.result.page + 1) + " " + result.result.keyword))
-                        .withHoverEvent(new HoverEvent(
-                                HoverEvent.Action.SHOW_TEXT,
-                                Text.of(LanguageManager.getMessage("list.next_page")))));
+                        .withClickEvent(new ClickEvent.RunCommand("/music search page " + (result.result.page + 1) + " " + result.result.keyword))
+                        .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("list.next_page")))));
             }
             text.append(pagePrev).append(Text.of(
                             "§r ----"+ " §a" + result.result.page + " §r/ §a" + (result.result.songCount + 9) / 10 + "§r ---- "))

@@ -9,6 +9,8 @@ import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.manager.LanguageManager;
 import org.lolicode.nekomusic.music.Api;
 
+import java.net.URI;
+
 public class LoginHelper {
     public static void genQr(ServerCommandSource source) {
         NekoMusic.EXECUTOR.execute(() -> {
@@ -17,7 +19,7 @@ public class LoginHelper {
                     if (source.isExecutedByPlayer()) {
                         source.sendFeedback(() -> Text.of(LanguageManager.getMessage("login.qr_prompt")), false);
                         MutableText link = Text.literal("https://qrcode.lolicode.org/?text=https://music.163.com/login?codekey=" + Api.getLoginKey());
-                        link.setStyle(link.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, link.getString())).withColor(Formatting.AQUA));
+                        link.setStyle(link.getStyle().withClickEvent(new ClickEvent.OpenUrl(new URI(link.getString()))).withColor(Formatting.AQUA));
                         source.sendFeedback(() -> link, false);
                         source.sendFeedback(() -> Text.of(LanguageManager.getMessage("login.qr_check")), false);
                         return;

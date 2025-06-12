@@ -10,6 +10,7 @@ import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.helper.PacketHelper;
 import org.lolicode.nekomusic.music.MusicObj;
 
+// TODO: THIS IS NOT HUD MANAGER...
 public class HudManager {
 
     private static final Identifier NEKO_META_ID = Identifier.of(NekoMusic.MOD_ID, "metadata");

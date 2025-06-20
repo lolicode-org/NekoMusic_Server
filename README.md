@@ -1,4 +1,4 @@
-<p style="text-align: center">
+<p align="center">
     <img src="./src/main/resources/assets/nekomusic/icon.png" alt="Icon" width=128>
 </p>
 

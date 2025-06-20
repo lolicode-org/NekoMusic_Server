@@ -61,7 +61,39 @@
 
 ### API
 
-> 2025-03：由于上游仓库已被开发者设为私有（原因不明），API仓库的链接和直接部署方式不再可用。如果你此前没有保存原项目的代码，可以使用docker部署，详情参见[官方文档中的 #docker容器运行 章节](https://neteasecloudmusicapi.vercel.app/docs/#/?id=docker-%e5%ae%b9%e5%99%a8%e8%bf%90%e8%a1%8c)
+> 2025-03：由于上游仓库已被开发者设为私有（原因不明），API仓库的链接和直接部署方式不再可用。如果你此前没有保存原项目的代码，可以：
+> a) 使用docker部署，详情参见[官方文档中的 #docker容器运行 章节](https://neteasecloudmusicapi.vercel.app/docs/#/?id=docker-%e5%ae%b9%e5%99%a8%e8%bf%90%e8%a1%8c)
+> b) 使用npx命令运行：`npx NeteaseCloudMusicApi@latest`，这会从npm仓库下载最新的API代码并运行。
+> docker部署会比较简单，但是会消耗更多的资源。下面的内容只是针对npx命令运行的方式。
+
+本项目并不直接与某云的API交互，而是通过 [社区维护的API](https://gitlab.com/Binaryify/neteasecloudmusicapi) 来获取音乐信息。这是为了防止因API变动而导致MOD需要频繁更新。
+
+关于本API的使用方法，请参考其[文档](https://neteasecloudmusicapi.vercel.app)。
+
+如果API因异常而频繁退出，可以使用 [PM2](https://pm2.keymetrics.io/) 来保证持续运行，具体请参考官方文档。
+
+此外在Linux上可以使用 `systemd` 来实现自动重启。参考以下配置文件：
+```ini
+[Unit]
+Description=NeteaseCloudMusicApi
+After=network.target
+Requires=network.target
+
+[Service]
+Type=simple
+DynamicUser=true
+ExecStart=/usr/bin/npx NeteaseCloudMusicApi@latest
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+```
+将以上内容保存为 `/etc/systemd/system/ncm.service` ，然后以root用户执行 `systemctl enable --now ncm` 即可。
+
+对于Windows Server，可以使用系统的 [计划任务](https://docs.microsoft.com/zh-cn/windows/win32/taskschd/task-scheduler-start-page) 来实现开机自启和自动重启。
+
+对于没有ssh权限的面板服，可以参考官方文档的Serverless部署方式在公网部署API，此处不再赘述。
 
 ### Cookie
 

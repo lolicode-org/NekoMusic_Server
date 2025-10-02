@@ -18,6 +18,6 @@ public class ServerPlayNetworkHandlerMixin {
 
     @Inject(at = @At(value = "TAIL"), method = "onDisconnected")
     private void onPlayerLeave(DisconnectionInfo info, CallbackInfo ci) {
-        PlayerLeaveCallback.EVENT.invoker().leaveServer(this.player, this.player.getServer());
+        PlayerLeaveCallback.EVENT.invoker().leaveServer(this.player, this.player.getEntityWorld().getServer());
     }
 }

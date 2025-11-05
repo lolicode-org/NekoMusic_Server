@@ -236,6 +236,8 @@ public class Api {
             }
         } catch (IOException e) {
             NekoMusic.LOGGER.error("Failed to get music: Network error", e);
+        } catch (Exception e) {
+            NekoMusic.LOGGER.error("Failed to get music: Unknown error", e);
         }
         return null;
     }

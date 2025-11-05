@@ -248,7 +248,8 @@ public class Api {
      */
     public static MusicObj getMusicForPlay(MusicObj musicObj) {
         MusicObj music = getMusic(musicObj.id);
-        if (music != null && music.url != null && !(music.url.isBlank())) {
+        if (music != null && music.url != null && !(music.url.isBlank())
+                && !music.url.contains("kuwo.cn/9afe47753bd597bc82331038e5532b24/690bbca2/resource/n2/73/84/3759149332.mp3")) {  // kuwo download app advertisement
             if (music.freeTrialInfo == null) {
                 return music;
             } else {

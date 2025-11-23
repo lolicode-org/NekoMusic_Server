@@ -1,9 +1,9 @@
 package org.lolicode.nekomusic.config;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
 import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.manager.LanguageManager;
 import org.lolicode.nekomusic.music.SongList;
@@ -80,11 +80,11 @@ public class ModConfig {
         return false;
     }
 
-    public static void reload(MinecraftServer server, ServerCommandSource source) {
+    public static void reload(MinecraftServer server, CommandSourceStack source) {
         if (load()) {
-            source.sendFeedback(() -> Text.of(LanguageManager.getMessage("config.reloaded")), true);
+            source.sendSuccess(() -> Component.nullToEmpty(LanguageManager.getMessage("config.reloaded")), true);
         } else {
-            source.sendFeedback(() -> Text.of(LanguageManager.getMessage("config.reload_failed")), true);
+            source.sendSuccess(() -> Component.nullToEmpty(LanguageManager.getMessage("config.reload_failed")), true);
         }
     }
 }

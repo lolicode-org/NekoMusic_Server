@@ -8,8 +8,8 @@ import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 import okhttp3.OkHttpClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +31,7 @@ public class NekoMusic implements DedicatedServerModInitializer {
     public static final String MOD_ID = "nekomusic";
     public static final String MOD_NAME = "NekoMusic";
     public static final String MOD_VERSION = "1.1.4";
-    public static final Identifier ID = Identifier.of(MOD_ID, "channel");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(MOD_ID, "channel");
     public static final Logger LOGGER = LogManager.getLogger();
     public static final Gson GSON = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).setPrettyPrinting().create();
     public static final ModConfig CONFIG = new ModConfig();
@@ -47,7 +47,7 @@ public class NekoMusic implements DedicatedServerModInitializer {
     public static Set<String> currentVote = new HashSet<>();
     public static MusicObj currentMusic = null;
     public static long currentStartTime = 0;
-    public static final Set<ServerPlayerEntity> nekoPlayerSet = new HashSet<>();
+    public static final Set<ServerPlayer> nekoPlayerSet = new HashSet<>();
 
     @Override
     public void onInitializeServer() {

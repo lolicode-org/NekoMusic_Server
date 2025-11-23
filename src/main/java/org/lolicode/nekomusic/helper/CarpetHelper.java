@@ -3,7 +3,7 @@ package org.lolicode.nekomusic.helper;
 
 import carpet.patches.EntityPlayerMPFake;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class CarpetHelper {
     /**
@@ -12,7 +12,7 @@ public class CarpetHelper {
      * @param player player to check
      * @return true if it's fake, otherwise false
      */
-    public static boolean isPlayerFake(PlayerEntity player) {
+    public static boolean isPlayerFake(Player player) {
         if (FabricLoader.getInstance().isModLoaded("carpet")) {
             return player instanceof EntityPlayerMPFake;
         } else return false;

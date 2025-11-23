@@ -2,10 +2,15 @@ package org.lolicode.nekomusic.helper;
 
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import org.jetbrains.annotations.NotNull;
 import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.manager.LanguageManager;
@@ -16,20 +21,20 @@ import org.lolicode.nekomusic.music.MusicObj;
 import java.util.function.Supplier;
 
 public class PacketHelper {
-    public static PacketByteBuf getMetadataPacket(MusicObj music) {
+    public static FriendlyByteBuf getMetadataPacket(MusicObj music) {
         return getMetadataPacket(music, false);
     }
 
-    public static PacketByteBuf getMetadataPacket(MusicObj musicObj, boolean seek) {
+    public static FriendlyByteBuf getMetadataPacket(MusicObj musicObj, boolean seek) {
         if (musicObj == null)
             return null;
         musicObj.seekTo = seek ? (System.currentTimeMillis() - NekoMusic.currentStartTime) / 1000 : 0;
         String serialized = NekoMusic.GSON.toJson(musicObj);
 
-        return PacketByteBufs.create().writeString(serialized);
+        return PacketByteBufs.create().writeUtf(serialized);
     }
 
-    public static PacketByteBuf getPlayListPacket() {
+    public static FriendlyByteBuf getPlayListPacket() {
         MusicList musicList = new MusicList();
         musicList.musics = NekoMusic.orderList.getSongs().stream().limit(10).map(musicObj -> {
             MusicList.Music music = new MusicList.Music();
@@ -40,106 +45,106 @@ public class PacketHelper {
         }).toArray(MusicList.Music[]::new);
         String serialized = NekoMusic.GSON.toJson(musicList);
 
-        return PacketByteBufs.create().writeString(serialized);
+        return PacketByteBufs.create().writeUtf(serialized);
     }
 
-    public static Text getPlayMessage(@NotNull MusicObj musicObj) {
+    public static Component getPlayMessage(@NotNull MusicObj musicObj) {
         String player = musicObj.player;
         if (player == null || player.isBlank())
             player = LanguageManager.getMessage("player.default");
-        return Text.of(LanguageManager.getMessage("music.playing") + musicObj.name + " §e-§9 "
+        return Component.nullToEmpty(LanguageManager.getMessage("music.playing") + musicObj.name + " §e-§9 "
                 + String.join(" & ",
                 musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                 + " §eby §d" + player);
     }
 
-    public static Text getVoteMessage(int count, int total) {
-        return Text.of(LanguageManager.getMessage("music.vote_count") + count + " §e/ §9" + total +
+    public static Component getVoteMessage(int count, int total) {
+        return Component.nullToEmpty(LanguageManager.getMessage("music.vote_count") + count + " §e/ §9" + total +
                 " §e(§a" + (int) (count * 100.0 / total) + "%§e of §a" + NekoMusic.CONFIG.voteThreshold * 100 + "%§e)");
     }
 
-    public static Text getOrderMessage(@NotNull MusicObj musicObj) {
-        return Text.of(LanguageManager.getMessage("music.ordered") + musicObj.name + " §e-§9 "
+    public static Component getOrderMessage(@NotNull MusicObj musicObj) {
+        return Component.nullToEmpty(LanguageManager.getMessage("music.ordered") + musicObj.name + " §e-§9 "
                 + String.join(" & ",
                 musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                 + " §eby §d" + musicObj.player);
     }
 
-    public static Supplier<Text> getOrderMessage() {
-        return () -> Text.of(LanguageManager.getMessage("music.get_info_failed"));
+    public static Supplier<Component> getOrderMessage() {
+        return () -> Component.nullToEmpty(LanguageManager.getMessage("music.get_info_failed"));
     }
 
-    public static Supplier<Text> getOrderedMessage() {
-        return () -> Text.of(LanguageManager.getMessage("music.ordered_already"));
+    public static Supplier<Component> getOrderedMessage() {
+        return () -> Component.nullToEmpty(LanguageManager.getMessage("music.ordered_already"));
     }
 
-    public static Supplier<Text> getBannedMessage() {
-        return () -> Text.of(LanguageManager.getMessage("music.banned"));
+    public static Supplier<Component> getBannedMessage() {
+        return () -> Component.nullToEmpty(LanguageManager.getMessage("music.banned"));
     }
 
-    public static Supplier<Text> getDelMessage(MusicObj musicObj) {
-        return () -> Text.of(LanguageManager.getMessage("music.deleted") + musicObj.name);
+    public static Supplier<Component> getDelMessage(MusicObj musicObj) {
+        return () -> Component.nullToEmpty(LanguageManager.getMessage("music.deleted") + musicObj.name);
     }
 
-    public static Supplier<Text> getDelMessage(int error) {
-        Text result;
+    public static Supplier<Component> getDelMessage(int error) {
+        Component result;
         if (error == 1) {
-            result = Text.of(LanguageManager.getMessage("music.invalid_index"));
+            result = Component.nullToEmpty(LanguageManager.getMessage("music.invalid_index"));
         } else if (error == 2) {
-            result = Text.of(LanguageManager.getMessage("music.no_permission"));
+            result = Component.nullToEmpty(LanguageManager.getMessage("music.no_permission"));
         } else {
-            result = Text.of(LanguageManager.getMessage("music.delete_failed"));
+            result = Component.nullToEmpty(LanguageManager.getMessage("music.delete_failed"));
         }
         return () -> result;
     }
 
-    public static Supplier<Text> getListMessage() {
+    public static Supplier<Component> getListMessage() {
         if (NekoMusic.orderList.size() == 0 && NekoMusic.currentMusic == null) {
-            return () -> Text.of(LanguageManager.getMessage("music.no_music"));
+            return () -> Component.nullToEmpty(LanguageManager.getMessage("music.no_music"));
         } else {
-            MutableText text = Text.literal(LanguageManager.getMessage("music.playlist"));
+            MutableComponent text = Component.literal(LanguageManager.getMessage("music.playlist"));
             if (NekoMusic.currentMusic != null) {
                 var current = NekoMusic.currentMusic;
-                text.append(Text.literal(LanguageManager.getMessage("music.current") + current.name + " §e-§9 "
+                text.append(Component.literal(LanguageManager.getMessage("music.current") + current.name + " §e-§9 "
                                 + String.join(" & ",
                                 current.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                                 + " §eby §d" + (current.player == null ? LanguageManager.getMessage("player.default") : current.player)))
-                        .append(Text.literal(" [⏭]").setStyle(Style.EMPTY.withColor(Formatting.RED)
+                        .append(Component.literal(" [⏭]").setStyle(Style.EMPTY.withColor(ChatFormatting.RED)
                                 .withClickEvent(new ClickEvent.RunCommand("/music next"))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.click_next"))))))
-                        .append(Text.literal(" [B]").setStyle(Style.EMPTY.withColor(Formatting.RED)
+                                .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.click_next"))))))
+                        .append(Component.literal(" [B]").setStyle(Style.EMPTY.withColor(ChatFormatting.RED)
                                 .withClickEvent(new ClickEvent.RunCommand("/music ban " + current.id))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.click_ban"))))))
-                        .append(Text.literal("\n"));
+                                .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.click_ban"))))))
+                        .append(Component.literal("\n"));
             }
             int num = 0;
             for (MusicObj musicObj : NekoMusic.orderList.getSongs()) {
-                text.append(Text.literal("§e" + (++num) + ". " + "§a" + musicObj.name + " §e-§9 "
+                text.append(Component.literal("§e" + (++num) + ". " + "§a" + musicObj.name + " §e-§9 "
                         + String.join(" & ",
                         musicObj.ar.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                         + " §eby §d" + (musicObj.player == null ? LanguageManager.getMessage("player.default") : musicObj.player)))
-                        .append(Text.literal(" [⏩]").setStyle(Style.EMPTY.withColor(Formatting.GOLD)
+                        .append(Component.literal(" [⏩]").setStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)
                                 .withClickEvent(new ClickEvent.RunCommand("/music add --replace " + musicObj.id))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.click_next"))))))
-                        .append(Text.literal(" [X]").setStyle(Style.EMPTY.withColor(Formatting.RED)
+                                .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.click_next"))))))
+                        .append(Component.literal(" [X]").setStyle(Style.EMPTY.withColor(ChatFormatting.RED)
                                 .withClickEvent(new ClickEvent.RunCommand("/music del id " + musicObj.id))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.click_delete"))))))
-                        .append(Text.literal(" [B]").setStyle(Style.EMPTY.withColor(Formatting.RED)
+                                .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.click_delete"))))))
+                        .append(Component.literal(" [B]").setStyle(Style.EMPTY.withColor(ChatFormatting.RED)
                                 .withClickEvent(new ClickEvent.RunCommand("/music ban " + musicObj.id))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.click_ban"))))));
+                                .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.click_ban"))))));
                 if (num != NekoMusic.orderList.size())
-                    text.append(Text.literal("\n"));
+                    text.append(Component.literal("\n"));
             }
             return () -> text;
         }
     }
 
-    public static Supplier<Text> getSearchMessage(Api.SearchResult result, ServerCommandSource source) {
+    public static Supplier<Component> getSearchMessage(Api.SearchResult result, CommandSourceStack source) {
         if (result.result.songs == null || result.result.songs.length == 0) {
-            return () -> Text.of(LanguageManager.getMessage("search.no_search_result"));
+            return () -> Component.nullToEmpty(LanguageManager.getMessage("search.no_search_result"));
         } else {
-            MutableText text = Text.literal(LanguageManager.getMessage("search.search_result_header") + "\n")
-                    .setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.YELLOW)));
+            MutableComponent text = Component.literal(LanguageManager.getMessage("search.search_result_header") + "\n")
+                    .setStyle(Component.empty().getStyle().withColor(TextColor.fromLegacyFormat(ChatFormatting.YELLOW)));
             int num = 0;
             for (Api.SearchResult.Result.OneSong song : result.result.songs) {
                 if (NekoMusic.CONFIG.bannedSongs.contains(song.id) &&
@@ -148,89 +153,89 @@ public class PacketHelper {
                     continue;
                 }
                 text.append(
-                        Text.literal(
+                        Component.literal(
                                 "§e" + (++num) + ". " + "§a" + song.name + " §e-§9 "
                                         + String.join(" & ", song.artists.stream().map(artistObj -> artistObj.name).toArray(String[]::new))
                                         + "§e - §d" + song.album.name + " §6[+]"
-                        ).setStyle(Text.empty().getStyle()
+                        ).setStyle(Component.empty().getStyle()
                                 .withClickEvent(new ClickEvent.RunCommand("/music add " + song.id))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.add"))))));
+                                .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.add"))))));
                 if (Permissions.check(source, "nekomusic.add.now", 0)) {
-                    text.append(Text.literal(" [▶]").setStyle(Text.empty().getStyle()
-                            .withColor(TextColor.fromFormatting(Formatting.GOLD))
+                    text.append(Component.literal(" [▶]").setStyle(Component.empty().getStyle()
+                            .withColor(TextColor.fromLegacyFormat(ChatFormatting.GOLD))
                             .withClickEvent(new ClickEvent.RunCommand("/music add --now " + song.id))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.add_now"))))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.add_now"))))
                     ));
                 }
                 if (Permissions.check(source, "nekomusic.add.replace", 1)) {
-                    text.append(Text.literal(" [⏩]").setStyle(Text.empty().getStyle()
-                            .withColor(TextColor.fromFormatting(Formatting.GOLD))
+                    text.append(Component.literal(" [⏩]").setStyle(Component.empty().getStyle()
+                            .withColor(TextColor.fromLegacyFormat(ChatFormatting.GOLD))
                             .withClickEvent(new ClickEvent.RunCommand("/music add --replace " + song.id))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.add_force_now"))))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.add_force_now"))))
                     ));
                 }
                 if (NekoMusic.CONFIG.bannedSongs.contains(song.id) && Permissions.check(source, "nekomusic.unban", 1)) {
-                    text.append(Text.literal(" [✔]").setStyle(Text.empty().getStyle()
-                            .withColor(TextColor.fromFormatting(Formatting.RED))
+                    text.append(Component.literal(" [✔]").setStyle(Component.empty().getStyle()
+                            .withColor(TextColor.fromLegacyFormat(ChatFormatting.RED))
                             .withClickEvent(new ClickEvent.RunCommand("/music unban " + song.id))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.unban"))))));
+                            .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.unban"))))));
                 } else if (Permissions.check(source, "nekomusic.ban", 1)) {
-                    text.append(Text.literal(" [X]").setStyle(Text.empty().getStyle()
-                            .withColor(TextColor.fromFormatting(Formatting.RED))
+                    text.append(Component.literal(" [X]").setStyle(Component.empty().getStyle()
+                            .withColor(TextColor.fromLegacyFormat(ChatFormatting.RED))
                             .withClickEvent(new ClickEvent.RunCommand("/music ban " + song.id))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("music.ban"))))));
+                            .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.ban"))))));
                 }
-                text.append(Text.literal("\n"));
+                text.append(Component.literal("\n"));
             }
-            MutableText pagePrev = Text.literal("<<");
+            MutableComponent pagePrev = Component.literal("<<");
             if (result.result.page == 1) {
-                pagePrev.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.GRAY)));
+                pagePrev.setStyle(Component.empty().getStyle().withColor(TextColor.fromLegacyFormat(ChatFormatting.GRAY)));
             } else {
-                pagePrev.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.BLUE))
+                pagePrev.setStyle(Component.empty().getStyle().withColor(TextColor.fromLegacyFormat(ChatFormatting.BLUE))
                         .withClickEvent(new ClickEvent.RunCommand("/music search page " + (result.result.page - 1) + " " + result.result.keyword))
-                        .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("list.previous_page")))));
+                        .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("list.previous_page")))));
             }
-            MutableText pageNext = Text.literal(">>");
+            MutableComponent pageNext = Component.literal(">>");
             if (result.result.page == (result.result.songCount + 9) / 10) {
-                pageNext.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.GRAY)));
+                pageNext.setStyle(Component.empty().getStyle().withColor(TextColor.fromLegacyFormat(ChatFormatting.GRAY)));
             } else {
-                pageNext.setStyle(Text.empty().getStyle().withColor(TextColor.fromFormatting(Formatting.BLUE))
+                pageNext.setStyle(Component.empty().getStyle().withColor(TextColor.fromLegacyFormat(ChatFormatting.BLUE))
                         .withClickEvent(new ClickEvent.RunCommand("/music search page " + (result.result.page + 1) + " " + result.result.keyword))
-                        .withHoverEvent(new HoverEvent.ShowText(Text.of(LanguageManager.getMessage("list.next_page")))));
+                        .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("list.next_page")))));
             }
-            text.append(pagePrev).append(Text.of(
+            text.append(pagePrev).append(Component.nullToEmpty(
                             "§r ----"+ " §a" + result.result.page + " §r/ §a" + (result.result.songCount + 9) / 10 + "§r ---- "))
                     .append(pageNext);
             return () -> text;
         }
     }
 
-    public static Supplier<Text> getSearchMessage() {
-        return () -> Text.of(LanguageManager.getMessage("search.search_failed"));
+    public static Supplier<Component> getSearchMessage() {
+        return () -> Component.nullToEmpty(LanguageManager.getMessage("search.search_failed"));
     }
 
-    public static Supplier<Text> getWorkingMessage() {
-        return () -> Text.of(LanguageManager.getMessage("music.working"));
+    public static Supplier<Component> getWorkingMessage() {
+        return () -> Component.nullToEmpty(LanguageManager.getMessage("music.working"));
     }
 
-    public static Supplier<Text> getBanMessage(int result) {
+    public static Supplier<Component> getBanMessage(int result) {
         return () -> switch (result) {
-            case 1 -> Text.of(LanguageManager.getMessage("music.ban_already"));
-            case 2 -> Text.of(LanguageManager.getMessage("music.invalid_id"));
-            case 3 -> Text.of(LanguageManager.getMessage("music.ban_success"));
-            default -> Text.of(LanguageManager.getMessage("music.unknown_error"));
+            case 1 -> Component.nullToEmpty(LanguageManager.getMessage("music.ban_already"));
+            case 2 -> Component.nullToEmpty(LanguageManager.getMessage("music.invalid_id"));
+            case 3 -> Component.nullToEmpty(LanguageManager.getMessage("music.ban_success"));
+            default -> Component.nullToEmpty(LanguageManager.getMessage("music.unknown_error"));
         };
     }
 
-    public static Supplier<Text> getUnbanMessage(int result) {
+    public static Supplier<Component> getUnbanMessage(int result) {
         return () -> switch (result) {
-            case 1 -> Text.of(LanguageManager.getMessage("music.unban_not_banned"));
-            case 2 -> Text.of(LanguageManager.getMessage("music.unban_success"));
-            default -> Text.of(LanguageManager.getMessage("music.unknown_error"));
+            case 1 -> Component.nullToEmpty(LanguageManager.getMessage("music.unban_not_banned"));
+            case 2 -> Component.nullToEmpty(LanguageManager.getMessage("music.unban_success"));
+            default -> Component.nullToEmpty(LanguageManager.getMessage("music.unknown_error"));
         };
     }
 
-    public static Text getGetMusicErrorMessage(String music) {
-        return Text.of(LanguageManager.getMessage("music.get_url_failed", music));
+    public static Component getGetMusicErrorMessage(String music) {
+        return Component.nullToEmpty(LanguageManager.getMessage("music.get_url_failed", music));
     }
 }

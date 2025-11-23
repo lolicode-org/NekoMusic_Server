@@ -1,9 +1,9 @@
 package org.lolicode.nekomusic.manager;
 
 import me.lucko.fabric.api.permissions.v0.Permissions;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.config.ModConfig;
@@ -54,7 +54,7 @@ public class MusicManager {
                         urlGetSuccess = true;
                     }
                 } catch (MusicUrlGetException e) {  // Music order list fails, send broadcast
-                    server.getPlayerManager().broadcast(PacketHelper.getGetMusicErrorMessage(e.getMusicDescription()), false);
+                    server.getPlayerList().broadcastSystemMessage(PacketHelper.getGetMusicErrorMessage(e.getMusicDescription()), false);
                 }
                 if (urlGetSuccess) {
                     try {
@@ -94,35 +94,35 @@ public class MusicManager {
     * Always call this method in a new thread
      */
     public static void play(@NotNull MusicObj musicObj, MinecraftServer server) {
-        Set<ServerPlayerEntity> playerList = PlayerManager.getNekoPlayerSet();
+        Set<ServerPlayer> playerList = PlayerManager.getNekoPlayerSet();
         if (playerList.isEmpty())
             return;
 
         HudManager.sendMetadata(musicObj);
         HudManager.sendPlayList();
 
-        server.getPlayerManager().broadcast(PacketHelper.getPlayMessage(musicObj), false);
+        server.getPlayerList().broadcastSystemMessage(PacketHelper.getPlayMessage(musicObj), false);
     }
 
-    public static void playToPlayer(@NotNull MusicObj musicObj, ServerPlayerEntity player, boolean seek) {
+    public static void playToPlayer(@NotNull MusicObj musicObj, ServerPlayer player, boolean seek) {
         HudManager.sendMetadata(musicObj, player, seek);
         HudManager.sendPlayList(player);
-        player.sendMessage(PacketHelper.getPlayMessage(musicObj), false);
+        player.displayClientMessage(PacketHelper.getPlayMessage(musicObj), false);
     }
 
-    public static void resumeToPlayer(ServerPlayerEntity player) {
+    public static void resumeToPlayer(ServerPlayer player) {
         if (NekoMusic.currentMusic == null) return;
         playToPlayer(NekoMusic.currentMusic, player, System.currentTimeMillis() - NekoMusic.currentStartTime > 5000);  // don't seek if the audio has been playing for less than 5 seconds
     }
 
-    public static void next(MinecraftServer server, ServerCommandSource source) {
-        source.sendFeedback(PacketHelper.getWorkingMessage(), false);
+    public static void next(MinecraftServer server, CommandSourceStack source) {
+        source.sendSuccess(PacketHelper.getWorkingMessage(), false);
         playNext(server);
     }
 
-    public static void vote(MinecraftServer server,  ServerCommandSource source) {
-        if (source.isExecutedByPlayer()) {
-            NekoMusic.currentVote.add(source.getName());
+    public static void vote(MinecraftServer server,  CommandSourceStack source) {
+        if (source.isPlayer()) {
+            NekoMusic.currentVote.add(source.getTextName());
         } else {
             NekoMusic.currentVote.add("console");
             NekoMusic.LOGGER.warn("Got vote from console, this should not happen, please check your permission manager.");
@@ -131,12 +131,12 @@ public class MusicManager {
                 >= NekoMusic.CONFIG.voteThreshold) {
             next(server, source);
         } else {
-            server.getPlayerManager().broadcast(PacketHelper.getVoteMessage(
+            server.getPlayerList().broadcastSystemMessage(PacketHelper.getVoteMessage(
                     NekoMusic.currentVote.size(), PlayerManager.getOnlineRealPlayerList(server).size()), false);
         }
     }
 
-    public static void order(MinecraftServer server, ServerCommandSource source, String url, boolean skipIdle, boolean addToFirst) {
+    public static void order(MinecraftServer server, CommandSourceStack source, String url, boolean skipIdle, boolean addToFirst) {
         long id;
         if (intPattern.matcher(url).matches()) {
             id = Long.parseLong(url);
@@ -154,7 +154,7 @@ public class MusicManager {
             }
         }
 
-        source.sendFeedback(PacketHelper.getWorkingMessage(), false);
+        source.sendSuccess(PacketHelper.getWorkingMessage(), false);
 
         NekoMusic.EXECUTOR.execute(() -> {
             long real_id = 0;
@@ -171,13 +171,13 @@ public class MusicManager {
                         }
                     }
                 } catch (Exception e) {
-                    source.sendFeedback(PacketHelper.getOrderMessage(), false);
+                    source.sendSuccess(PacketHelper.getOrderMessage(), false);
                     return;
                 }
             }
             if (real_id <= 0) {
                 if (id <= 0) {
-                    source.sendFeedback(PacketHelper.getOrderMessage(), false);
+                    source.sendSuccess(PacketHelper.getOrderMessage(), false);
                     return;
                 } else {
                     real_id = id;
@@ -185,18 +185,18 @@ public class MusicManager {
             }
             if ((NekoMusic.currentMusic != null && NekoMusic.currentMusic.id == real_id)
                     || (NekoMusic.orderList.hasSong(real_id) && !(addToFirst && skipIdle))) {
-                source.sendFeedback(PacketHelper.getOrderedMessage(), false);
+                source.sendSuccess(PacketHelper.getOrderedMessage(), false);
                 return;
             }
             if (NekoMusic.CONFIG.bannedSongs != null && NekoMusic.CONFIG.bannedSongs.contains(real_id)
                     && !Permissions.check(source, "nekomusic.bypassban", 1)) {
-                source.sendFeedback(PacketHelper.getBannedMessage(), false);
+                source.sendSuccess(PacketHelper.getBannedMessage(), false);
                 return;
             }
             MusicObj musicObj = Api.getMusicInfo(real_id);
             if (musicObj != null) {
-                if (source.isExecutedByPlayer()) {
-                    musicObj.player = source.getName();
+                if (source.isPlayer()) {
+                    musicObj.player = source.getTextName();
                 } else {
                     musicObj.player = "console";
                 }
@@ -206,7 +206,7 @@ public class MusicManager {
                 } else {
                     NekoMusic.orderList.add(musicObj);
                 }
-                server.getPlayerManager().broadcast(PacketHelper.getOrderMessage(musicObj), false);
+                server.getPlayerList().broadcastSystemMessage(PacketHelper.getOrderMessage(musicObj), false);
                 if (((!NekoMusic.orderList.isPlaying && (skipIdle || NekoMusic.idleList.size() <= 0)) || addToFirst)
                         && !PlayerManager.getNekoPlayerSet().isEmpty()) {
                     playNext(server);
@@ -215,67 +215,67 @@ public class MusicManager {
                     HudManager.sendPlayList();
                 }
             } else {
-                source.sendFeedback(PacketHelper.getOrderMessage(), false);
+                source.sendSuccess(PacketHelper.getOrderMessage(), false);
             }
         });
     }
 
-    public static void del(MinecraftServer server, ServerCommandSource source, int index) {
+    public static void del(MinecraftServer server, CommandSourceStack source, int index) {
         if (index <= 0 || index > NekoMusic.orderList.size()) {
-            source.sendFeedback(PacketHelper.getDelMessage(1), true);
+            source.sendSuccess(PacketHelper.getDelMessage(1), true);
             return;
         }
         MusicObj musicObj = NekoMusic.orderList.get(index - 1);
         del(server, source, musicObj);
     }
 
-    public static void del(MinecraftServer server, ServerCommandSource source, long id) {
+    public static void del(MinecraftServer server, CommandSourceStack source, long id) {
         MusicObj musicObj = NekoMusic.orderList.get(id);
         if (musicObj == null) {
-            source.sendFeedback(PacketHelper.getDelMessage(1), true);
+            source.sendSuccess(PacketHelper.getDelMessage(1), true);
             return;
         }
         del(server, source, musicObj);
     }
 
-    static void del(MinecraftServer server, ServerCommandSource source, MusicObj musicObj) {
-        if (musicObj.player.equals(source.getName())
+    static void del(MinecraftServer server, CommandSourceStack source, MusicObj musicObj) {
+        if (musicObj.player.equals(source.getTextName())
                 || Permissions.check(source, "nekomusic.del.other", 1)) {
             NekoMusic.orderList.remove(musicObj);
-            source.sendFeedback(PacketHelper.getDelMessage(musicObj), true);
+            source.sendSuccess(PacketHelper.getDelMessage(musicObj), true);
 //            HudManager.sendList();
             HudManager.sendPlayList();
         } else {
-            source.sendFeedback(PacketHelper.getDelMessage(2), false);
+            source.sendSuccess(PacketHelper.getDelMessage(2), false);
         }
     }
 
-    public static void list(MinecraftServer server, ServerCommandSource source) {
-        source.sendFeedback(PacketHelper.getListMessage(), false);
+    public static void list(MinecraftServer server, CommandSourceStack source) {
+        source.sendSuccess(PacketHelper.getListMessage(), false);
     }
 
-    public static void search(MinecraftServer server, ServerCommandSource source, String keyword, int page) {
-        source.sendFeedback(PacketHelper.getWorkingMessage(), false);
+    public static void search(MinecraftServer server, CommandSourceStack source, String keyword, int page) {
+        source.sendSuccess(PacketHelper.getWorkingMessage(), false);
         NekoMusic.EXECUTOR.execute(() -> {
             Api.SearchResult result = Api.search(keyword, page, 10);
             if (result != null && result.result != null) {
-                source.sendFeedback(PacketHelper.getSearchMessage(result, source), false);
+                source.sendSuccess(PacketHelper.getSearchMessage(result, source), false);
             } else {
-                source.sendFeedback(PacketHelper.getSearchMessage(), false);
+                source.sendSuccess(PacketHelper.getSearchMessage(), false);
             }
         });
     }
 
-    public static void ban(MinecraftServer server, ServerCommandSource source, long id) {
+    public static void ban(MinecraftServer server, CommandSourceStack source, long id) {
         if (NekoMusic.CONFIG.bannedSongs == null) {
             NekoMusic.CONFIG.bannedSongs = new ArrayList<>();
         }
         if (NekoMusic.CONFIG.bannedSongs.contains(id)) {
-            source.sendFeedback(PacketHelper.getBanMessage(1), false);
+            source.sendSuccess(PacketHelper.getBanMessage(1), false);
             return;
         }
         if (id <= 0) {
-            source.sendFeedback(PacketHelper.getBanMessage(2), false);
+            source.sendSuccess(PacketHelper.getBanMessage(2), false);
             return;
         }
         NekoMusic.CONFIG.bannedSongs.add(id);
@@ -284,16 +284,16 @@ public class MusicManager {
             playNext(server);
         }
         NekoMusic.orderList.remove(id);
-        source.sendFeedback(PacketHelper.getBanMessage(3), false);
+        source.sendSuccess(PacketHelper.getBanMessage(3), false);
     }
 
-    public static void unban(MinecraftServer server, ServerCommandSource source, long id) {
+    public static void unban(MinecraftServer server, CommandSourceStack source, long id) {
         if (NekoMusic.CONFIG.bannedSongs == null || !NekoMusic.CONFIG.bannedSongs.contains(id)) {
-            source.sendFeedback(PacketHelper.getUnbanMessage(1), false);
+            source.sendSuccess(PacketHelper.getUnbanMessage(1), false);
             return;
         }
         NekoMusic.CONFIG.bannedSongs.remove(id);
         ModConfig.save();
-        source.sendFeedback(PacketHelper.getUnbanMessage(2), false);
+        source.sendSuccess(PacketHelper.getUnbanMessage(2), false);
     }
 }

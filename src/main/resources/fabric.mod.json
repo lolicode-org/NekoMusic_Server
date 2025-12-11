@@ -10,7 +10,7 @@
   "contact": {
     "repo": "https://github.com/lolicode-org/NekoMusic_Server"
   },
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "icon": "assets/nekomusic/icon.png",
   "environment": "server",
   "entrypoints": {
@@ -22,11 +22,11 @@
     "nekomusic.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.14",
+    "fabricloader": ">=0.18.2",
     "fabric": "*",
-    "minecraft": ">=1.21.6",
+    "minecraft": ">=1.21.11",
     "fabric-permissions-api-v0": "*",
     "fabric-language-kotlin": "*",
-    "badpackets": ">=0.9.0"
+    "badpackets": ">=0.11.1"
   }
 }

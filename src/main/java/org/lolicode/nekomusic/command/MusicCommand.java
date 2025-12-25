@@ -4,37 +4,45 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.permissions.PermissionLevel;
+import org.jetbrains.annotations.NotNull;
 import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.config.ModConfig;
 import org.lolicode.nekomusic.helper.LoginHelper;
-import org.lolicode.nekomusic.helper.PacketHelper;
 import org.lolicode.nekomusic.manager.MusicManager;
 import org.lolicode.nekomusic.music.SongList;
 
+import java.util.function.Predicate;
+
 public class MusicCommand {
+    private static CommandSourceStack noPermissionSource = null;
+
+    public static void setNoPermissionSource(CommandSourceStack source) {
+        noPermissionSource = source;
+    }
+
     /*
-    * Helper function to check permission and send denial message
-    * Use this instead of .requires() to bypass confirmation dialogue on 1.21.11+
-    * (IDK why this feature was added in 1.21.6 but cause issue only in 1.21.11+)
+        * A permission predicate that always returns true for the no-permission source.
+        * 1.21.11+ uses a no-permission source to check if command requires privilege,
+        * without any way to manually specify it.
+        * To avoid popups for normal players, we need to bypass permission checks for that source.
      */
-    private static boolean checkPermission(CommandContext<CommandSourceStack> context, String permission, PermissionLevel defaultRequiredLevel) {
-        if (!Permissions.check(context.getSource(), permission, defaultRequiredLevel)) {
-            context.getSource().sendFailure(PacketHelper.getPermissionDeniedMessage());
-            return false;
-        }
-        return true;
+    private static Predicate<CommandSourceStack> requireUnrestricted(@NotNull String Permission, @NotNull PermissionLevel defaultRequiredLevel) {
+        var predicate = Permissions.require(Permission, defaultRequiredLevel);
+        return source -> {
+            if (noPermissionSource != null && source == noPermissionSource) return true;
+            return predicate.test(source);
+        };
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         LiteralCommandNode<CommandSourceStack> rootNode = Commands.literal("music")
-//                .requires(Permissions.require("nekomusic", PermissionLevel.ALL))
+                .requires(requireUnrestricted("nekomusic", PermissionLevel.ALL))
                 .then(Commands.argument("url", StringArgumentType.greedyString())
                         .requires(Permissions.require("nekomusic.add", PermissionLevel.ALL))
                         .executes(context -> {
@@ -60,46 +68,34 @@ public class MusicCommand {
                                 })))
                 .build();
         LiteralCommandNode<CommandSourceStack> addNode = Commands.literal("add")
-//                .requires(Permissions.require("nekomusic.add", PermissionLevel.ALL))
+                .requires(requireUnrestricted("nekomusic.add", PermissionLevel.ALL))
                 .then(Commands.argument("url", StringArgumentType.greedyString())
                         .executes(context -> {
-                            if (!checkPermission(context, "nekomusic.add", PermissionLevel.ALL)) {
-                                return 0;
-                            }
                             String url = StringArgumentType.getString(context, "url");
                             MusicManager.order(context.getSource().getServer(), context.getSource(), url, false, false);
                             return 0;
                         }))
                 .then(Commands.literal("--now")
-//                        .requires(Permissions.require("nekomusic.add.now", PermissionLevel.ALL))
+                        .requires(requireUnrestricted("nekomusic.add.now", PermissionLevel.ALL))
                         .then(Commands.argument("url", StringArgumentType.greedyString())
                                 .executes(context -> {
-                                    if (!checkPermission(context, "nekomusic.add.now", PermissionLevel.ALL)) {
-                                        return 0;
-                                    }
                                     String url = StringArgumentType.getString(context, "url");
                                     MusicManager.order(context.getSource().getServer(), context.getSource(), url, true, false);
                                     return 0;
                                 })))
                 .then(Commands.literal("--replace")
-//                        .requires(Permissions.require("nekomusic.add.replace", PermissionLevel.MODERATORS))
+                        .requires(requireUnrestricted("nekomusic.add.replace", PermissionLevel.MODERATORS))
                         .then(Commands.argument("url", StringArgumentType.greedyString())
                                 .executes(context -> {
-                                    if (!checkPermission(context, "nekomusic.add.replace", PermissionLevel.MODERATORS)) {
-                                        return 0;
-                                    }
                                     String url = StringArgumentType.getString(context, "url");
                                     MusicManager.order(context.getSource().getServer(), context.getSource(), url, true, true);
                                     return 0;
                                 })))
                 .build();
         LiteralCommandNode<CommandSourceStack> delNode = Commands.literal("del")
-//                .requires(Permissions.require("nekomusic.del", PermissionLevel.ALL))
+                .requires(requireUnrestricted("nekomusic.del", PermissionLevel.ALL))
                 .then(Commands.argument("index", IntegerArgumentType.integer())
                         .executes(context -> {
-                            if (!checkPermission(context, "nekomusic.del", PermissionLevel.ALL)) {
-                                return 0;
-                            }
                             int index = IntegerArgumentType.getInteger(context, "index");
                             MusicManager.del(context.getSource().getServer(), context.getSource(), index);
                             return 0;
@@ -107,33 +103,24 @@ public class MusicCommand {
                 .then(Commands.literal("id")
                         .then(Commands.argument("id", LongArgumentType.longArg())
                                 .executes(context -> {
-                                    if (!checkPermission(context, "nekomusic.del", PermissionLevel.ALL)) {
-                                        return 0;
-                                    }
                                     long id = LongArgumentType.getLong(context, "id");
                                     MusicManager.del(context.getSource().getServer(), context.getSource(), id);
                                     return 0;
                                 })))
                 .build();
         LiteralCommandNode<CommandSourceStack> banNode = Commands.literal("ban")
-//                .requires(Permissions.require("nekomusic.ban", PermissionLevel.MODERATORS))
-                    .then(Commands.argument("id", LongArgumentType.longArg())
-                            .executes(context -> {
-                                if (!checkPermission(context, "nekomusic.ban", PermissionLevel.MODERATORS)) {
-                                    return 0;
-                                }
-                                long id = LongArgumentType.getLong(context, "id");
-                                MusicManager.ban(context.getSource().getServer(), context.getSource(), id);
-                                return 0;
-                            }))
-                .build();
-        LiteralCommandNode<CommandSourceStack> unbanNode = Commands.literal("unban")
-//                .requires(Permissions.require("nekomusic.unban", PermissionLevel.MODERATORS))
+                .requires(requireUnrestricted("nekomusic.ban", PermissionLevel.MODERATORS))
                 .then(Commands.argument("id", LongArgumentType.longArg())
                         .executes(context -> {
-                            if (!checkPermission(context, "nekomusic.unban", PermissionLevel.MODERATORS)) {
-                                return 0;
-                            }
+                            long id = LongArgumentType.getLong(context, "id");
+                            MusicManager.ban(context.getSource().getServer(), context.getSource(), id);
+                            return 0;
+                        }))
+                .build();
+        LiteralCommandNode<CommandSourceStack> unbanNode = Commands.literal("unban")
+                .requires(requireUnrestricted("nekomusic.unban", PermissionLevel.MODERATORS))
+                .then(Commands.argument("id", LongArgumentType.longArg())
+                        .executes(context -> {
                             long id = LongArgumentType.getLong(context, "id");
                             MusicManager.unban(context.getSource().getServer(), context.getSource(), id);
                             return 0;
@@ -146,8 +133,8 @@ public class MusicCommand {
                     return 0;
                 }).build();
         LiteralCommandNode<CommandSourceStack> nextNode = Commands.literal("next")
-                .requires(Permissions.require("nekomusic.next", PermissionLevel.MODERATORS)
-                        .or(Permissions.require("nekomusic.vote", PermissionLevel.ALL)))
+                .requires(requireUnrestricted("nekomusic.next", PermissionLevel.MODERATORS)
+                        .or(requireUnrestricted("nekomusic.vote", PermissionLevel.ALL)))
                 .executes(context -> {
                     if (Permissions.check(context.getSource(), "nekomusic.next", PermissionLevel.MODERATORS))
                         MusicManager.next(context.getSource().getServer(), context.getSource());
@@ -156,14 +143,11 @@ public class MusicCommand {
                     return 0;
                 }).build();
         LiteralCommandNode<CommandSourceStack> searchNode = Commands.literal("search")
-//                .requires(Permissions.require("nekomusic.search", PermissionLevel.ALL))
+                .requires(requireUnrestricted("nekomusic.search", PermissionLevel.ALL))
                 .then(Commands.literal("page")
                         .then(Commands.argument("page", IntegerArgumentType.integer())
                                 .then(Commands.argument("keyword", StringArgumentType.greedyString())
                                         .executes(context -> {
-                                            if (!checkPermission(context, "nekomusic.search", PermissionLevel.ALL)) {
-                                                return 0;
-                                            }
                                             String keyword = StringArgumentType.getString(context, "keyword");
                                             int page = IntegerArgumentType.getInteger(context, "page");
                                             MusicManager.search(context.getSource().getServer(), context.getSource(), keyword, page);
@@ -171,9 +155,6 @@ public class MusicCommand {
                                         }))))
                 .then(Commands.argument("keyword", StringArgumentType.greedyString())
                         .executes(context -> {
-                            if (!checkPermission(context, "nekomusic.search", PermissionLevel.ALL)) {
-                                return 0;
-                            }
                             String keyword = StringArgumentType.getString(context, "keyword");
                             MusicManager.search(context.getSource().getServer(), context.getSource(), keyword, 1);
                             return 0;

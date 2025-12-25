@@ -49,10 +49,6 @@ public class PacketHelper {
         return PacketByteBufs.create().writeUtf(serialized);
     }
 
-    public static Component getPermissionDeniedMessage() {
-        return Component.nullToEmpty(LanguageManager.getMessage("misc.no_permission"));
-    }
-
     public static Component getPlayMessage(@NotNull MusicObj musicObj) {
         String player = musicObj.player;
         if (player == null || player.isBlank())

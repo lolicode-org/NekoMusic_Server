@@ -64,7 +64,6 @@ public class LanguageManager {
         zhCN.put("player.default", "默认");
         zhCN.put("list.previous_page", "上一页");
         zhCN.put("list.next_page", "下一页");
-        zhCN.put("misc.no_permission", "§c你没有足够的权限执行此操作");
 
         Map<String, String> enUS = new HashMap<>();
         enUS.put("config.reloaded", "§eNekoMusic: Config reloaded");
@@ -121,7 +120,6 @@ public class LanguageManager {
         enUS.put("player.default", "Default");
         enUS.put("list.previous_page", "Previous Page");
         enUS.put("list.next_page", "Next Page");
-        enUS.put("misc.no_permission", "§cYou don't have enough permission to perform this action");
 
         messages.put("zh-CN", zhCN);
         messages.put("en-US", enUS);

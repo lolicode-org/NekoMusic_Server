@@ -222,11 +222,11 @@ public class MusicManager {
     }
 
     public static void del(MinecraftServer server, CommandSourceStack source, int index) {
-        if (index <= 0 || index > NekoMusic.orderList.size()) {
+        MusicObj musicObj = NekoMusic.orderList.getByIndex(index - 1);
+        if (musicObj == null) {
             source.sendSuccess(PacketHelper.getDelMessage(1), true);
             return;
         }
-        MusicObj musicObj = NekoMusic.orderList.get(index - 1);
         del(server, source, musicObj);
     }
 

@@ -46,6 +46,16 @@ public class SongList {
         }
     }
 
+    public MusicObj getByIndex(int index) {
+        try {
+            lock.lock();
+            if (index < 0 || index >= songs.size()) return null;
+            return songs.get(index);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public MusicObj get(long id) {
         try {
             lock.lock();

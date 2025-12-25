@@ -9,6 +9,7 @@ import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.PermissionLevel;
 import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.config.ModConfig;
 import org.lolicode.nekomusic.helper.LoginHelper;
@@ -18,16 +19,16 @@ import org.lolicode.nekomusic.music.SongList;
 public class MusicCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         LiteralCommandNode<CommandSourceStack> rootNode = Commands.literal("music")
-                .requires(Permissions.require("nekomusic", 0))
+                .requires(Permissions.require("nekomusic", PermissionLevel.ALL))
                 .then(Commands.argument("url", StringArgumentType.greedyString())
-                        .requires(Permissions.require("nekomusic.add", 0))
+                        .requires(Permissions.require("nekomusic.add", PermissionLevel.ALL))
                         .executes(context -> {
                             String url = StringArgumentType.getString(context, "url");
                             MusicManager.order(context.getSource().getServer(), context.getSource(), url, false, false);
                             return 0;
                         }))
                 .then(Commands.literal("--now")
-                        .requires(Permissions.require("nekomusic.add.now", 0))
+                        .requires(Permissions.require("nekomusic.add.now", PermissionLevel.ALL))
                         .then(Commands.argument("url", StringArgumentType.greedyString())
                                 .executes(context -> {
                                     String url = StringArgumentType.getString(context, "url");
@@ -35,7 +36,7 @@ public class MusicCommand {
                                     return 0;
                                 })))
                 .then(Commands.literal("--replace")
-                        .requires(Permissions.require("nekomusic.add.replace", 1))
+                        .requires(Permissions.require("nekomusic.add.replace", PermissionLevel.MODERATORS))
                         .then(Commands.argument("url", StringArgumentType.greedyString())
                                 .executes(context -> {
                                     String url = StringArgumentType.getString(context, "url");
@@ -44,7 +45,7 @@ public class MusicCommand {
                                 })))
                 .build();
         LiteralCommandNode<CommandSourceStack> addNode = Commands.literal("add")
-                .requires(Permissions.require("nekomusic.add", 0))
+                .requires(Permissions.require("nekomusic.add", PermissionLevel.ALL))
                 .then(Commands.argument("url", StringArgumentType.greedyString())
                         .executes(context -> {
                             String url = StringArgumentType.getString(context, "url");
@@ -52,7 +53,7 @@ public class MusicCommand {
                             return 0;
                         }))
                 .then(Commands.literal("--now")
-                        .requires(Permissions.require("nekomusic.add.now", 0))
+                        .requires(Permissions.require("nekomusic.add.now", PermissionLevel.ALL))
                         .then(Commands.argument("url", StringArgumentType.greedyString())
                                 .executes(context -> {
                                     String url = StringArgumentType.getString(context, "url");
@@ -60,7 +61,7 @@ public class MusicCommand {
                                     return 0;
                                 })))
                 .then(Commands.literal("--replace")
-                        .requires(Permissions.require("nekomusic.add.replace", 1))
+                        .requires(Permissions.require("nekomusic.add.replace", PermissionLevel.MODERATORS))
                         .then(Commands.argument("url", StringArgumentType.greedyString())
                                 .executes(context -> {
                                     String url = StringArgumentType.getString(context, "url");
@@ -69,7 +70,7 @@ public class MusicCommand {
                                 })))
                 .build();
         LiteralCommandNode<CommandSourceStack> delNode = Commands.literal("del")
-                .requires(Permissions.require("nekomusic.del", 0))
+                .requires(Permissions.require("nekomusic.del", PermissionLevel.ALL))
                 .then(Commands.argument("index", IntegerArgumentType.integer())
                         .executes(context -> {
                             int index = IntegerArgumentType.getInteger(context, "index");
@@ -85,7 +86,7 @@ public class MusicCommand {
                                 })))
                 .build();
         LiteralCommandNode<CommandSourceStack> banNode = Commands.literal("ban")
-                .requires(Permissions.require("nekomusic.ban", 1))
+                .requires(Permissions.require("nekomusic.ban", PermissionLevel.MODERATORS))
                     .then(Commands.argument("id", LongArgumentType.longArg())
                             .executes(context -> {
                                 long id = LongArgumentType.getLong(context, "id");
@@ -94,7 +95,7 @@ public class MusicCommand {
                             }))
                 .build();
         LiteralCommandNode<CommandSourceStack> unbanNode = Commands.literal("unban")
-                .requires(Permissions.require("nekomusic.unban", 1))
+                .requires(Permissions.require("nekomusic.unban", PermissionLevel.MODERATORS))
                 .then(Commands.argument("id", LongArgumentType.longArg())
                         .executes(context -> {
                             long id = LongArgumentType.getLong(context, "id");
@@ -103,23 +104,23 @@ public class MusicCommand {
                         }))
                 .build();
         LiteralCommandNode<CommandSourceStack> listNode = Commands.literal("list")
-                .requires(Permissions.require("nekomusic.list", 0))
+                .requires(Permissions.require("nekomusic.list", PermissionLevel.ALL))
                 .executes(context -> {
                     MusicManager.list(context.getSource().getServer(), context.getSource());
                     return 0;
                 }).build();
         LiteralCommandNode<CommandSourceStack> nextNode = Commands.literal("next")
-                .requires(Permissions.require("nekomusic.next", 1)
-                        .or(Permissions.require("nekomusic.vote", 0)))
+                .requires(Permissions.require("nekomusic.next", PermissionLevel.MODERATORS)
+                        .or(Permissions.require("nekomusic.vote", PermissionLevel.ALL)))
                 .executes(context -> {
-                    if (Permissions.check(context.getSource(), "nekomusic.next", 1))
+                    if (Permissions.check(context.getSource(), "nekomusic.next", PermissionLevel.MODERATORS))
                         MusicManager.next(context.getSource().getServer(), context.getSource());
                     else
                         MusicManager.vote(context.getSource().getServer(), context.getSource());
                     return 0;
                 }).build();
         LiteralCommandNode<CommandSourceStack> searchNode = Commands.literal("search")
-                .requires(Permissions.require("nekomusic.search", 0))
+                .requires(Permissions.require("nekomusic.search", PermissionLevel.ALL))
                 .then(Commands.literal("page")
                         .then(Commands.argument("page", IntegerArgumentType.integer())
                                 .then(Commands.argument("keyword", StringArgumentType.greedyString())
@@ -136,15 +137,15 @@ public class MusicCommand {
                             return 0;
                         })).build();
         LiteralCommandNode<CommandSourceStack> reloadNode = Commands.literal("reload")
-                .requires(Permissions.require("nekomusic.reload", 1))
+                .requires(Permissions.require("nekomusic.reload", PermissionLevel.MODERATORS))
                 .then(Commands.literal("all")
-                        .requires(Permissions.require("nekomusic.reload.all", 2))
+                        .requires(Permissions.require("nekomusic.reload.all", PermissionLevel.OWNERS))
                         .executes(context -> {
                             ModConfig.reload(context.getSource().getServer(), context.getSource());
                             return 0;
                         }))
                 .then(Commands.literal("list")
-                        .requires(Permissions.require("nekomusic.reload.list", 1))
+                        .requires(Permissions.require("nekomusic.reload.list", PermissionLevel.MODERATORS))
                         .executes(context -> {
                             if (NekoMusic.CONFIG.idleList > 0) {
                                 SongList.loadIdleList();
@@ -154,21 +155,21 @@ public class MusicCommand {
                         }))
                 .build();
         LiteralCommandNode<CommandSourceStack> loginNode = Commands.literal("login")
-                .requires(Permissions.require("nekomusic.login", 4))
+                .requires(Permissions.require("nekomusic.login", PermissionLevel.OWNERS))
                 .then(Commands.literal("start")
-                        .requires(Permissions.require("nekomusic.login.start", 4))
+                        .requires(Permissions.require("nekomusic.login.start", PermissionLevel.OWNERS))
                         .executes(context -> {
                             LoginHelper.genQr(context.getSource());
                             return 0;
                         }))
                 .then(Commands.literal("check")
-                        .requires(Permissions.require("nekomusic.login.check", 4))
+                        .requires(Permissions.require("nekomusic.login.check", PermissionLevel.OWNERS))
                         .executes(context -> {
                             LoginHelper.check(context.getSource());
                             return 0;
                         }))
                 .then(Commands.literal("status")
-                        .requires(Permissions.require("nekomusic.login.status", 4))
+                        .requires(Permissions.require("nekomusic.login.status", PermissionLevel.OWNERS))
                         .executes(context -> {
                             LoginHelper.status(context.getSource());
                             return 0;

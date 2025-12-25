@@ -11,6 +11,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.server.permissions.PermissionLevel;
 import org.jetbrains.annotations.NotNull;
 import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.manager.LanguageManager;
@@ -148,8 +149,8 @@ public class PacketHelper {
             int num = 0;
             for (Api.SearchResult.Result.OneSong song : result.result.songs) {
                 if (NekoMusic.CONFIG.bannedSongs.contains(song.id) &&
-                        !(Permissions.check(source, "nekomusic.bypassban", 1) ||
-                                Permissions.check(source, "nekomusic.unban", 1))) {
+                        !(Permissions.check(source, "nekomusic.bypassban", PermissionLevel.MODERATORS) ||
+                                Permissions.check(source, "nekomusic.unban", PermissionLevel.MODERATORS))) {
                     continue;
                 }
                 text.append(
@@ -160,26 +161,26 @@ public class PacketHelper {
                         ).setStyle(Component.empty().getStyle()
                                 .withClickEvent(new ClickEvent.RunCommand("/music add " + song.id))
                                 .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.add"))))));
-                if (Permissions.check(source, "nekomusic.add.now", 0)) {
+                if (Permissions.check(source, "nekomusic.add.now", PermissionLevel.ALL)) {
                     text.append(Component.literal(" [▶]").setStyle(Component.empty().getStyle()
                             .withColor(TextColor.fromLegacyFormat(ChatFormatting.GOLD))
                             .withClickEvent(new ClickEvent.RunCommand("/music add --now " + song.id))
                             .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.add_now"))))
                     ));
                 }
-                if (Permissions.check(source, "nekomusic.add.replace", 1)) {
+                if (Permissions.check(source, "nekomusic.add.replace", PermissionLevel.MODERATORS)) {
                     text.append(Component.literal(" [⏩]").setStyle(Component.empty().getStyle()
                             .withColor(TextColor.fromLegacyFormat(ChatFormatting.GOLD))
                             .withClickEvent(new ClickEvent.RunCommand("/music add --replace " + song.id))
                             .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.add_force_now"))))
                     ));
                 }
-                if (NekoMusic.CONFIG.bannedSongs.contains(song.id) && Permissions.check(source, "nekomusic.unban", 1)) {
+                if (NekoMusic.CONFIG.bannedSongs.contains(song.id) && Permissions.check(source, "nekomusic.unban", PermissionLevel.MODERATORS)) {
                     text.append(Component.literal(" [✔]").setStyle(Component.empty().getStyle()
                             .withColor(TextColor.fromLegacyFormat(ChatFormatting.RED))
                             .withClickEvent(new ClickEvent.RunCommand("/music unban " + song.id))
                             .withHoverEvent(new HoverEvent.ShowText(Component.nullToEmpty(LanguageManager.getMessage("music.unban"))))));
-                } else if (Permissions.check(source, "nekomusic.ban", 1)) {
+                } else if (Permissions.check(source, "nekomusic.ban", PermissionLevel.MODERATORS)) {
                     text.append(Component.literal(" [X]").setStyle(Component.empty().getStyle()
                             .withColor(TextColor.fromLegacyFormat(ChatFormatting.RED))
                             .withClickEvent(new ClickEvent.RunCommand("/music ban " + song.id))

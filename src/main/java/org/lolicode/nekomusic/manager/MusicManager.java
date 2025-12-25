@@ -4,6 +4,7 @@ import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.PermissionLevel;
 import org.jetbrains.annotations.NotNull;
 import org.lolicode.nekomusic.NekoMusic;
 import org.lolicode.nekomusic.config.ModConfig;
@@ -189,7 +190,7 @@ public class MusicManager {
                 return;
             }
             if (NekoMusic.CONFIG.bannedSongs != null && NekoMusic.CONFIG.bannedSongs.contains(real_id)
-                    && !Permissions.check(source, "nekomusic.bypassban", 1)) {
+                    && !Permissions.check(source, "nekomusic.bypassban", PermissionLevel.MODERATORS)) {
                 source.sendSuccess(PacketHelper.getBannedMessage(), false);
                 return;
             }
@@ -240,7 +241,7 @@ public class MusicManager {
 
     static void del(MinecraftServer server, CommandSourceStack source, MusicObj musicObj) {
         if (musicObj.player.equals(source.getTextName())
-                || Permissions.check(source, "nekomusic.del.other", 1)) {
+                || Permissions.check(source, "nekomusic.del.other", PermissionLevel.MODERATORS)) {
             NekoMusic.orderList.remove(musicObj);
             source.sendSuccess(PacketHelper.getDelMessage(musicObj), true);
 //            HudManager.sendList();

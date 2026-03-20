@@ -23,8 +23,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.18.2",
-    "fabric": "*",
-    "minecraft": ">=1.21.11",
+    "fabric-api": "*",
+    "minecraft": ">1.99",
     "fabric-permissions-api-v0": "*",
     "fabric-language-kotlin": "*",
     "badpackets": ">=0.11.1"

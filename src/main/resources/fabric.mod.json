@@ -22,11 +22,11 @@
     "nekomusic.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.18.2",
+    "fabricloader": ">=0.18.4",
     "fabric-api": "*",
-    "minecraft": ">1.99",
+    "minecraft": ">=26.1",
     "fabric-permissions-api-v0": "*",
     "fabric-language-kotlin": "*",
-    "badpackets": ">=0.11.1"
+    "badpackets": ">=0.12.1"
   }
 }

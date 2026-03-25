@@ -1,7 +1,7 @@
 package org.lolicode.nekomusic.helper;
 
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.FriendlyByteBufs;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.FriendlyByteBuf;
@@ -32,7 +32,7 @@ public class PacketHelper {
         musicObj.seekTo = seek ? (System.currentTimeMillis() - NekoMusic.currentStartTime) / 1000 : 0;
         String serialized = NekoMusic.GSON.toJson(musicObj);
 
-        return PacketByteBufs.create().writeUtf(serialized);
+        return FriendlyByteBufs.create().writeUtf(serialized);
     }
 
     public static FriendlyByteBuf getPlayListPacket() {
@@ -46,7 +46,7 @@ public class PacketHelper {
         }).toArray(MusicList.Music[]::new);
         String serialized = NekoMusic.GSON.toJson(musicList);
 
-        return PacketByteBufs.create().writeUtf(serialized);
+        return FriendlyByteBufs.create().writeUtf(serialized);
     }
 
     public static Component getPlayMessage(@NotNull MusicObj musicObj) {

@@ -108,7 +108,7 @@ public class MusicManager {
     public static void playToPlayer(@NotNull MusicObj musicObj, ServerPlayer player, boolean seek) {
         HudManager.sendMetadata(musicObj, player, seek);
         HudManager.sendPlayList(player);
-        player.displayClientMessage(PacketHelper.getPlayMessage(musicObj), false);
+        player.sendSystemMessage(PacketHelper.getPlayMessage(musicObj), false);
     }
 
     public static void resumeToPlayer(ServerPlayer player) {

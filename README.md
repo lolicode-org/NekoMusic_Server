@@ -6,6 +6,16 @@
 
 适用于Fabric服务端的点歌Mod
 
+> [!CAUTION]
+> 本模组已停止开发。如果有严重的 bug，你仍可在 issues 里提出，我可能会修复它们。但本模组将不会再接收到任何功能更新，也不会被移植到任何新的 Minecraft 版本。
+>
+> 这并不代表我们放弃了本模组的用户。相反，我们编写了一个全新的模组，它在包含本模组几乎全部功能的基础上，额外加入了对单人模式的支持、简洁完善的 GUI、由插件驱动的多音源支持，以及，仍然 100% 开源。现有的服务端可以下载以下模组来进行无缝迁移：
+> - [MoeMusic](https://modrinth.com/mod/moemusic) 核心模组
+> - [MoeMusic NCM Lite Source](https://github.com/lolicode-org/MoeMusic-NCM-Lite-Source) 某云音乐音源
+> - [MoeMusic NekoCompat](https://github.com/lolicode-org/MoeMusic-NekoCompat) 用于与 NekoMusic CLient 保持兼容的插件
+>
+> 尽管有兼容插件，我们仍然建议你通知你的玩家，换用新的模组以获得更佳的体验。
+
 ## 使用
 
 ### 服务端
